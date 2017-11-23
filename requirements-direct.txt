@@ -1,1 +1,2 @@
 requests==2.18.4
+rethinkdb==2.3.0.post6
