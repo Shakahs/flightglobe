@@ -66,7 +66,7 @@ const rules = [
   },
   {
     test: /\.(png|gif|jpg|svg)$/,
-    include: imgPath,
+    include: /node_modules/,
     use: 'url-loader?limit=20480&name=assets/[name]-[hash].[ext]',
   },
 ];
@@ -101,7 +101,7 @@ if (isProduction) {
     test: /\.[s]*css$/,
     use: ExtractTextPlugin.extract({
       fallback: 'style-loader',
-      use: ['css-loader', 'sass-loader'],
+      use: ['css-loader'],
     }),
   });
 } else {
@@ -122,7 +122,6 @@ if (isProduction) {
       // https://github.com/webpack/css-loader/issues/232#issuecomment-240449998
       // 'css-loader?sourceMap',
       'css-loader',
-      'sass-loader?sourceMap',
     ],
   });
 }
