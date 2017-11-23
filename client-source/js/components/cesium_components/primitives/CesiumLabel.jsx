@@ -6,7 +6,7 @@ import LabelStyle from 'cesium/Source/Scene/LabelStyle';
 import HorizontalOrigin from 'cesium/Source/Scene/HorizontalOrigin';
 import VerticalOrigin from 'cesium/Source/Scene/VerticalOrigin';
 
-import { shallowEqual } from 'utils/utils';
+import { shallowEqual } from '../../../utils/utils';
 
 
 export default class CesiumLabel extends Component {

@@ -5,7 +5,7 @@ import Color from 'cesium/Source/Core/Color';
 import Ellipsoid from 'cesium/Source/Core/Ellipsoid';
 import Material from 'cesium/Source/Scene/Material';
 
-import { shallowEqual } from 'utils/utils';
+import { shallowEqual } from '../../../utils/utils';
 
 export default class CesiumPolyline extends Component {
   componentDidMount() {

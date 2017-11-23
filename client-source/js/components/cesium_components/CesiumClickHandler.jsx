@@ -4,7 +4,7 @@ import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler'
 import SSET from 'cesium/Source/Core/ScreenSpaceEventType';
 import CesiumMath from 'cesium/Source/Core/Math';
 
-import { noop } from 'utils/utils';
+import { noop } from '../../utils/utils';
 
 export default class CesiumClickHandler extends Component {
     static defaultProps = {

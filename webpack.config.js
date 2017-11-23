@@ -136,8 +136,11 @@ module.exports = {
     path: buildPath,
     publicPath: '/',
     filename: 'app-[hash].js',
+    sourcePrefix: '',
   },
   module: {
+    unknownContextCritical: false,
+    unknownContextRegExp: /^.\/.*$/,
     rules,
   },
   resolve: {
@@ -159,7 +162,7 @@ module.exports = {
     disableHostCheck: true,
     proxy: [
       {
-        context: ['/api'],
+        context: ['/api', '/cesium'],
         target: `http://localhost:${ process.env.PORT }`,
       },
     ],

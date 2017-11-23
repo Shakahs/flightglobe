@@ -3,7 +3,7 @@ import { Component } from 'react';
 import CesiumMath from 'cesium/Source/Core/Math';
 import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 
-import { isUndefined } from 'utils/utils';
+import { isUndefined } from '../../utils/utils';
 
 
 export default class CesiumCameraManager extends Component {

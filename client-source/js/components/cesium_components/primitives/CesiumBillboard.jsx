@@ -4,7 +4,7 @@ import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 import HorizontalOrigin from 'cesium/Source/Scene/HorizontalOrigin';
 import VerticalOrigin from 'cesium/Source/Scene/VerticalOrigin';
 
-import { shallowEqual } from 'utils/utils';
+import { shallowEqual } from '../../../utils/utils';
 
 
 export default class CesiumBillboard extends Component {
