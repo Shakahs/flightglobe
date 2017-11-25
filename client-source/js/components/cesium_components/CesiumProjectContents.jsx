@@ -2,18 +2,22 @@ import React, { Component } from 'react';
 
 import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
 import CesiumEntity from './primitives/CesiumEntity';
+import ModelGraphics from 'cesium/Source/DataSources/ModelGraphics';
 
-const _ = require('lodash')
+const _ = require('lodash');
 
 export class CesiumProjectContents extends Component {
   constructor(props) {
     super(props);
 
-    this.planeData = new CustomDataSource('planedata');
-
-    this.primitiveCollections = [this.planeData];
-
     const { viewer } = props;
+
+    this.planeData = new CustomDataSource('planedata');
+    this.planeModel = new ModelGraphics({
+      uri: '/static/Cesium_Air.gltf',
+      minimumPixelSize: 32,
+      runAnimations: false,
+    });
 
     if (viewer) {
       viewer.dataSources.add(this.planeData);
@@ -34,6 +38,7 @@ export class CesiumProjectContents extends Component {
       (<CesiumEntity
         plane={ plane }
         planeData={ this.planeData }
+        planeModel={ this.planeModel }
         key={ plane.id }
       />));
 
