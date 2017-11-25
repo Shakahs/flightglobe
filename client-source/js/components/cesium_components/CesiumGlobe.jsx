@@ -14,101 +14,102 @@ import CesiumCameraManager from './CesiumCameraManager';
 
 
 export default class CesiumGlobe extends Component {
-    state = {
-      viewerLoaded: false,
+  constructor(props) {
+    super(props);
+    this.state = { viewerLoaded: false };
+  }
+
+  componentDidMount() {
+    const imageryProvider = new BingMapsImageryProvider({
+      url: BING_MAPS_URL,
+      key: BING_MAPS_KEY,
+    });
+
+    const terrainProvider = new CesiumTerrainProvider({
+      url: STK_TERRAIN_URL,
+    });
+
+    this.viewer = new Viewer(this.cesiumContainer, {
+      animation: false,
+      baseLayerPicker: false,
+      fullscreenButton: false,
+      geocoder: false,
+      homeButton: false,
+      infoBox: false,
+      sceneModePicker: false,
+      selectionIndicator: true,
+      timeline: false,
+      navigationHelpButton: false,
+      scene3DOnly: true,
+      imageryProvider,
+      terrainProvider,
+    });
+
+    // Force immediate re-render now that the Cesium viewer is created
+    this.setState({ viewerLoaded: true }); // eslint-disable-line react/no-did-mount-set-state
+  }
+
+  componentWillUnmount() {
+    if (this.viewer) {
+      this.viewer.destroy();
     }
+  }
 
-    componentDidMount() {
-      const imageryProvider = new BingMapsImageryProvider({
-        url: BING_MAPS_URL,
-        key: BING_MAPS_KEY,
-      });
+  renderContents() {
+    const { viewerLoaded } = this.state;
+    let contents = null;
 
-      const terrainProvider = new CesiumTerrainProvider({
-        url: STK_TERRAIN_URL,
-      });
+    if (viewerLoaded) {
+      const { scene } = this.viewer;
+      const {
+        onLeftClick, flyToLocation, planes,
+      } = this.props;
 
-      this.viewer = new Viewer(this.cesiumContainer, {
-        animation: false,
-        baseLayerPicker: false,
-        fullscreenButton: false,
-        geocoder: false,
-        homeButton: false,
-        infoBox: false,
-        sceneModePicker: false,
-        selectionIndicator: true,
-        timeline: false,
-        navigationHelpButton: false,
-        scene3DOnly: true,
-        imageryProvider,
-        terrainProvider,
-      });
-
-      // Force immediate re-render now that the Cesium viewer is created
-      this.setState({ viewerLoaded: true }); // eslint-disable-line react/no-did-mount-set-state
-    }
-
-    componentWillUnmount() {
-      if (this.viewer) {
-        this.viewer.destroy();
-      }
-    }
-
-    renderContents() {
-      const { viewerLoaded } = this.state;
-      let contents = null;
-
-      if (viewerLoaded) {
-        const { scene } = this.viewer;
-        const {
-          onLeftClick, flyToLocation, planes,
-        } = this.props;
-
-        contents = (
-          <span>
-            <CesiumProjectContents
-              viewer={ this.viewer }
-              planes={ planes }
-            />
-            <CesiumClickHandler
-              scene={ scene }
-              onLeftClick={ onLeftClick }
-            />
-            <CesiumCameraManager
-              camera={ scene.camera }
-              flyToLocation={ flyToLocation }
-            />
-          </span>
-        );
-      }
-
-      return contents;
-    }
-
-    render() {
-      const containerStyle = {
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'stretch',
-      };
-
-      const widgetStyle = {
-        flexGrow: 2,
-      };
-
-      const contents = this.renderContents();
-
-      return (
-        <div className='cesiumGlobeWrapper' style={ containerStyle }>
-          <div
-            className='cesiumWidget'
-            ref={ element => this.cesiumContainer = element }
-            style={ widgetStyle }
-          >
-            {contents}
-          </div>
-        </div>
+      contents = (
+        <span>
+          <CesiumProjectContents
+            viewer={ this.viewer }
+            planes={ planes }
+          />
+          <CesiumClickHandler
+            scene={ scene }
+            onLeftClick={ onLeftClick }
+          />
+          <CesiumCameraManager
+            camera={ scene.camera }
+            flyToLocation={ flyToLocation }
+          />
+        </span>
       );
     }
+
+    return contents;
+  }
+
+  render() {
+    const containerStyle = {
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      alignItems: 'stretch',
+    };
+
+    const widgetStyle = {
+      flexGrow: 2,
+    };
+
+    const contents = this.renderContents();
+
+    return (
+      <div className='cesiumGlobeWrapper' style={ containerStyle }>
+        <div
+          className='cesiumWidget'
+          ref={ element => this.cesiumContainer = element }
+          style={ widgetStyle }
+        >
+          {contents}
+        </div>
+      </div>
+    );
+  }
 }
