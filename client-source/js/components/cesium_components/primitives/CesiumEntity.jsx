@@ -40,7 +40,7 @@ export default class CesiumEntity extends Component {
       this.props.plane.lat,
       this.props.plane.altitude
     );
-    this.entity.position = position
+    this.entity.position = position;
     const heading = CesiumMath.toRadians(this.props.plane.heading);
     const hpr = new HeadingPitchRoll(heading, 0, 0);
     this.entity.orientation = Transforms.headingPitchRollQuaternion(position, hpr);
