@@ -1,6 +1,11 @@
 {
   "presets": [
-    "env",
+    ["env",{
+      "modules":false,
+      "targets": {
+        "browsers": ["chrome >= 62", "firefox >= 57"]
+      }
+    }],
     "react"
   ],
   "env": {
