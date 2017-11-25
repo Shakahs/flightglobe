@@ -1,26 +1,22 @@
 import React from 'react';
-import CesiumGlobe from '../cesium_components/CesiumGlobe';
 import axios from 'axios';
+import io from 'socket.io-client';
+import CesiumGlobe from '../cesium_components/CesiumGlobe';
 
 class App extends React.Component {
   constructor() {
     super();
-    this.loadPlaneData = this.loadPlaneData.bind(this);
-    this.state = { planes: [] };
+    this.state = { planes: {} };
   }
 
   componentDidMount() {
-    this.loadPlaneData();
+    const socket = io('http://localhost:5000', { path: '/updates' });
+    socket.on('update', (planes) => {
+      console.log('updating...');
+      this.setState({ planes });
+    });
   }
 
-  loadPlaneData() {
-    console.log('start request');
-    axios.get('/data')
-      .then(({ data }) => {
-        this.setState({ planes: data });
-        console.log(data);
-      });
-  }
   // async loadPlaneData() {
   //   const planes = await
   //   this.setState({ planes });

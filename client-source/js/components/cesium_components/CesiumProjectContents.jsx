@@ -1,15 +1,9 @@
 import React, { Component } from 'react';
 
-import BillboardCollection from 'cesium/Source/Scene/BillboardCollection';
-import EntityCollection from 'cesium/Source/DataSources/EntityCollection';
-import LabelCollection from 'cesium/Source/Scene/LabelCollection';
-import PolylineCollection from 'cesium/Source/Scene/PolylineCollection';
 import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
-
-import CesiumBillboard from './primitives/CesiumBillboard';
-import CesiumLabel from './primitives/CesiumLabel';
-import CesiumPolyline from './primitives/CesiumPolyline';
 import CesiumEntity from './primitives/CesiumEntity';
+
+const _ = require('lodash')
 
 export class CesiumProjectContents extends Component {
   constructor(props) {
@@ -36,7 +30,7 @@ export class CesiumProjectContents extends Component {
   render() {
     const { planes } = this.props;
 
-    const renderedPlanes = planes.map((plane) =>
+    const renderedPlanes = _.map(planes, (plane) =>
       (<CesiumEntity
         plane={ plane }
         planeData={ this.planeData }
