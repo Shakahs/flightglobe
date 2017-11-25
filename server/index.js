@@ -33,7 +33,6 @@ const streamData = async (io) => {
 
 app.get('/', (req, res) => res.send('Hello World!'));
 app.use('/cesium', express.static('./node_modules/cesium/Build/Cesium'));
-app.use('/static', express.static('./static'));
 app.get('/data', getData);
 
 const port = process.env.PORT || 5000;

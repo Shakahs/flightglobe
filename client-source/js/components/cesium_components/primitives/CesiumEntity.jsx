@@ -12,7 +12,10 @@ export default class CesiumEntity extends Component {
     super(props);
     const { planeData } = this.props;
     this.entity = planeData.entities.getOrCreateEntity(props.plane.id);
-    this.entity.model = props.planeModel;
+    this.entity.point = {
+      'pixelSize': 5,
+    };
+    // this.entity.model = props.planeModel;
     // this.entity.position = Cartesian3.fromDegrees(
     //   props.plane.lon,
     //   props.plane.lat,
