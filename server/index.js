@@ -14,7 +14,7 @@ const getData = async (req, res) => {
   const conn = await rethinkConnect();
   const cursor = await rethinkdb.table('flight_position').run(conn);
   const data = await cursor.toArray();
-  res.json(data);
+  res.json(data.slice(0, 50));
 };
 
 app.get('/', (req, res) => res.send('Hello World!'));

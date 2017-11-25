@@ -1,9 +1,33 @@
 import React from 'react';
 import CesiumGlobe from '../cesium_components/CesiumGlobe';
+import axios from 'axios';
 
 class App extends React.Component {
-  render() {
+  constructor() {
+    super();
+    this.loadPlaneData = this.loadPlaneData.bind(this);
+    this.state = { planes: [] };
+  }
 
+  componentDidMount() {
+    this.loadPlaneData();
+  }
+
+  loadPlaneData() {
+    console.log('start request');
+    axios.get('/data')
+      .then(({ data }) => {
+        this.setState({ planes: data });
+        console.log(data);
+      });
+  }
+  // async loadPlaneData() {
+  //   const planes = await
+  //   this.setState({ planes });
+  //   console.log(planes);
+  // }
+
+  render() {
     const containerStyle = {
       width: '100%',
       height: '100%',
@@ -14,21 +38,12 @@ class App extends React.Component {
       position: 'fixed',
     };
 
-
     return (
       <div style={ containerStyle }>
         <CesiumGlobe
+          planes={ this.state.planes }
           onLeftClick={ this.handleLeftClick }
         />
-        <div style={ { position: 'fixed', top: 0 } }>
-          <div style={ { color: 'white', fontSize: 40 } }>
-            Text Over the Globezzz
-          </div>
-          <button style={ { fontSize: 40 } } onClick={ this.handleFlyToClicked }>
-            Jump Camera Location
-          </button>
-        </div>
-
       </div>
     );
   }

@@ -162,7 +162,7 @@ module.exports = {
     disableHostCheck: true,
     proxy: [
       {
-        context: ['/api', '/cesium'],
+        context: ['/api', '/cesium', '/data'],
         target: `http://localhost:${ process.env.PORT }`,
       },
     ],
