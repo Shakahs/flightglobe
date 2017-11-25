@@ -1,74 +1,51 @@
 import React, { Component } from 'react';
 
 import BillboardCollection from 'cesium/Source/Scene/BillboardCollection';
+import EntityCollection from 'cesium/Source/DataSources/EntityCollection';
 import LabelCollection from 'cesium/Source/Scene/LabelCollection';
 import PolylineCollection from 'cesium/Source/Scene/PolylineCollection';
+import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
 
 import CesiumBillboard from './primitives/CesiumBillboard';
 import CesiumLabel from './primitives/CesiumLabel';
 import CesiumPolyline from './primitives/CesiumPolyline';
+import CesiumEntity from './primitives/CesiumEntity';
 
 export class CesiumProjectContents extends Component {
   constructor(props) {
     super(props);
 
-    this.billboards = new BillboardCollection();
-    this.labels = new LabelCollection();
-    this.polylines = new PolylineCollection();
+    this.planeData = new CustomDataSource('planedata');
 
-    this.primitiveCollections = [this.billboards, this.labels, this.polylines];
+    this.primitiveCollections = [this.planeData];
 
-    const { scene } = props;
+    const { viewer } = props;
 
-    if (scene) {
-      this.primitiveCollections.forEach(primitiveCollection => scene.primitives.add(primitiveCollection));
+    if (viewer) {
+      viewer.dataSources.add(this.planeData);
+      // viewer.dataSources.add(this.planeData).then(() => { console.log('data source added'); });
     }
   }
 
   componentWillUnmount() {
-    this.primitiveCollections.forEach(primitiveCollection => {
-      if (!primitiveCollection.isDestroyed()) {
-        primitiveCollection.destroy();
-      }
-    });
-
-    const { scene } = this.props;
-
-    if (scene && !scene.isDestroyed() && scene.primitives) {
-      this.primitiveCollections.forEach(primitiveCollection => scene.primitives.remove(primitiveCollection));
+    if (!this.planeData.isDestroyed()) {
+      this.planeData.destroy();
     }
   }
 
   render() {
-    const { icons = [], labels = [], polylines = [] } = this.props;
+    const { planes } = this.props;
 
-    const renderedBillboards = icons.map((icon, index) =>
-      (<CesiumBillboard
-        { ...icon }
-        billboards={ this.billboards }
-        key={ index }
+    const renderedPlanes = planes.map((plane) =>
+      (<CesiumEntity
+        plane={ plane }
+        planeData={ this.planeData }
+        key={ plane.id }
       />));
-
-    const renderedLabels = labels.map((label, index) =>
-      (<CesiumLabel
-        { ...label }
-        labels={ this.labels }
-        key={ index }
-      />));
-
-    const renderedPolylines = polylines.map((polyline, index) =>
-      (<CesiumPolyline
-        coords={ polyline }
-        polylines={ this.polylines }
-        key={ index }
-      />));
-
 
     return (
       <span>
-        {renderedBillboards}
-        {renderedLabels}
-        {renderedPolylines}
+        {renderedPlanes}
       </span>
     );
   }

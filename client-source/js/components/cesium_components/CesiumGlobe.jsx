@@ -61,16 +61,14 @@ export default class CesiumGlobe extends Component {
       if (viewerLoaded) {
         const { scene } = this.viewer;
         const {
-          icons, labels, polylines, onLeftClick, flyToLocation,
+          onLeftClick, flyToLocation, planes,
         } = this.props;
 
         contents = (
           <span>
             <CesiumProjectContents
-              scene={ scene }
-              icons={ icons }
-              labels={ labels }
-              polylines={ polylines }
+              viewer={ this.viewer }
+              planes={ planes }
             />
             <CesiumClickHandler
               scene={ scene }
