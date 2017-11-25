@@ -25,7 +25,10 @@ export class CesiumProjectContents extends Component {
     const handler = new ScreenSpaceEventHandler(viewer.scene.canvas);
     handler.setInputAction((click) => {
       const pickedObject = scene.pick(click.position);
-      console.log(pickedObject.id.id);
+      if (pickedObject) {
+        const entity = pickedObject.id;
+        console.log(entity.id);
+      }
     }, ScreenSpaceEventType.LEFT_CLICK);
 
     if (viewer) {
