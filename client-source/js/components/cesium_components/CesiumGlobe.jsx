@@ -62,7 +62,7 @@ export default class CesiumGlobe extends Component {
     if (viewerLoaded) {
       const { scene } = this.viewer;
       const {
-        onLeftClick, flyToLocation, planes,
+        flyToLocation, planes,
       } = this.props;
 
       contents = (
@@ -70,10 +70,6 @@ export default class CesiumGlobe extends Component {
           <CesiumProjectContents
             viewer={ this.viewer }
             planes={ planes }
-          />
-          <CesiumClickHandler
-            scene={ scene }
-            onLeftClick={ onLeftClick }
           />
           <CesiumCameraManager
             camera={ scene.camera }

@@ -31,7 +31,7 @@ export class CesiumProjectContents extends Component {
   }
 
   componentWillUnmount() {
-    if (!this.planeData.isDestroyed()) {
+    if (this.planeData && !this.planeData.isDestroyed()) {
       this.planeData.destroy();
     }
   }
