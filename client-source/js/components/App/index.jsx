@@ -1,6 +1,5 @@
 import React from 'react';
 import axios from 'axios';
-import io from 'socket.io-client';
 import CesiumGlobe from '../cesium_components/CesiumGlobe';
 
 class App extends React.Component {
@@ -10,10 +9,14 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    const socket = io('http://localhost:5000', { path: '/updates' });
-    socket.on('update', (planes) => {
-      console.log('updating...');
-      this.setState({ planes });
+    console.log('websocket attempt');
+    const sock = new WebSocket('ws://localhost:7999/data/all');
+    sock.addEventListener('open', () => {
+      console.log('websocket open');
+    });
+    sock.addEventListener('message', (event) => {
+      console.log('websocket message received');
+      this.setState({ planes: Object.assign({}, this.state.planes, JSON.parse(event.data)) });
     });
   }
 

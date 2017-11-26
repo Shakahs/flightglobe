@@ -107,7 +107,7 @@ if (isProduction) {
 } else {
   // Development plugins
   plugins.push(
-    new webpack.HotModuleReplacementPlugin(),
+    // new webpack.HotModuleReplacementPlugin(),
     new BundleAnalyzerPlugin({ openAnalyzer: false })
   );
 
@@ -156,14 +156,15 @@ module.exports = {
     historyApiFallback: true,
     port: 3000,
     compress: isProduction,
-    inline: !isProduction,
-    hot: !isProduction,
+    // inline: !isProduction,
+    // hot: !isProduction,
     host: '0.0.0.0',
     disableHostCheck: true,
     proxy: [
       {
         context: ['/api', '/cesium', '/data', '/updates'],
         target: `http://localhost:${ process.env.PORT }`,
+        ws: true
       },
     ],
     stats: {
