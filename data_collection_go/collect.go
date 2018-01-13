@@ -19,7 +19,7 @@ type adsb_record struct {
 
 type adsb_list = []adsb_record
 
-var adsb_feed struct {
+type adsb_feed struct {
 	AcList adsb_list
 }
 
@@ -30,15 +30,17 @@ func getAdsbData() adsb_list {
 	}
 	defer resp.Body.Close()
 
+	var unmarshaledData adsb_feed
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
-	err = json.Unmarshal(bodyBytes, &adsb_feed)
+	err = json.Unmarshal(bodyBytes, &unmarshaledData)
 
 	if err != nil {
 		fmt.Println(err)
 	}
-	return adsb_feed.AcList
+	return unmarshaledData.AcList
 }
 
 func main() {
-	fmt.Print(getAdsbData())
+	flightData := getAdsbData()
+	fmt.Print(flightData)
 }
