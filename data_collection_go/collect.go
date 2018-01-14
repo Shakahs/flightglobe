@@ -3,19 +3,22 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/asaskevich/govalidator"
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"github.com/asaskevich/govalidator"
+	"time"
 )
 
 type adsb_record struct { //altitude is in feet
-	Id       string `json:"Icao"`
-	Lat      float64
-	Lng      float64 `json:"Long"`
-	Time     int64   `json:"PosTime"`
-	Heading  float32 `json:"Trak"`
-	Altitude int   `json:"Galt"`
+	Id           string `json:"Icao"`
+	Lat          float64
+	Lng          float64 `json:"Long"`
+	Timestamp    int64   `json:"PosTime"` //timestamp with nanosecond
+	Time         time.Time
+	Heading      float32 `json:"Trak"`
+	AltitudeFeet float32 `json:"Galt"`
+	Altitude     float32 // meters
 }
 
 type adsb_list = []adsb_record
@@ -41,6 +44,17 @@ func getAdsbData() adsb_list {
 	return unmarshaledData.AcList
 }
 
+func convertAdsbData(record *adsb_record) {
+	//convert timestamp to native time type
+	timeStringWithNano := strconv.FormatInt(record.Timestamp, 10)
+	timeStringUnix := timeStringWithNano[0 : len(timeStringWithNano)-3]
+	timeStampUnix, _ := strconv.ParseInt(timeStringUnix, 10, 32)
+	record.Time = time.Unix(timeStampUnix, 0)
+
+	//convert feet to meters
+	record.Altitude = record.AltitudeFeet / 3.2808399
+}
+
 func validateAdsbData(record adsb_record) bool {
 	//Icao id
 	return govalidator.IsAlphanumeric(record.Id) &&
@@ -54,19 +68,19 @@ func validateAdsbData(record adsb_record) bool {
 		// heading
 		govalidator.InRangeFloat32(record.Heading, 0, 360) &&
 		// altitude
-		govalidator.InRangeInt(record.Altitude, -1000, 100000)
-
+		govalidator.InRangeFloat32(record.Altitude, -500, 30000)
 }
 
 func main() {
-	flightData := getAdsbData()
-	var validData []adsb_record
+	rawFlightData := getAdsbData()
+	var validatedData []adsb_record
 
-	for _, val := range flightData {
+	for _, val := range rawFlightData {
 		if validateAdsbData(val) {
-			validData = append(validData, val)
+			convertAdsbData(&val)
+			validatedData = append(validatedData, val)
 		}
 	}
 
-	fmt.Print(validData)
+	fmt.Print(validatedData)
 }
