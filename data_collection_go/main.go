@@ -14,8 +14,8 @@ type FlightRecord struct { //altitude is in feet
 	Lat      float64   `json:"lat"`
 	Lng      float64   `json:"lon"`
 	Time     time.Time `json:"time"`
-	Heading  float32   `json:"heading"`
-	Altitude float32   `json:"altitude"` // meters
+	Heading  float64   `json:"heading"`
+	Altitude float64   `json:"altitude"` // meters
 }
 
 type FlightList = []FlightRecord
@@ -25,7 +25,7 @@ var AllFlights FlightList
 func main() {
 	scheduler := cron.New()
 	scheduler.AddFunc("@every 5s", func() { GetAdsbData() })
-	scheduler.AddFunc("@every 10s", func() { SendAdsbData() })
+	scheduler.AddFunc("@every 10s", func() { SendGlobalFeed() })
 	scheduler.Start()
 
 	sigc := make(chan os.Signal, 1)

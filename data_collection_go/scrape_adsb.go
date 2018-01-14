@@ -16,8 +16,8 @@ type adsbRecord struct { //altitude is in feet
 	Lat     float64
 	Long    float64
 	PosTime int64 //timestamp with nanosecond
-	Trak    float32
-	Galt    float32 //altitude in feet
+	Trak    float64
+	Galt    float64 //altitude in feet
 }
 
 type adsbList = []adsbRecord
@@ -54,7 +54,7 @@ func convertAdsbData(record *adsbRecord) (FlightRecord, error) {
 
 	//convert timestamp to native time type
 	if record.PosTime == 0 {
-		return flight, errors.New("Invalid time")
+		return flight, errors.New("invalid time")
 	}
 	timeStringWithNano := strconv.FormatInt(record.PosTime, 10)
 	timeStringUnix := timeStringWithNano[0 : len(timeStringWithNano)-3]
@@ -74,9 +74,9 @@ func validateFlightData(record FlightRecord) bool {
 		// longitude
 		govalidator.IsLongitude(strconv.FormatFloat(record.Lng, 'f', -1, 64)) &&
 		// heading
-		govalidator.InRangeFloat32(record.Heading, 0, 360) &&
+		govalidator.InRangeFloat64(record.Heading, 0, 360) &&
 		// altitude
-		govalidator.InRangeFloat32(record.Altitude, -500, 30000)
+		govalidator.InRangeFloat64(record.Altitude, -500, 30000)
 
 	validatorB := record.Lat != 0 || record.Lng != 0
 
