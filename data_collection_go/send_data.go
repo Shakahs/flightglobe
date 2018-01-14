@@ -8,43 +8,46 @@ import (
 	"net/http"
 )
 
-var GlobalPrecision = PrecisionStandards{2, 0, 0}
-var LocalPrecision = PrecisionStandards{2, 0, 0}
-
 type PrecisionStandards struct {
 	coordinates int32
 	altitude    int32
 	heading     int32
 }
 
-func decreasePrecision(record *FlightRecord, p PrecisionStandards) *FlightRecord {
-	newRecord := &FlightRecord{}
-	*newRecord = *record
+var GlobalPrecision = PrecisionStandards{2, 0, 0}
+var LocalPrecision = PrecisionStandards{2, 0, 0}
 
+func decreasePrecisionOfRecord(record FlightRecord, p PrecisionStandards) FlightRecord {
 	newLat, _ := decimal.NewFromFloat(record.Lat).Round(p.coordinates).Float64()
-	newRecord.Lat = newLat
+	record.Lat = newLat
 
 	newLng, _ := decimal.NewFromFloat(record.Lng).Round(p.coordinates).Float64()
-	newRecord.Lng = newLng
+	record.Lng = newLng
 
 	newAltitude, _ := decimal.NewFromFloat(record.Altitude).Round(p.altitude).Float64()
-	newRecord.Altitude = newAltitude
+	record.Altitude = newAltitude
 
 	newHeading, _ := decimal.NewFromFloat(record.Heading).Round(p.heading).Float64()
-	newRecord.Heading = newHeading
+	record.Heading = newHeading
 
-	return newRecord
+	return record
+}
+
+func decreasePrecisionOfDataset(data FlightList, p PrecisionStandards) FlightList {
+	var dpFlights FlightList
+	for _, val := range data {
+		dpFlights = append(dpFlights, decreasePrecisionOfRecord(val, p))
+	}
+	return dpFlights
 }
 
 func SendGlobalFeed() {
-	var dpFlights = []*FlightRecord{}
-	for _, val := range AllFlights {
-		dpFlights = append(dpFlights, decreasePrecision(&val, GlobalPrecision))
-	}
-	jsonValue, _ := json.Marshal(dpFlights)
+	globalFeed := decreasePrecisionOfDataset(AllFlights, GlobalPrecision)
+	jsonValue, _ := json.Marshal(globalFeed)
 	_, err := http.Post("http://localhost:8080/pub", "application/json", bytes.NewBuffer(jsonValue))
 	if err != nil {
 		fmt.Println(err)
 	}
 	fmt.Println("Sent", len(AllFlights), "flights downstream")
 }
+ 
