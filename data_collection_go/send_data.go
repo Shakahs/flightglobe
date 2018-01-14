@@ -14,8 +14,8 @@ type PrecisionStandards struct {
 	heading     int32
 }
 
-var GlobalPrecision = PrecisionStandards{2, 0, 0}
-var LocalPrecision = PrecisionStandards{2, 0, 0}
+var GlobalPrecision = PrecisionStandards{3, 0, 0}
+var LocalPrecision = PrecisionStandards{4, 0, 0}
 
 func decreasePrecisionOfRecord(record FlightRecord, p PrecisionStandards) FlightRecord {
 	newLat, _ := decimal.NewFromFloat(record.Lat).Round(p.coordinates).Float64()
@@ -41,13 +41,17 @@ func decreasePrecisionOfDataset(data FlightList, p PrecisionStandards) FlightLis
 	return dpFlights
 }
 
-func SendGlobalFeed() {
-	globalFeed := decreasePrecisionOfDataset(AllFlights, GlobalPrecision)
-	jsonValue, _ := json.Marshal(globalFeed)
-	_, err := http.Post("http://localhost:8080/pub", "application/json", bytes.NewBuffer(jsonValue))
+func sendToEndpoint(channel string, data FlightList) {
+	jsonValue, _ := json.Marshal(data)
+	_, err := http.Post("http://localhost:8080/pub/"+channel, "application/json", bytes.NewBuffer(jsonValue))
 	if err != nil {
 		fmt.Println(err)
 	}
+	fmt.Println("Sending to", channel, "done")
+}
+
+func SendGlobalFeed() {
+	globalFeed := decreasePrecisionOfDataset(AllFlights, GlobalPrecision)
+	go sendToEndpoint("global", globalFeed)
 	fmt.Println("Sent", len(AllFlights), "flights downstream")
 }
- 
