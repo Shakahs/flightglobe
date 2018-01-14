@@ -12,17 +12,27 @@ import (
 	"strconv"
 	"syscall"
 	"time"
+	"errors"
 )
 
+type flight_record struct { //altitude is in feet
+	Id           string `json:"id"`
+	Lat          float64 `json:"lat"`
+	Lng          float64 `json:"lon"`
+	Time         time.Time `json:"time"`
+	Heading      float32 `json:"heading"`
+	Altitude     float32 `json:"altitude"` // meters
+}
+
+type flight_list = []flight_record
+
 type adsb_record struct { //altitude is in feet
-	Id           string `json:"Icao"`
+	Icao          string
 	Lat          float64
-	Lng          float64 `json:"Long"`
-	Timestamp    int64   `json:"PosTime"` //timestamp with nanosecond
-	Time         time.Time
-	Heading      float32 `json:"Trak"`
-	AltitudeFeet float32 `json:"Galt"`
-	Altitude     float32 // meters
+	Long         float64
+	PosTime    int64    //timestamp with nanosecond
+	Trak      float32
+	Galt float32 //altitude in feet
 }
 
 type adsb_list = []adsb_record
@@ -48,18 +58,30 @@ func getRawAdsbData() adsb_list {
 	return unmarshaledData.AcList
 }
 
-func convertAdsbData(record *adsb_record) {
+func convertAdsbData(record *adsb_record) (flight_record, error) {
+	var flight flight_record
+
+	//copy values
+	flight.Id = record.Icao
+	flight.Lat = record.Lat
+	flight.Lng = record.Long
+	flight.Heading = record.Trak
+
 	//convert timestamp to native time type
-	timeStringWithNano := strconv.FormatInt(record.Timestamp, 10)
+	if record.PosTime == 0 {
+		return flight, errors.New("Invalid time")
+	}
+	timeStringWithNano := strconv.FormatInt(record.PosTime, 10)
 	timeStringUnix := timeStringWithNano[0 : len(timeStringWithNano)-3]
 	timeStampUnix, _ := strconv.ParseInt(timeStringUnix, 10, 32)
-	record.Time = time.Unix(timeStampUnix, 0)
+	flight.Time = time.Unix(timeStampUnix, 0)
 
 	//convert feet to meters
-	record.Altitude = record.AltitudeFeet / 3.2808399
+	flight.Altitude = record.Galt / 3.2808399
+	return flight, nil
 }
 
-func validateAdsbData(record adsb_record) bool {
+func validateFlightData(record flight_record) bool {
 	validatorA := govalidator.IsAlphanumeric(record.Id) && //Icao id
 		govalidator.IsByteLength(record.Id, 3, 10) &&
 		// latitude
@@ -76,14 +98,14 @@ func validateAdsbData(record adsb_record) bool {
 	return validatorA && validatorB
 }
 
-func getAdsbData() []adsb_record {
+func getAdsbData() []flight_record {
 	rawFlightData := getRawAdsbData()
-	var processedData []adsb_record
+	var processedData []flight_record
 
 	for _, val := range rawFlightData {
-		if validateAdsbData(val) {
-			convertAdsbData(&val)
-			processedData = append(processedData, val)
+		convertedRecord, err := convertAdsbData(&val)
+		if err == nil && validateFlightData(convertedRecord) {
+			processedData = append(processedData, convertedRecord)
 		}
 	}
 
@@ -101,7 +123,7 @@ func sendAdsbData() {
 }
 
 func main() {
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(10 * time.Second)
 	quit := make(chan struct{})
 
 	sigc := make(chan os.Signal, 1)

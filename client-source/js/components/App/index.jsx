@@ -10,13 +10,13 @@ class App extends React.Component {
 
   componentDidMount() {
     console.log('websocket attempt');
-    const sock = new WebSocket('ws://localhost:7999/data/all');
+    const sock = new WebSocket('ws://localhost:8080/sub');
     sock.addEventListener('open', () => {
       console.log('websocket open');
     });
     sock.addEventListener('message', (event) => {
       console.log('websocket message received');
-      this.setState({ planes: Object.assign({}, this.state.planes, JSON.parse(event.data)) });
+      this.setState({ planes: JSON.parse(event.data) });
     });
   }
 
