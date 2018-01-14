@@ -10,7 +10,7 @@ class App extends React.Component {
 
   componentDidMount() {
     console.log('websocket attempt');
-    const sock = new WebSocket('ws://localhost:8080/sub');
+    const sock = new WebSocket('ws://localhost:8080/sub/global');
     sock.addEventListener('open', () => {
       console.log('websocket open');
     });

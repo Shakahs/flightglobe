@@ -44,10 +44,10 @@ const plugins = [
 // Common rules
 const rules = [
   {
-    test: /\.(js|jsx)$/,
+    test: /\.([tj])sx?$/,
     exclude: /node_modules/,
     use: [
-      'babel-loader',
+      'awesome-typescript-loader',
     ],
   },
   {
@@ -108,8 +108,7 @@ if (isProduction) {
   // Development plugins
   plugins.push(
     // new webpack.HotModuleReplacementPlugin(),
-    new BundleAnalyzerPlugin({ openAnalyzer: false })
-  );
+    new BundleAnalyzerPlugin({ openAnalyzer: false }));
 
   // Development rules
   rules.push({
@@ -144,7 +143,7 @@ module.exports = {
     rules,
   },
   resolve: {
-    extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.js', '.jsx'],
+    extensions: ['ts', 'tsx', '.js', '.jsx'],
     modules: [
       path.resolve(__dirname, 'node_modules'),
       jsSourcePath,
@@ -164,7 +163,7 @@ module.exports = {
       {
         context: ['/api', '/cesium', '/data', '/updates'],
         target: `http://localhost:${ process.env.PORT }`,
-        ws: true
+        ws: true,
       },
     ],
     stats: {
