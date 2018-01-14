@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/asaskevich/govalidator"
 	"github.com/davecgh/go-spew/spew"
+	//"github.com/robfig/cron"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -28,7 +29,7 @@ type adsb_feed struct {
 	AcList adsb_list
 }
 
-func getAdsbData() adsb_list {
+func getRawAdsbData() adsb_list {
 	resp, err := http.Get("http://public-api.adsbexchange.com/VirtualRadar/AircraftList.json")
 	if err != nil {
 		fmt.Println(err)
@@ -73,16 +74,20 @@ func validateAdsbData(record adsb_record) bool {
 	return validatorA && validatorB
 }
 
-func main() {
-	rawFlightData := getAdsbData()
-	var validatedData []adsb_record
+func getAdsbData() []adsb_record {
+	rawFlightData := getRawAdsbData()
+	var processedData []adsb_record
 
 	for _, val := range rawFlightData {
 		if validateAdsbData(val) {
 			convertAdsbData(&val)
-			validatedData = append(validatedData, val)
+			processedData = append(processedData, val)
 		}
 	}
 
-	spew.Dump(validatedData)
+	return processedData
+}
+
+func main() {
+	spew.Dump(getAdsbData())
 }
