@@ -8,7 +8,10 @@ import (
 	//"github.com/robfig/cron"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 	"time"
 )
 
@@ -89,5 +92,32 @@ func getAdsbData() []adsb_record {
 }
 
 func main() {
-	spew.Dump(getAdsbData())
+	ticker := time.NewTicker(5 * time.Second)
+	quit := make(chan struct{})
+
+	sigc := make(chan os.Signal, 1)
+	signal.Notify(sigc,
+		syscall.SIGHUP,
+		syscall.SIGINT,
+		syscall.SIGTERM,
+		syscall.SIGQUIT)
+	go func() {
+		for {
+			select {
+			case <-sigc:
+				fmt.Println("Received signal, quitting")
+				close(quit)
+			}
+		}
+	}()
+
+	for {
+		select {
+		case <-ticker.C:
+			spew.Dump(getAdsbData())
+		case <-quit:
+			ticker.Stop()
+			return
+		}
+	}
 }
