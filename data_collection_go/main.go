@@ -29,7 +29,7 @@ func main() {
 	scheduler.AddFunc("@every 10s", func() { SendLocalFeeds() })
 	scheduler.Start()
 
-	go SendToEndpoint()
+	go sendToEndpoint()
 
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc,

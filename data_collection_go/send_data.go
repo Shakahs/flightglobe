@@ -11,22 +11,22 @@ import (
 	"time"
 )
 
-type PrecisionStandards struct {
+type precisionStandards struct {
 	coordinates int32
 	altitude    int32
 	heading     int32
 	geohash     uint
 }
 
-var globalPrecision = PrecisionStandards{3, 0, 0, 1}
-var localPrecision = PrecisionStandards{4, 0, 0, 3}
+var globalPrecision = precisionStandards{3, 0, 0, 1}
+var localPrecision = precisionStandards{4, 0, 0, 3}
 
 type dataExport struct {
 	channel string
 	data    FlightList
 }
 
-func decreasePrecisionOfRecord(record FlightRecord, p PrecisionStandards) FlightRecord {
+func decreasePrecisionOfRecord(record FlightRecord, p precisionStandards) FlightRecord {
 	newLat, _ := decimal.NewFromFloat(record.Lat).Round(p.coordinates).Float64()
 	record.Lat = newLat
 
@@ -42,7 +42,7 @@ func decreasePrecisionOfRecord(record FlightRecord, p PrecisionStandards) Flight
 	return record
 }
 
-func decreasePrecisionOfDataset(data FlightList, p PrecisionStandards) FlightList {
+func decreasePrecisionOfDataset(data FlightList, p precisionStandards) FlightList {
 	var dpFlights FlightList
 	for _, val := range data {
 		dpFlights = append(dpFlights, decreasePrecisionOfRecord(val, p))
@@ -63,7 +63,7 @@ var nChanClient = http.Client{
 	},
 }
 
-func SendToEndpoint() {
+func sendToEndpoint() {
 	for {
 		select {
 		case export := <-nchan:
