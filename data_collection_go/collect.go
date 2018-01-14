@@ -3,8 +3,10 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/asaskevich/govalidator"
+	"github.com/robfig/cron"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -12,27 +14,26 @@ import (
 	"strconv"
 	"syscall"
 	"time"
-	"errors"
 )
 
 type flight_record struct { //altitude is in feet
-	Id           string `json:"id"`
-	Lat          float64 `json:"lat"`
-	Lng          float64 `json:"lon"`
-	Time         time.Time `json:"time"`
-	Heading      float32 `json:"heading"`
-	Altitude     float32 `json:"altitude"` // meters
+	Id       string    `json:"id"`
+	Lat      float64   `json:"lat"`
+	Lng      float64   `json:"lon"`
+	Time     time.Time `json:"time"`
+	Heading  float32   `json:"heading"`
+	Altitude float32   `json:"altitude"` // meters
 }
 
 type flight_list = []flight_record
 
 type adsb_record struct { //altitude is in feet
-	Icao          string
-	Lat          float64
-	Long         float64
-	PosTime    int64    //timestamp with nanosecond
-	Trak      float32
-	Galt float32 //altitude in feet
+	Icao    string
+	Lat     float64
+	Long    float64
+	PosTime int64 //timestamp with nanosecond
+	Trak    float32
+	Galt    float32 //altitude in feet
 }
 
 type adsb_list = []adsb_record
@@ -98,7 +99,7 @@ func validateFlightData(record flight_record) bool {
 	return validatorA && validatorB
 }
 
-func getAdsbData() []flight_record {
+func getAdsbData() flight_list {
 	rawFlightData := getRawAdsbData()
 	var processedData []flight_record
 
@@ -113,18 +114,21 @@ func getAdsbData() []flight_record {
 }
 
 func sendAdsbData() {
-	flight_data := getAdsbData()
-	jsonValue, _ := json.Marshal(flight_data)
+	all_flights = getAdsbData()
+	jsonValue, _ := json.Marshal(all_flights)
 	_, err := http.Post("http://localhost:8080/pub", "application/json", bytes.NewBuffer(jsonValue))
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("Sent", len(flight_data), "flights")
+	fmt.Println("Sent", len(all_flights), "flights")
 }
 
+var all_flights flight_list
+
 func main() {
-	ticker := time.NewTicker(10 * time.Second)
-	quit := make(chan struct{})
+	scheduler := cron.New()
+	scheduler.AddFunc("@every 10s", func() { sendAdsbData() })
+	scheduler.Start()
 
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc,
@@ -132,24 +136,12 @@ func main() {
 		syscall.SIGINT,
 		syscall.SIGTERM,
 		syscall.SIGQUIT)
-	go func() {
-		for {
-			select {
-			case <-sigc:
-				fmt.Println("Received signal, quitting")
-				close(quit)
-			}
-		}
-	}()
-
-	sendAdsbData()
 
 	for {
 		select {
-		case <-ticker.C:
-			sendAdsbData()
-		case <-quit:
-			ticker.Stop()
+		case <-sigc:
+			fmt.Println("Received signal, quitting")
+			scheduler.Stop()
 			return
 		}
 	}
