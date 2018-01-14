@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/asaskevich/govalidator"
+	"github.com/davecgh/go-spew/spew"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -56,19 +57,20 @@ func convertAdsbData(record *adsb_record) {
 }
 
 func validateAdsbData(record adsb_record) bool {
-	//Icao id
-	return govalidator.IsAlphanumeric(record.Id) &&
+	validatorA := govalidator.IsAlphanumeric(record.Id) && //Icao id
 		govalidator.IsByteLength(record.Id, 3, 10) &&
 		// latitude
-		record.Lat != 0 &&
 		govalidator.IsLatitude(strconv.FormatFloat(record.Lat, 'f', -1, 64)) &&
 		// longitude
-		record.Lng != 0 &&
 		govalidator.IsLongitude(strconv.FormatFloat(record.Lng, 'f', -1, 64)) &&
 		// heading
 		govalidator.InRangeFloat32(record.Heading, 0, 360) &&
 		// altitude
 		govalidator.InRangeFloat32(record.Altitude, -500, 30000)
+
+	validatorB := record.Lat != 0 || record.Lng != 0
+
+	return validatorA && validatorB
 }
 
 func main() {
@@ -82,5 +84,5 @@ func main() {
 		}
 	}
 
-	fmt.Print(validatedData)
+	spew.Dump(validatedData)
 }
