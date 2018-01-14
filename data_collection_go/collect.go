@@ -1,11 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/asaskevich/govalidator"
-	"github.com/davecgh/go-spew/spew"
-	//"github.com/robfig/cron"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -91,6 +90,16 @@ func getAdsbData() []adsb_record {
 	return processedData
 }
 
+func sendAdsbData() {
+	flight_data := getAdsbData()
+	jsonValue, _ := json.Marshal(flight_data)
+	_, err := http.Post("http://localhost:8080/pub", "application/json", bytes.NewBuffer(jsonValue))
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("Sent", len(flight_data), "flights")
+}
+
 func main() {
 	ticker := time.NewTicker(5 * time.Second)
 	quit := make(chan struct{})
@@ -111,10 +120,12 @@ func main() {
 		}
 	}()
 
+	sendAdsbData()
+
 	for {
 		select {
 		case <-ticker.C:
-			spew.Dump(getAdsbData())
+			sendAdsbData()
 		case <-quit:
 			ticker.Stop()
 			return
