@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"github.com/mmcloughlin/geohash"
 	"github.com/shopspring/decimal"
+	"net"
 	"net/http"
+	"time"
 )
 
 type PrecisionStandards struct {
@@ -18,6 +20,11 @@ type PrecisionStandards struct {
 
 var globalPrecision = PrecisionStandards{3, 0, 0, 1}
 var localPrecision = PrecisionStandards{4, 0, 0, 3}
+
+type dataExport struct {
+	channel string
+	data    FlightList
+}
 
 func decreasePrecisionOfRecord(record FlightRecord, p PrecisionStandards) FlightRecord {
 	newLat, _ := decimal.NewFromFloat(record.Lat).Round(p.coordinates).Float64()
@@ -43,18 +50,42 @@ func decreasePrecisionOfDataset(data FlightList, p PrecisionStandards) FlightLis
 	return dpFlights
 }
 
-func sendToEndpoint(channel string, data FlightList) {
-	jsonValue, _ := json.Marshal(data)
-	_, err := http.Post("http://localhost:8080/pub/"+channel, "application/json", bytes.NewBuffer(jsonValue))
-	if err != nil {
-		fmt.Println(err)
+var rateLimit = make(chan bool, 500)
+var nchan = make(chan dataExport)
+
+var nChanClient = http.Client{
+	Transport: &http.Transport{
+		DialContext: (&net.Dialer{
+			Timeout:   5 * time.Second,
+			KeepAlive: 0,
+		}).DialContext,
+		DisableKeepAlives: true,
+	},
+}
+
+func SendToEndpoint() {
+	for {
+		select {
+		case export := <-nchan:
+			rateLimit <- true
+			go func(val FlightList) {
+				defer func() { <-rateLimit }()
+				jsonValue, _ := json.Marshal(val)
+				resp, err := nChanClient.Post("http://localhost:8080/pub/"+export.channel, "application/json", bytes.NewBuffer(jsonValue))
+				if err == nil {
+					defer resp.Body.Close()
+				} else {
+					fmt.Println(err)
+				}
+			}(export.data)
+		}
 	}
-	fmt.Println("Sent", len(data), "flights to", channel)
 }
 
 func SendGlobalFeed() {
 	globalData := decreasePrecisionOfDataset(AllFlights, globalPrecision)
-	go sendToEndpoint("global", globalData)
+	nchan <- dataExport{"global", globalData}
+	fmt.Println("Sent", len(globalData), "flights to", "global")
 }
 
 func SendLocalFeeds() {
@@ -67,6 +98,8 @@ func SendLocalFeeds() {
 	}
 
 	for key, value := range hashedLocations {
-		go sendToEndpoint(key, value)
+		nchan <- dataExport{key, value}
 	}
+
+	fmt.Println("Sent", len(localData), "flights to", len(hashedLocations), "channels")
 }
