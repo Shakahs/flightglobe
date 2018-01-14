@@ -99,7 +99,7 @@ func validateFlightData(record flight_record) bool {
 	return validatorA && validatorB
 }
 
-func getAdsbData() flight_list {
+func getAdsbData() {
 	rawFlightData := getRawAdsbData()
 	var processedData []flight_record
 
@@ -109,24 +109,24 @@ func getAdsbData() flight_list {
 			processedData = append(processedData, convertedRecord)
 		}
 	}
-
-	return processedData
+	all_flights = processedData
+	fmt.Println("Retrieved", len(all_flights), "flights from ADSB")
 }
 
 func sendAdsbData() {
-	all_flights = getAdsbData()
 	jsonValue, _ := json.Marshal(all_flights)
 	_, err := http.Post("http://localhost:8080/pub", "application/json", bytes.NewBuffer(jsonValue))
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("Sent", len(all_flights), "flights")
+	fmt.Println("Sent", len(all_flights), "flights downstream")
 }
 
 var all_flights flight_list
 
 func main() {
 	scheduler := cron.New()
+	scheduler.AddFunc("@every 5s", func() { getAdsbData() })
 	scheduler.AddFunc("@every 10s", func() { sendAdsbData() })
 	scheduler.Start()
 
