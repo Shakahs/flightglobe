@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/mmcloughlin/geohash"
 	"github.com/shopspring/decimal"
 	"net/http"
 )
@@ -12,10 +13,11 @@ type PrecisionStandards struct {
 	coordinates int32
 	altitude    int32
 	heading     int32
+	geohash     uint
 }
 
-var GlobalPrecision = PrecisionStandards{3, 0, 0}
-var LocalPrecision = PrecisionStandards{4, 0, 0}
+var globalPrecision = PrecisionStandards{3, 0, 0, 1}
+var localPrecision = PrecisionStandards{4, 0, 0, 3}
 
 func decreasePrecisionOfRecord(record FlightRecord, p PrecisionStandards) FlightRecord {
 	newLat, _ := decimal.NewFromFloat(record.Lat).Round(p.coordinates).Float64()
@@ -47,11 +49,24 @@ func sendToEndpoint(channel string, data FlightList) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("Sending to", channel, "done")
+	fmt.Println("Sent", len(data), "flights to", channel)
 }
 
 func SendGlobalFeed() {
-	globalFeed := decreasePrecisionOfDataset(AllFlights, GlobalPrecision)
-	go sendToEndpoint("global", globalFeed)
-	fmt.Println("Sent", len(AllFlights), "flights downstream")
+	globalData := decreasePrecisionOfDataset(AllFlights, globalPrecision)
+	go sendToEndpoint("global", globalData)
+}
+
+func SendLocalFeeds() {
+	localData := decreasePrecisionOfDataset(AllFlights, localPrecision)
+
+	hashedLocations := make(map[string]FlightList)
+	for _, val := range localData {
+		hash := geohash.EncodeWithPrecision(val.Lat, val.Lng, localPrecision.geohash)
+		hashedLocations[hash] = append(hashedLocations[hash], val)
+	}
+
+	for key, value := range hashedLocations {
+		go sendToEndpoint(key, value)
+	}
 }

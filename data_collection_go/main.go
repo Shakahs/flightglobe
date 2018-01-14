@@ -26,6 +26,7 @@ func main() {
 	scheduler := cron.New()
 	scheduler.AddFunc("@every 5s", func() { GetAdsbData() })
 	scheduler.AddFunc("@every 10s", func() { SendGlobalFeed() })
+	scheduler.AddFunc("@every 10s", func() { SendLocalFeeds() })
 	scheduler.Start()
 
 	sigc := make(chan os.Signal, 1)
