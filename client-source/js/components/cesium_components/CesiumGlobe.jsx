@@ -69,7 +69,6 @@ export default class CesiumGlobe extends Component {
         <span>
           <CesiumProjectContents
             viewer={ this.viewer }
-            planes={ planes }
           />
           <CesiumCameraManager
             camera={ scene.camera }

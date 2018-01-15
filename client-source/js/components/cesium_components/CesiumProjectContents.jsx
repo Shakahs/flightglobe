@@ -1,16 +1,16 @@
-import React, { Component } from 'react';
-
+import { connect } from 'react-redux';
+import React  from 'react';
 import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
-import CesiumEntity from './primitives/CesiumEntity';
 import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler';
 import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
+import CesiumEntity from './primitives/CesiumEntity';
+import { selectors as globeSelectors } from '../../redux/globe';
 
 const _ = require('lodash');
 
-export class CesiumProjectContents extends Component {
+class CesiumProjectContents extends React.Component {
   constructor(props) {
     super(props);
-
     const { viewer } = props;
     const { scene } = viewer;
 
@@ -54,5 +54,8 @@ export class CesiumProjectContents extends Component {
   }
 }
 
+const mapStateToProps = state => ({
+  planes: globeSelectors.getGlobalFeed(state),
+});
 
-export default CesiumProjectContents;
+export default connect(mapStateToProps)(CesiumProjectContents);
