@@ -9,14 +9,8 @@
     "lint": "eslint ./client-source/js ./webpack.config.js -f table --ext .js --ext .jsx || true"
   },
   "devDependencies": {
-    "babel-core": "^6.7.2",
-    "babel-eslint": "^8.0.0",
-    "babel-loader": "^7.1.0",
-    "babel-preset-env": "^1.6.1",
-    "babel-preset-react": "^6.5.0",
-    "babel-preset-react-hmre": "^1.1.1",
-    "babel-runtime": "^6.6.1",
     "copy-webpack-plugin": "^4.3.1",
+    "awesome-typescript-loader": "^3.4.1",
     "css-loader": "^0.28.4",
     "dsn-parser": "^1.0.1",
     "eslint": "^4.7.2",
@@ -39,6 +33,7 @@
     "svg-sprite-loader": "^3.0.5",
     "svgo": "^1.0.1",
     "svgo-loader": "^2.0.0",
+    "typescript": "^2.6.2",
     "url-loader": "^0.6.2",
     "webpack": "^3.6.0",
     "webpack-bundle-analyzer": "^2.9.0",

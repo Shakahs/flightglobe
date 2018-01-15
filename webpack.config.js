@@ -55,10 +55,10 @@ const plugins = [
 // Common rules
 const rules = [
   {
-    test: /\.(js|jsx)$/,
+    test: /\.([tj])sx?$/,
     exclude: /node_modules/,
     use: [
-      'babel-loader',
+      'awesome-typescript-loader',
     ],
   },
   {
@@ -146,12 +146,7 @@ module.exports = {
     fs: 'empty',
   },
   resolve: {
-    extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.js', '.jsx', '.json'],
-    // modules: [
-    //   cesiumSource,
-    //   path.resolve(__dirname, 'node_modules'),
-    //   jsSourcePath,
-    // ],
+    extensions: ['ts', 'tsx', '.js', '.jsx'],
     alias: {
       // Cesium module name
       cesium: path.resolve(__dirname, cesiumSource),
