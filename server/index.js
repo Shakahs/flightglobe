@@ -46,7 +46,8 @@ const streamData = async () => {
   });
 };
 
-app.get('/', (req, res) => res.send('Hello World!'));
+app.use('/', express.static('./client-build'));
+// app.get('/', (req, res) => res.send('Hello World!'));
 app.use('/cesium', express.static('./node_modules/cesium/Build/Cesium'));
 app.get('/all', getData);
 

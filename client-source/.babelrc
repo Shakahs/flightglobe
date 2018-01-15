@@ -3,7 +3,8 @@
     ["env",{
       "modules":false,
       "targets": {
-        "browsers": ["chrome >= 62", "firefox >= 57"]
+        "browsers": ["chrome >= 62", "firefox >= 57"],
+        "uglify": true
       }
     }],
     "react"
