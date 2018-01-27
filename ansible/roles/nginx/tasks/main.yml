@@ -1,0 +1,18 @@
+---
+- name: Install Nginx package
+  yum:
+    state: latest
+    name: nginx
+
+- name: enable Nginx service
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+
+- name: Ensure Nginx default site is disabled
+  notify:
+  - reload nginx
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent

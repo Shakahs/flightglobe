@@ -1,0 +1,73 @@
+---
+- name: Setup Foodtrac system dependencies
+  include: system.yml
+
+- name: deploy code from active branch of local git repo
+  tags: deploy
+  include: gitpush.yml
+
+- name: install foodtrac environment files
+  notify:
+  - restart foodtrac
+  copy:
+    src: "{{ item }}"
+    dest: /var/www/{{ domain_name }}/{{ item }}
+    owner: foodtrac
+    group: foodtrac
+  with_items:
+    - .env
+    - googleCloudKey.json
+
+- name: install npm deps
+  tags: deploy
+  shell: npm install
+  register: npm_finished
+  failed_when: '"ERR!" in npm_finished.stderr'
+  when: git_push.changed
+  args:
+    chdir: /var/www/{{ domain_name }}
+
+- name: Run data seeding task
+  when: git_push.changed
+  tags: gulp
+  command: /var/www/{{ domain_name }}/node_modules/gulp/bin/gulp.js db
+  args:
+    chdir: /var/www/{{ domain_name }}
+
+- name: Add data seeding task to cron
+  tags: gulp
+  cron:
+    name: gulp_reseed
+    hour: '*/4'
+    minute: 0
+    job: cd /var/www/{{ domain_name }} && /var/www/{{ domain_name }}/node_modules/gulp/bin/gulp.js db
+
+- name: Build bundle.js
+  tags: bundle
+  when: git_push.changed
+  command: /var/www/{{ domain_name }}/node_modules/webpack/bin/webpack.js -p
+  args:
+    chdir: /var/www/{{ domain_name }}
+
+- name: install foodtrac systemd unit
+  template:
+    src: foodtrac.service.jinja2
+    dest: /etc/systemd/system/foodtrac.service
+    owner: root
+    group: root
+    mode: 0444
+
+- name: start foodtrac systemd service
+  systemd:
+    state: started
+    enabled: yes
+    name: foodtrac
+    daemon_reload: yes
+
+#todo: fallback to self-signed cert when letsencrypt fails (needed for development without access to domain)
+- name: Foodtrac Letsencrypt setup
+  tags: letsencrypt
+  include: letsencrypt.yml
+
+- name: Foodtrac Nginx setup
+  include: nginx.yml

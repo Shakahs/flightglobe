@@ -1,0 +1,13 @@
+[Service]
+ExecStart=/usr/bin/node /var/www/{{ domain_name }}/server/index.js
+WorkingDirectory=/var/www/{{ domain_name }}
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=foodtrac
+User=foodtrac
+Group=foodtrac
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
