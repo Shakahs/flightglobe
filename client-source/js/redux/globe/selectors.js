@@ -6,9 +6,9 @@ export const getGlobalFeed = state => state.globe.flights;
 export const getPositions = createSelector(
   [getGlobalFeed],
   (allFlights) => {
-    return map(allFlights, (flight, id) => (
+    return map(allFlights, (flight, icao) => (
       {
-        id,
+        icao,
         ...flight[0],
       }
     ));

@@ -50,7 +50,7 @@ func normalizeAdsbData(rawPositions adsbList) (FlightHistory) {
 		var normalized Position
 
 		//copy values
-		normalized.Id = record.Icao
+		normalized.Icao = record.Icao
 		normalized.Lat = record.Lat
 		normalized.Lng = record.Long
 		normalized.Heading = record.Trak
@@ -75,8 +75,8 @@ func normalizeAdsbData(rawPositions adsbList) (FlightHistory) {
 }
 
 func validator(record Position) bool {
-	validatorA := govalidator.IsAlphanumeric(record.Id) && //Icao id
-		govalidator.IsByteLength(record.Id, 3, 10) &&
+	validatorA := govalidator.IsAlphanumeric(record.Icao) && //Icao id
+		govalidator.IsByteLength(record.Icao, 3, 10) &&
 		// latitude
 		govalidator.IsLatitude(strconv.FormatFloat(record.Lat, 'f', -1, 64)) &&
 		// longitude
@@ -111,8 +111,8 @@ func GetAdsbData() {
 
 	AllFlights.Lock()
 	for _, position := range validatedPositions {
-		id := position.Id
-		position.Id=""
+		id := position.Icao
+		position.Icao =""
 		AllFlights.flightData[id] = FlightHistory{position}
 	}
 	AllFlights.Unlock()

@@ -11,7 +11,7 @@ import (
 )
 
 type Position struct {
-	Id       string    `json:"id,omitempty"`
+	Icao     string    `json:"icao,omitempty"`
 	Lat      float64   `json:"lat"`
 	Lng      float64   `json:"lon"`
 	Time     time.Time `json:"time"`

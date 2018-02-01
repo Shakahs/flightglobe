@@ -20,8 +20,8 @@ class CesiumProjectContents extends React.Component {
     handler.setInputAction((click) => {
       const pickedObject = scene.pick(click.position);
       if (pickedObject) {
-        const entity = pickedObject.id;
-        console.log(entity.id);
+        const entity = pickedObject.icao;
+        console.log(entity.icao);
       }
     }, ScreenSpaceEventType.LEFT_CLICK);
 
@@ -43,7 +43,7 @@ class CesiumProjectContents extends React.Component {
       (<CesiumEntity
         plane={ plane }
         planeData={ this.planeData }
-        key={ plane.id }
+        key={ plane.icao }
       />));
 
     return (
