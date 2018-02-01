@@ -5,7 +5,7 @@ export const RECEIVE_FLIGHTS = 'globe/RECEIVE_FLIGHTS';
 export const receiveFlights = createAction(RECEIVE_FLIGHTS);
 
 const initialState = {
-  flights: [],
+  flights: {},
 };
 
 export default function reducer(state = initialState, action) {

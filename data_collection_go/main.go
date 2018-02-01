@@ -7,10 +7,11 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"sync"
 )
 
-type FlightRecord struct { //altitude is in feet
-	Id       string    `json:"id"`
+type Position struct {
+	Id       string    `json:"id,omitempty"`
 	Lat      float64   `json:"lat"`
 	Lng      float64   `json:"lon"`
 	Time     time.Time `json:"time"`
@@ -18,15 +19,22 @@ type FlightRecord struct { //altitude is in feet
 	Altitude float64   `json:"altitude"` // meters
 }
 
-type FlightList = []FlightRecord
+type FlightHistory = []Position
 
-var AllFlights FlightList
+type FlightDataSet map[string]FlightHistory
+
+type LockableFlightDataSet = struct{
+	sync.RWMutex
+	flightData FlightDataSet
+}
+
+var AllFlights = LockableFlightDataSet{flightData: make(FlightDataSet)}
 
 func main() {
 	scheduler := cron.New()
 	scheduler.AddFunc("@every 5s", func() { GetAdsbData() })
 	scheduler.AddFunc("@every 10s", func() { SendGlobalFeed() })
-	scheduler.AddFunc("@every 10s", func() { SendLocalFeeds() })
+	//scheduler.AddFunc("@every 10s", func() { SendLocalFeeds() })
 	scheduler.Start()
 
 	go sendToEndpoint()

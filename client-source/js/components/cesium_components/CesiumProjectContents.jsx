@@ -55,7 +55,7 @@ class CesiumProjectContents extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  planes: globeSelectors.getGlobalFeed(state),
+  planes: globeSelectors.getPositions(state),
 });
 
 export default connect(mapStateToProps)(CesiumProjectContents);

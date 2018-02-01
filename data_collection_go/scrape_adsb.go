@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
+	//"errors"
 	"fmt"
 	"github.com/asaskevich/govalidator"
 	"io/ioutil"
@@ -43,30 +43,38 @@ func getRawAdsbData() adsbList {
 	return unmarshaledData.AcList
 }
 
-func convertAdsbData(record *adsbRecord) (FlightRecord, error) {
-	var flight FlightRecord
+func normalizeAdsbData(rawPositions adsbList) (FlightHistory) {
+	var normalData FlightHistory
 
-	//copy values
-	flight.Id = record.Icao
-	flight.Lat = record.Lat
-	flight.Lng = record.Long
-	flight.Heading = record.Trak
+	for _, record := range rawPositions {
+		var normalized Position
 
-	//convert timestamp to native time type
-	if record.PosTime == 0 {
-		return flight, errors.New("invalid time")
+		//copy values
+		normalized.Id = record.Icao
+		normalized.Lat = record.Lat
+		normalized.Lng = record.Long
+		normalized.Heading = record.Trak
+
+		//convert timestamp to native time type
+		if record.PosTime == 0 {
+			normalized.Time=time.Unix(0, 0)
+		} else {
+			timeStringWithNano := strconv.FormatInt(record.PosTime, 10)
+			timeStringUnix := timeStringWithNano[0 : len(timeStringWithNano)-3]
+			timeStampUnix, _ := strconv.ParseInt(timeStringUnix, 10, 32)
+			normalized.Time = time.Unix(timeStampUnix, 0)
+		}
+
+		//convert feet to meters
+		normalized.Altitude = record.Galt / 3.2808399
+
+		normalData = append(normalData, normalized)
 	}
-	timeStringWithNano := strconv.FormatInt(record.PosTime, 10)
-	timeStringUnix := timeStringWithNano[0 : len(timeStringWithNano)-3]
-	timeStampUnix, _ := strconv.ParseInt(timeStringUnix, 10, 32)
-	flight.Time = time.Unix(timeStampUnix, 0)
 
-	//convert feet to meters
-	flight.Altitude = record.Galt / 3.2808399
-	return flight, nil
+	return normalData
 }
 
-func validateFlightData(record FlightRecord) bool {
+func validator(record Position) bool {
 	validatorA := govalidator.IsAlphanumeric(record.Id) && //Icao id
 		govalidator.IsByteLength(record.Id, 3, 10) &&
 		// latitude
@@ -77,22 +85,49 @@ func validateFlightData(record FlightRecord) bool {
 		govalidator.InRangeFloat64(record.Heading, 0, 360) &&
 		// altitude
 		govalidator.InRangeFloat64(record.Altitude, -500, 30000)
+		// time?
 
 	validatorB := record.Lat != 0 || record.Lng != 0
 
 	return validatorA && validatorB
 }
 
-func GetAdsbData() {
-	rawFlightData := getRawAdsbData()
-	var processedData []FlightRecord
+func validateFlightData(normalData FlightHistory) FlightHistory {
+	var validData FlightHistory
 
-	for _, val := range rawFlightData {
-		convertedRecord, err := convertAdsbData(&val)
-		if err == nil && validateFlightData(convertedRecord) {
-			processedData = append(processedData, convertedRecord)
+	for _, record := range normalData {
+		if validator(record){
+			validData = append(validData, record)
 		}
 	}
-	AllFlights = processedData
-	fmt.Println("Retrieved", len(AllFlights), "flights from ADSB")
+
+	return validData
+}
+
+func GetAdsbData() {
+	rawPositions := getRawAdsbData()
+	normalizedPositions := normalizeAdsbData(rawPositions)
+	validatedPositions := validateFlightData(normalizedPositions)
+
+	AllFlights.Lock()
+	for _, position := range validatedPositions {
+		id := position.Id
+		position.Id=""
+		AllFlights.flightData[id] = FlightHistory{position}
+	}
+	AllFlights.Unlock()
+
+	fmt.Println("Retrieved", len(AllFlights.flightData), "flights from ADSB")
+
+	//var processedData []Position
+	//
+	//for _, val := range rawPositions {
+	//	convertedRecord, err := normalizeAdsbData(&val)
+	//	if err == nil && validateFlightData(convertedRecord) {
+	//		processedData = append(processedData, convertedRecord)
+	//	}
+	//}
+	//
+	//AllFlights = processedData
+	//fmt.Println("Retrieved", len(AllFlights), "flights from ADSB")
 }

@@ -51,7 +51,8 @@
     "react-router-dom": "^4.1.2",
     "redux": "^3.7.2",
     "redux-actions": "^2.2.1",
-    "redux-saga": "^0.16.0"
+    "redux-saga": "^0.16.0",
+    "reselect": "^3.0.1"
   },
   "engines": {
     "node": "8.9.x"
