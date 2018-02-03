@@ -1,4 +1,4 @@
-package main
+package dataserver
 
 import (
 	"bytes"
@@ -64,7 +64,7 @@ var nChanClient = http.Client{
 	},
 }
 
-func sendToEndpoint() {
+func SendToEndpoint() {
 	for {
 		select {
 		case export := <-nchan:
@@ -72,7 +72,7 @@ func sendToEndpoint() {
 			go func(export dataExport) {
 				defer func() { <-rateLimit }()
 				export.data.RLock()
-				jsonValue, _ := json.Marshal(export.data.flightData)
+				jsonValue, _ := json.Marshal(export.data.FlightData)
 				export.data.RUnlock()
 				resp, err := nChanClient.Post("http://localhost:8080/pub/"+export.channel, "application/json", bytes.NewBuffer(jsonValue))
 				if err == nil {
@@ -88,7 +88,7 @@ func sendToEndpoint() {
 func SendGlobalFeed() {
 	//globalData := decreasePrecisionOfDataset(AllFlights, localPrecision)
 	nchan <- dataExport{"global", AllFlights}
-	fmt.Println("Sent", len(AllFlights.flightData), "flights to", "global")
+	fmt.Println("Sent", len(AllFlights.FlightData), "flights to", "global")
 }
 //
 //func SendLocalFeeds() {

@@ -1,4 +1,4 @@
-package main
+package dataserver
 
 import (
 	"encoding/json"
@@ -113,11 +113,11 @@ func GetAdsbData() {
 	for _, position := range validatedPositions {
 		id := position.Icao
 		position.Icao =""
-		AllFlights.flightData[id] = FlightHistory{position}
+		AllFlights.FlightData[id] = FlightHistory{position}
 	}
 	AllFlights.Unlock()
 
-	fmt.Println("Retrieved", len(AllFlights.flightData), "flights from ADSB")
+	fmt.Println("Retrieved", len(AllFlights.FlightData), "flights from ADSB")
 
 	//var processedData []Position
 	//

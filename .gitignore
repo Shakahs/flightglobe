@@ -6,5 +6,3 @@
 /webpack-stats.json
 /.env
 /client-build/
-/server-build/
-scratch.go
