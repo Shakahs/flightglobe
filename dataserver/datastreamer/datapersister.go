@@ -31,7 +31,7 @@ func insert(newData types.FlightHistory) {
 	}
 
 	elapsed := time.Since(start)
-	fmt.Println("Insert took %s", elapsed)
+	fmt.Println("Insert took", elapsed)
 }
 
 func Persist(inChan chan types.FlightHistory) {

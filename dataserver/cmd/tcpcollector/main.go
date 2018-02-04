@@ -31,8 +31,6 @@ func main() {
 		case <-sigc:
 			fmt.Println("Received signal, quitting")
 			return
-		case r := <-cleanData:
-			fmt.Println(len(r))
 		}
 	}
 }
