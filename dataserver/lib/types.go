@@ -23,3 +23,8 @@ type LockableFlightDataSet = struct {
 	sync.RWMutex
 	FlightData FlightDataSet
 }
+
+type DataExport struct {
+	channel string
+	data    FlightDataSet
+}
