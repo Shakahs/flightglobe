@@ -13,6 +13,8 @@ func main() {
 	sendChan := make(chan lib.DataExport)
 	go lib.SendToEndpoint(sendChan)
 
+	lib.SendGlobalFeed(sendChan)
+
 	scheduler := cron.New()
 	scheduler.AddFunc("@every 5s", func() { lib.SendGlobalFeed(sendChan) })
 	scheduler.Start()

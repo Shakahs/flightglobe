@@ -3,7 +3,9 @@ package lib
 func CreateMap(data FlightHistory) FlightDataSet {
 	var newMap = make(FlightDataSet)
 	for _, pos := range data {
-		newMap[pos.Icao] = FlightHistory{pos}
+		icao := pos.Icao
+		pos.Icao = ""
+		newMap[icao] = FlightHistory{pos}
 	}
 	return newMap
 }
