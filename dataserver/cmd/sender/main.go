@@ -2,22 +2,19 @@ package main
 
 import (
 	"fmt"
-	"github.com/Shakahs/flightglobe/dataserver/datastreamer"
-	"github.com/Shakahs/flightglobe/dataserver/types"
+	"github.com/Shakahs/flightglobe/dataserver/scrape"
+	"github.com/robfig/cron"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
 func main() {
+	scheduler := cron.New()
+	scheduler.AddFunc("@every 10s", func() { scrape.SendGlobalFeed() })
+	scheduler.Start()
 
-	rawData := make(chan []byte)
-	go datastreamer.Stream(rawData)
-
-	cleanData := make(chan types.FlightHistory)
-	go datastreamer.Clean(rawData, cleanData)
-
-	go datastreamer.Persist(cleanData)
+	go scrape.SendToEndpoint()
 
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc,
@@ -30,6 +27,7 @@ func main() {
 		select {
 		case <-sigc:
 			fmt.Println("Received signal, quitting")
+			scheduler.Stop()
 			return
 		}
 	}

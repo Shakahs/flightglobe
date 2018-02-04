@@ -1,4 +1,4 @@
-package datastreamer
+package lib
 
 import (
 	"bytes"
@@ -6,7 +6,7 @@ import (
 	"net"
 )
 
-func Stream(outputChan chan []byte) {
+func Intake(outputChan chan []byte) {
 	conn, err := net.Dial("tcp", "pub-vrs.adsbexchange.com:32001")
 	if err != nil {
 		fmt.Println("dial error:", err)

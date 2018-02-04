@@ -1,8 +1,7 @@
-package datastreamer
+package lib
 
 import (
 	"fmt"
-	"github.com/Shakahs/flightglobe/dataserver/types"
 	_ "github.com/jackc/pgx/stdlib"
 	"github.com/jmoiron/sqlx"
 	"time"
@@ -13,7 +12,7 @@ var db = sqlx.MustConnect("pgx",
 var query = `INSERT INTO positions(lat, lng, heading, altitude,icao) 
           VALUES(:lat, :lng, :heading, :altitude, :icao)`
 
-func insert(newData types.FlightHistory) {
+func insert(newData FlightHistory) {
 	start := time.Now()
 	tx := db.MustBegin()
 
@@ -34,7 +33,7 @@ func insert(newData types.FlightHistory) {
 	fmt.Println("Insert took", elapsed)
 }
 
-func Persist(inChan chan types.FlightHistory) {
+func Persist(inChan chan FlightHistory) {
 	for {
 		select {
 		case r := <-inChan:

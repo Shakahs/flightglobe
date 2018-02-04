@@ -1,4 +1,4 @@
-package types
+package lib
 
 import (
 	"sync"
@@ -23,5 +23,3 @@ type LockableFlightDataSet = struct {
 	sync.RWMutex
 	FlightData FlightDataSet
 }
-
-var AllFlights = LockableFlightDataSet{FlightData: make(FlightDataSet)}
