@@ -2,19 +2,20 @@
 <project name="FlightglobeDB" id="Project_3b7203d" template="Default" database="PostgreSQL" >
 	<schema name="public" catalogname="flightglobe" schemaname="public" >
 		<table name="positions" >
-			<column name="id" type="integer" jt="4" mandatory="y" />
+			<column name="id" type="serial" jt="4" mandatory="y" />
 			<column name="lat" type="real" jt="7" mandatory="y" />
 			<column name="lng" type="real" jt="7" mandatory="y" />
 			<column name="heading" type="real" jt="7" mandatory="y" />
 			<column name="ptime" type="timestamptz" jt="93" mandatory="y" >
-				<defo>current_timestamp</defo>
+				<defo>CURRENT_TIMESTAMP</defo>
 			</column>
-			<column name="altitude" type="integer" jt="4" mandatory="y" />
+			<column name="altitude" type="real" jt="7" mandatory="y" />
 			<column name="icao" type="char" length="8" jt="1" mandatory="y" />
 			<index name="pk_positions_id" unique="PRIMARY_KEY" >
 				<column name="id" />
 			</index>
 		</table>
+		<sequence name="positions_id_seq" start="1" />
 	</schema>
 	<connector name="FlightglobeDB" database="PostgreSQL" driver_class="org.postgresql.Driver" driver_jar="postgresql-42.1.4.jar" driver_desc="Standard" host="localhost" port="5432" instance="flightglobe" user="flightglobe" passwd="ZmxpZ2h0Z2xvYmU=" />
 	<layout name="Default Layout" id="Layout_5a78fce" show_relation="columns" >
