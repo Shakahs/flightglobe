@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="FlightglobeDB" id="Project_3b7203d" template="Default" database="PostgreSQL" >
+	<schema name="public" catalogname="flightglobe" schemaname="public" />
+	<connector name="FlightglobeDB" database="PostgreSQL" driver_class="org.postgresql.Driver" driver_jar="postgresql-42.1.4.jar" driver_desc="Standard" host="localhost" port="5432" instance="flightglobe" user="flightglobe" passwd="ZmxpZ2h0Z2xvYmU=" />
+	<layout name="Default Layout" id="Layout_5a78fce" show_relation="columns" >
+		<callout x="45" y="45" pointer="NO" >
+			<comment><![CDATA[Create new tables by right-clicking the layout, new foreign keys by drag and drop of one column over a primary key column.
+For a better design create multiple layouts (diagrams) with the same or different tables.
+Right-click any table header to start Relational Data Browse (very useful) or other tools.]]></comment>
+		</callout>
+	</layout>
+</project>
