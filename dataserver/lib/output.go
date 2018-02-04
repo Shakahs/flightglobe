@@ -15,7 +15,7 @@ func SendGlobalFeed(outChan chan DataExport) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	positionMap := CreateMap(positions)
+	dpData := DecreasePrecisionOfDataset(positions, GlobalPrecision)
+	positionMap := CreateMap(dpData)
 	outChan <- DataExport{"global", positionMap}
-	fmt.Println(positions)
 }
