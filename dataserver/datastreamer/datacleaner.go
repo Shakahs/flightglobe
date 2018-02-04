@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/Shakahs/flightglobe/dataserver/types"
 	"github.com/asaskevich/govalidator"
+	"math"
 	"strconv"
 	"time"
 )
@@ -49,8 +50,8 @@ func normalizeAdsbData(rawPositions adsbList) types.FlightHistory {
 
 		normalized.Time = time.Now().UTC()
 
-		//convert feet to meters
-		normalized.Altitude = record.Galt / 3.2808399
+		//convert feet to meters, round down to nearest meter
+		normalized.Altitude = int32(math.Floor(record.Galt / 3.2808399))
 
 		normalData = append(normalData, normalized)
 	}
@@ -68,7 +69,7 @@ func validator(record types.Position) bool {
 		// heading
 		govalidator.InRangeFloat64(record.Heading, 0, 360) &&
 		// altitude
-		govalidator.InRangeFloat64(record.Altitude, -500, 30000)
+		govalidator.InRangeFloat64(float64(record.Altitude), -500, 100000)
 	// time?
 
 	validatorB := record.Lat != 0 || record.Lng != 0

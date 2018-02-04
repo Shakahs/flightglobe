@@ -6,13 +6,13 @@ import (
 )
 
 type Position struct {
-	Id       int
+	Id       int64
 	Icao     string    `json:"icao,omitempty"`
 	Lat      float64   `json:"lat"`
 	Lng      float64   `json:"lon"`
 	Time     time.Time `json:"time" db:"ptime"`
 	Heading  float64   `json:"heading"`
-	Altitude float64   `json:"altitude"` // meters
+	Altitude int32   `json:"altitude"` // meters
 }
 
 type FlightHistory = []Position
