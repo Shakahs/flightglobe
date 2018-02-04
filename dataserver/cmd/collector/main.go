@@ -2,23 +2,21 @@ package main
 
 import (
 	"fmt"
+	"github.com/Shakahs/flightglobe/dataserver/scrape"
 	"github.com/robfig/cron"
-	"github.com/Shakahs/flightglobe/dataserver"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
-
-
 func main() {
 	scheduler := cron.New()
-	scheduler.AddFunc("@every 5s", func() { dataserver.GetAdsbData() })
-	scheduler.AddFunc("@every 10s", func() { dataserver.SendGlobalFeed() })
+	scheduler.AddFunc("@every 5s", func() { scrape.GetAdsbData() })
+	scheduler.AddFunc("@every 10s", func() { scrape.SendGlobalFeed() })
 	//scheduler.AddFunc("@every 10s", func() { SendLocalFeeds() })
 	scheduler.Start()
 
-	go dataserver.SendToEndpoint()
+	go scrape.SendToEndpoint()
 
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc,

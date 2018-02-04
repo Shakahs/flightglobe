@@ -1,15 +1,13 @@
-package dataserver
+package scrape
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	//"github.com/mmcloughlin/geohash"
-	//"github.com/shopspring/decimal"
+	"github.com/Shakahs/flightglobe/dataserver/types"
 	"net"
 	"net/http"
 	"time"
-	//"github.com/mmcloughlin/geohash"
 )
 
 //type precisionStandards struct {
@@ -24,8 +22,9 @@ import (
 //
 type dataExport struct {
 	channel string
-	data    LockableFlightDataSet
+	data    types.LockableFlightDataSet
 }
+
 //
 //func decreasePrecisionOfRecord(record Position, p precisionStandards) Position {
 //	newLat, _ := decimal.NewFromFloat(record.Lat).Round(p.coordinates).Float64()
@@ -87,9 +86,10 @@ func SendToEndpoint() {
 
 func SendGlobalFeed() {
 	//globalData := decreasePrecisionOfDataset(AllFlights, localPrecision)
-	nchan <- dataExport{"global", AllFlights}
-	fmt.Println("Sent", len(AllFlights.FlightData), "flights to", "global")
+	nchan <- dataExport{"global", types.AllFlights}
+	fmt.Println("Sent", len(types.AllFlights.FlightData), "flights to", "global")
 }
+
 //
 //func SendLocalFeeds() {
 //	localData := decreasePrecisionOfDataset(AllFlights, localPrecision)

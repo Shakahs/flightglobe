@@ -1,9 +1,9 @@
-package dataserver
+package scrape
 
 import (
 	"encoding/json"
-	//"errors"
 	"fmt"
+	"github.com/Shakahs/flightglobe/dataserver/types"
 	"github.com/asaskevich/govalidator"
 	"io/ioutil"
 	"net/http"
@@ -43,11 +43,11 @@ func getRawAdsbData() adsbList {
 	return unmarshaledData.AcList
 }
 
-func normalizeAdsbData(rawPositions adsbList) (FlightHistory) {
-	var normalData FlightHistory
+func normalizeAdsbData(rawPositions adsbList) types.FlightHistory {
+	var normalData types.FlightHistory
 
 	for _, record := range rawPositions {
-		var normalized Position
+		var normalized types.Position
 
 		//copy values
 		normalized.Icao = record.Icao
@@ -57,7 +57,7 @@ func normalizeAdsbData(rawPositions adsbList) (FlightHistory) {
 
 		//convert timestamp to native time type
 		if record.PosTime == 0 {
-			normalized.Time=time.Unix(0, 0)
+			normalized.Time = time.Unix(0, 0)
 		} else {
 			timeStringWithNano := strconv.FormatInt(record.PosTime, 10)
 			timeStringUnix := timeStringWithNano[0 : len(timeStringWithNano)-3]
@@ -74,7 +74,7 @@ func normalizeAdsbData(rawPositions adsbList) (FlightHistory) {
 	return normalData
 }
 
-func validator(record Position) bool {
+func validator(record types.Position) bool {
 	validatorA := govalidator.IsAlphanumeric(record.Icao) && //Icao id
 		govalidator.IsByteLength(record.Icao, 3, 10) &&
 		// latitude
@@ -92,11 +92,11 @@ func validator(record Position) bool {
 	return validatorA && validatorB
 }
 
-func validateFlightData(normalData FlightHistory) FlightHistory {
-	var validData FlightHistory
+func validateFlightData(normalData types.FlightHistory) types.FlightHistory {
+	var validData types.FlightHistory
 
 	for _, record := range normalData {
-		if validator(record){
+		if validator(record) {
 			validData = append(validData, record)
 		}
 	}
@@ -109,15 +109,15 @@ func GetAdsbData() {
 	normalizedPositions := normalizeAdsbData(rawPositions)
 	validatedPositions := validateFlightData(normalizedPositions)
 
-	AllFlights.Lock()
+	types.AllFlights.Lock()
 	for _, position := range validatedPositions {
 		id := position.Icao
-		position.Icao =""
-		AllFlights.FlightData[id] = FlightHistory{position}
+		position.Icao = ""
+		types.AllFlights.FlightData[id] = types.FlightHistory{position}
 	}
-	AllFlights.Unlock()
+	types.AllFlights.Unlock()
 
-	fmt.Println("Retrieved", len(AllFlights.FlightData), "flights from ADSB")
+	fmt.Println("Retrieved", len(types.AllFlights.FlightData), "flights from ADSB")
 
 	//var processedData []Position
 	//

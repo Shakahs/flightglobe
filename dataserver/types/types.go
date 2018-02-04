@@ -1,4 +1,4 @@
-package dataserver
+package types
 
 import (
 	"time"
