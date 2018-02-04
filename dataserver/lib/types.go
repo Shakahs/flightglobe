@@ -28,3 +28,11 @@ type DataExport struct {
 	channel string
 	data    FlightDataSet
 }
+
+type precisionStandards struct {
+	coordinates int32
+	altitude    int32
+	heading     int32
+	geohash     uint
+}
+

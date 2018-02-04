@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/asaskevich/govalidator"
+	"github.com/shopspring/decimal"
 	"math"
 	"strconv"
 	"time"
@@ -87,6 +88,27 @@ func validateFlightData(normalData FlightHistory) FlightHistory {
 	return validData
 }
 
+func decreasePrecisionOfRecord(record Position, p precisionStandards) Position {
+	newLat, _ := decimal.NewFromFloat(record.Lat).Round(p.coordinates).Float64()
+	record.Lat = newLat
+
+	newLng, _ := decimal.NewFromFloat(record.Lng).Round(p.coordinates).Float64()
+	record.Lng = newLng
+
+	newHeading, _ := decimal.NewFromFloat(record.Heading).Round(p.heading).Float64()
+	record.Heading = newHeading
+
+	return record
+}
+
+func decreasePrecisionOfDataset(data FlightHistory, p precisionStandards) FlightHistory {
+	var dpFlights FlightHistory
+	for _, val := range data {
+		dpFlights = append(dpFlights, decreasePrecisionOfRecord(val, p))
+	}
+	return dpFlights
+}
+
 func Clean(inChan chan []byte, outChan chan FlightHistory) {
 	for {
 		select {
@@ -94,7 +116,8 @@ func Clean(inChan chan []byte, outChan chan FlightHistory) {
 			rawPositions := getRawAdsbData(raw)
 			normalizedPositions := normalizeAdsbData(rawPositions)
 			validatedPositions := validateFlightData(normalizedPositions)
-			outChan <- validatedPositions
+			deaccurizedPositions := decreasePrecisionOfDataset(validatedPositions, GlobalPrecision)
+			outChan <- deaccurizedPositions
 		}
 	}
 }

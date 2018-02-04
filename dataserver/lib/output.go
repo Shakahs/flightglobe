@@ -17,4 +17,5 @@ func SendGlobalFeed(outChan chan DataExport) {
 	}
 	positionMap := CreateMap(positions)
 	outChan <- DataExport{"global", positionMap}
+	fmt.Println(positions)
 }
