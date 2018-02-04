@@ -17,6 +17,8 @@ func main() {
 	cleanData := make(chan types.FlightHistory)
 	go datastreamer.Clean(rawData, cleanData)
 
+	go datastreamer.Persist(cleanData)
+
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc,
 		syscall.SIGHUP,
@@ -30,7 +32,7 @@ func main() {
 			fmt.Println("Received signal, quitting")
 			return
 		case r := <-cleanData:
-			fmt.Println(r)
+			fmt.Println(len(r))
 		}
 	}
 }
