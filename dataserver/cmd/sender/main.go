@@ -10,13 +10,18 @@ import (
 )
 
 func main() {
-	sendChan := make(chan lib.DataExport)
-	go lib.SendToEndpoint(sendChan)
+	for w := 1; w <= 4; w++ {
+		go lib.SendToEndpoint()
+		go lib.SendFlightHistoryWorker()
+	}
 
-	lib.SendGlobalFeed(sendChan)
+
+	lib.SendGlobalFeed()
+	lib.FanoutSendFlightHistory()
 
 	scheduler := cron.New()
-	scheduler.AddFunc("@every 5s", func() { lib.SendGlobalFeed(sendChan) })
+	scheduler.AddFunc("@every 5s", func() { lib.SendGlobalFeed() })
+	scheduler.AddFunc("@every 30s", func() { lib.FanoutSendFlightHistory() })
 	scheduler.Start()
 
 	sigc := make(chan os.Signal, 1)

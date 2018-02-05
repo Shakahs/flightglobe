@@ -3,7 +3,7 @@
 	<schema name="public" catalogname="flightglobe" schemaname="public" >
 		<table name="positions" >
 			<column name="id" type="bigserial" jt="-5" mandatory="y" />
-			<column name="icao" type="char" length="8" jt="1" mandatory="y" />
+			<column name="icao" type="char" length="6" jt="1" mandatory="y" />
 			<column name="ptime" type="timestamptz" jt="93" mandatory="y" >
 				<defo>CURRENT_TIMESTAMP</defo>
 			</column>

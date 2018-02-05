@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func SendToEndpoint(inChan chan DataExport) {
+func SendToEndpoint() {
 	var nChanClient = http.Client{
 		Transport: &http.Transport{
 			DialContext: (&net.Dialer{
@@ -21,11 +21,15 @@ func SendToEndpoint(inChan chan DataExport) {
 	}
 	for {
 		select {
-		case export := <-inChan:
+		case export := <-SendDataJobs:
 			go func(export DataExport) {
 				jsonValue, _ := json.Marshal(export.data)
 				resp, err := nChanClient.Post("http://localhost:8080/pub/"+export.channel, "application/json", bytes.NewBuffer(jsonValue))
-				fmt.Println("Sent data for", len(export.data), "flights to endpoint", export.channel)
+				posCount := 0
+				for _, v := range export.data {
+					posCount += len(v)
+				}
+				fmt.Println("Sent", posCount, "positions for", len(export.data), "flights to endpoint", export.channel)
 				if err == nil {
 					defer resp.Body.Close()
 				} else {

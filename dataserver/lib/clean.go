@@ -87,8 +87,6 @@ func validateFlightData(normalData FlightHistory) FlightHistory {
 	return validData
 }
 
-
-
 func Clean(inChan chan []byte, outChan chan FlightHistory) {
 	for {
 		select {
