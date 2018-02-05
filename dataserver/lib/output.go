@@ -2,12 +2,11 @@ package lib
 
 import "fmt"
 
-var globalFeedQuery = `WITH T AS (
-					SELECT *, ROW_NUMBER() OVER(PARTITION BY icao ORDER BY ptime DESC) AS rn
-					FROM positions
-					where ptime > (now()-'1 minutes'::INTERVAL)
-				)
-				SELECT id,icao,lat,lng,heading,altitude,ptime FROM T WHERE rn = 1;`
+var globalFeedQuery =
+`SELECT distinct on (icao) *
+FROM positions
+where ptime  between  (CURRENT_TIMESTAMP - INTERVAL '1 minute') and CURRENT_TIMESTAMP
+order by icao,ptime desc;`
 
 func SendGlobalFeed(outChan chan DataExport) {
 	var positions FlightHistory

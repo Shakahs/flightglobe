@@ -26,9 +26,9 @@ func DecreasePrecisionOfDataset(data FlightHistory, p precisionStandards) Flight
 func CreateMap(data FlightHistory) FlightDataSet {
 	var newMap = make(FlightDataSet)
 	for _, pos := range data {
-		icao := pos.Icao
-		pos.Icao = ""
-		newMap[icao] = FlightHistory{pos}
+		//icao := pos.Icao
+		//pos.Icao = ""
+		newMap[pos.Icao] = append(newMap[pos.Icao],pos)
 	}
 	return newMap
 }
