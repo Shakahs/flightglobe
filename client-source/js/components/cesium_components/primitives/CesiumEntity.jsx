@@ -11,7 +11,8 @@ export default class CesiumEntity extends Component {
   constructor(props) {
     super(props);
     const { planeData } = this.props;
-    this.entity = planeData.entities.getOrCreateEntity(props.plane.icao);
+    this.entity = planeData.entities.getOrCreateEntity(props.plane.id);
+    this.entity.name = props.plane.icao;
     this.entity.point = {
       'pixelSize': 5,
     };
@@ -38,7 +39,7 @@ export default class CesiumEntity extends Component {
   }
 
   componentWillUnmount() {
-    this.props.planeData.entities.removeById(this.props.plane.icao);
+    this.props.planeData.entities.removeById(this.props.plane.id);
   }
 
   updateEntity() {

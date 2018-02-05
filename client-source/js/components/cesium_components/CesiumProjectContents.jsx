@@ -20,7 +20,7 @@ class CesiumProjectContents extends React.Component {
     handler.setInputAction((click) => {
       const pickedObject = scene.pick(click.position);
       if (pickedObject) {
-        this.props.globeActions.retrieveHistory(pickedObject.id._id);
+        this.props.globeActions.retrieveHistory(pickedObject.id._name);
       }
     }, ScreenSpaceEventType.LEFT_CLICK);
 
@@ -43,7 +43,7 @@ class CesiumProjectContents extends React.Component {
       (<CesiumEntity
         plane={ plane }
         planeData={ this.planeData }
-        key={ plane.icao }
+        key={ plane.id }
       />));
 
     return (

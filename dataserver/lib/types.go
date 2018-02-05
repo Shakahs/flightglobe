@@ -6,7 +6,7 @@ import (
 )
 
 type Position struct {
-	Id       int64     `json:"-"`
+	Id       int64     `json:"id"`
 	Icao     string    `json:"icao,omitempty"`
 	Lat      float64   `json:"lat"`
 	Lng      float64   `json:"lon"`
