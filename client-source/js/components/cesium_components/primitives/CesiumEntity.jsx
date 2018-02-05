@@ -37,6 +37,10 @@ export default class CesiumEntity extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.props.planeData.entities.removeById(this.props.plane.icao);
+  }
+
   updateEntity() {
     const position = Cartesian3.fromDegrees(
       this.props.plane.lon,

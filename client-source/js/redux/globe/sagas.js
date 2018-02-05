@@ -1,6 +1,8 @@
 import { eventChannel } from 'redux-saga';
 import { call, put, take } from 'redux-saga/effects';
 import { actions as globeActions } from './index';
+import { globe } from '../../api';
+
 
 const loc = window.location;
 
@@ -21,5 +23,18 @@ export function* streamGlobalFeed() {
   while (true) {
     const action = yield take(channel);
     yield put(action);
+  }
+}
+
+export function* watchRetrieveHistory() {
+  while (true) {
+    try {
+      const { payload } = yield take(globeActions.RETRIEVE_HISTORY);
+      const data = yield call(globe.retrieveFlightHistory, payload);
+      console.log(data);
+      yield put(globeActions.receiveFlights(data));
+    } catch (err) {
+      console.log(err);
+    }
   }
 }

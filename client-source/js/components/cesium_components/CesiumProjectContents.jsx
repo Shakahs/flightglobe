@@ -1,12 +1,12 @@
 import { connect } from 'react-redux';
-import React  from 'react';
+import React from 'react';
+import { bindActionCreators } from 'redux';
+import { map } from 'lodash-es';
 import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
 import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler';
 import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
 import CesiumEntity from './primitives/CesiumEntity';
-import { selectors as globeSelectors } from '../../redux/globe';
-
-const _ = require('lodash');
+import { actions as globeActions, selectors as globeSelectors } from '../../redux/globe';
 
 class CesiumProjectContents extends React.Component {
   constructor(props) {
@@ -20,8 +20,7 @@ class CesiumProjectContents extends React.Component {
     handler.setInputAction((click) => {
       const pickedObject = scene.pick(click.position);
       if (pickedObject) {
-        const entity = pickedObject.icao;
-        console.log(entity.icao);
+        this.props.globeActions.retrieveHistory(pickedObject.id._id);
       }
     }, ScreenSpaceEventType.LEFT_CLICK);
 
@@ -38,8 +37,9 @@ class CesiumProjectContents extends React.Component {
 
   render() {
     const { planes } = this.props;
+    console.log('rendering planes', planes.length);
 
-    const renderedPlanes = _.map(planes, (plane) =>
+    const renderedPlanes = map(planes, (plane) =>
       (<CesiumEntity
         plane={ plane }
         planeData={ this.planeData }
@@ -58,4 +58,8 @@ const mapStateToProps = state => ({
   planes: globeSelectors.getPositions(state),
 });
 
-export default connect(mapStateToProps)(CesiumProjectContents);
+const mapDispatchToProps = dispatch => ({
+  globeActions: bindActionCreators(globeActions, dispatch),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(CesiumProjectContents);

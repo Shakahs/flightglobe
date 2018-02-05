@@ -4,6 +4,9 @@ import { assign } from 'lodash-es';
 export const RECEIVE_FLIGHTS = 'globe/RECEIVE_FLIGHTS';
 export const receiveFlights = createAction(RECEIVE_FLIGHTS);
 
+export const RETRIEVE_HISTORY = 'globe/RETRIEVE_HISTORY';
+export const retrieveHistory = createAction(RETRIEVE_HISTORY);
+
 const initialState = {
   flights: {},
 };
