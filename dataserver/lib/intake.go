@@ -7,7 +7,7 @@ import (
 )
 
 func Intake(outputChan chan []byte) {
-	conn, err := net.Dial("tcp", "pub-vrs.adsbexchange.com:32001")
+	conn, err := net.Dial("tcp", "pub-vrs.adsbexchange.com:32005")
 	if err != nil {
 		fmt.Println("dial error:", err)
 		return
