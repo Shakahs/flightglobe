@@ -17,11 +17,4 @@
     name: postgresql-contrib
     cache_valid_time: 3600
 
-- name: Add hstore extension to Flightglobe database
-  become: true
-  become_user: postgres
-  postgresql_ext:
-    name: hstore
-    db: flightglobe
-
 

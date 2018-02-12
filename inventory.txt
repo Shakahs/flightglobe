@@ -1,4 +1,4 @@
 [all]
-207.246.98.44
+
 [all:vars]
 ansible_python_interpreter=/usr/bin/python3
