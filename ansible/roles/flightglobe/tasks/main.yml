@@ -1,0 +1,32 @@
+---
+- name: Create Flightglobe group
+  group:
+    name: flightglobe
+    state: present
+
+- name: Setup Flightglobe user
+  user:
+    name: flightglobe
+    group: flightglobe
+
+- name: Setup Flightglobe database user
+  become: true
+  become_user: postgres
+  postgresql_user:
+    name: flightglobe
+    password: flightglobe
+
+- name: Setup Flightglobe database
+  become: true
+  become_user: postgres
+  postgresql_db:
+    name: flightglobe
+    owner: flightglobe
+
+- name: Copy Flightglobe collector
+  copy:
+    src: dataserver/
+    dest: /etc/foo.conf
+    owner: foo
+    group: foo
+    mode: 0644
