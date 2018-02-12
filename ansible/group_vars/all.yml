@@ -1,5 +1,0 @@
----
-letsencrypt_email: shakahs@gmail.com
-domain_name: foodtrac.me
-gitpush_repo_path: /tmp/foodtracrepo
-gitpush_workdir_path: /var/www/foodtrac.me

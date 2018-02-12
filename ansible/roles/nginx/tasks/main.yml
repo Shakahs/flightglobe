@@ -1,8 +1,15 @@
 ---
+- name: Install Nginx-Nchan package
+  apt:
+    state: latest
+    name: libnginx-mod-nchan
+    cache_valid_time: 3600
+
 - name: Install Nginx package
-  yum:
+  apt:
     state: latest
     name: nginx
+    cache_valid_time: 3600
 
 - name: enable Nginx service
   service:
@@ -10,9 +17,9 @@
     state: started
     enabled: yes
 
-- name: Ensure Nginx default site is disabled
-  notify:
-  - reload nginx
-  file:
-    path: /etc/nginx/sites-enabled/default
-    state: absent
+#- name: Ensure Nginx default site is disabled
+#  notify:
+#  - reload nginx
+#  file:
+#    path: /etc/nginx/sites-enabled/default
+#    state: absent

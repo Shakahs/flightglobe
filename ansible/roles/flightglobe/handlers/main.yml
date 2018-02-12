@@ -1,5 +1,0 @@
----
-- name: restart foodtrac
-  service:
-    name: foodtrac
-    state: restarted
