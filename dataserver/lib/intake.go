@@ -4,22 +4,17 @@ import (
 	"bytes"
 	"fmt"
 	"net"
+	"time"
 )
 
-func Intake(outputChan chan []byte) {
-	conn, err := net.Dial("tcp", "pub-vrs.adsbexchange.com:32005")
-	if err != nil {
-		fmt.Println("dial error:", err)
-		return
-	}
-	fmt.Println("Connection opened")
-
+func readStream(conn net.Conn, outputChan chan []byte) {
 	collector := []byte{}
 	for {
 		b := make([]byte, 1024*128)
 		n, err := conn.Read(b)
 		if err != nil {
 			fmt.Println(err)
+			return
 		}
 
 		for _, onebyte := range b[:n] {
@@ -33,5 +28,18 @@ func Intake(outputChan chan []byte) {
 			outputChan <- newData
 		}
 	}
+}
 
+func Intake(outputChan chan []byte) {
+	for {
+		conn, err := net.Dial("tcp", "pub-vrs.adsbexchange.com:32005")
+		if err != nil {
+			fmt.Println("dial error:", err)
+			return
+		}
+		fmt.Println("Connection opened")
+		readStream(conn, outputChan)
+		//todo: exponential backoff
+		time.Sleep(5 * time.Second)
+	}
 }
