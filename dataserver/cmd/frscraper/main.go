@@ -3,16 +3,15 @@ package main
 import (
 	"fmt"
 	"github.com/Shakahs/flightglobe/dataserver/lib/quadtree"
-	"github.com/Shakahs/go-geom"
-	"github.com/Shakahs/go-geom/encoding/geojson"
 	"github.com/paulmach/go.geo"
+	"github.com/paulmach/go.geojson"
 	"math/rand"
 	"time"
 )
 
 const MaxPoints = 10
 
-var fv = []*geojson.Feature{}
+var fc = geojson.NewFeatureCollection()
 
 func recurseQT(qt quadtree.Quadtree) {
 	if qt.HasChildren {
@@ -25,21 +24,15 @@ func recurseQT(qt quadtree.Quadtree) {
 		//fmt.Println(qt.Bound().SouthWest().Lat(), ",", qt.Bound().SouthWest().Lng())
 		//fmt.Println(qt.Bound().NorthEast().ToArray(), ",", qt.Bound().NorthEast().Lng())
 
-		pg := geom.NewPolygon(geom.XY).MustSetCoords([][]geom.Coord{
+		pg := geojson.NewPolygonFeature([][][]float64{
 			{{qt.Bound().SouthWest().Lng(), qt.Bound().SouthWest().Lat()},
 				{qt.Bound().SouthEast().Lng(), qt.Bound().SouthEast().Lat()},
 				{qt.Bound().NorthEast().Lng(), qt.Bound().NorthEast().Lat()},
 				{qt.Bound().NorthWest().Lng(), qt.Bound().NorthWest().Lat()},
 				{qt.Bound().SouthWest().Lng(), qt.Bound().SouthWest().Lat()},
-			},
-		})
-		m := make(map[string]string)
-		m["a"] = "b"
-		ft := &geojson.Feature{Geometry: pg}
-		ft.Properties = m
+			}})
 
-		fv = append(fv, ft)
-
+		fc.AddFeature(pg)
 	}
 }
 
@@ -64,11 +57,12 @@ func main() {
 	// insert 1000 random points
 	for i := 0; i < 3000; i++ {
 		np := geo.NewPoint(randX(), randY())
-		fmt.Println(np.Lat(),np.Lng())
+		fmt.Println(np.Lat(), np.Lng())
 		qt.Insert(np)
 	}
 	recurseQT(*qt)
-	gj := geojson.FeatureCollection{Features: fv}
-	byteString, _ := gj.MarshalJSON()
-	fmt.Println(string(byteString))
+
+	rawJSON, _ := fc.MarshalJSON()
+	fmt.Println(string(rawJSON))
+
 }
