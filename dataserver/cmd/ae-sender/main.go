@@ -16,11 +16,11 @@ func main() {
 	}
 
 
-	lib.SendGlobalFeed()
+	lib.SendAllPositions()
 	lib.FanoutSendFlightHistory()
 
 	scheduler := cron.New()
-	scheduler.AddFunc("@every 30s", func() { lib.SendGlobalFeed() })
+	scheduler.AddFunc("@every 30s", func() { lib.SendAllPositions() })
 	scheduler.AddFunc("@every 30s", func() { lib.FanoutSendFlightHistory() })
 	scheduler.Start()
 

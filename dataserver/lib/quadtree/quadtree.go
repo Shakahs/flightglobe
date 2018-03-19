@@ -114,3 +114,15 @@ func (q *Quadtree) insert(p geo.Pointer, left, right, bottom, top float64) {
 		q.AddPoint(point)
 	}
 }
+
+func WalkQTLeafs(qt *Quadtree, handler func(Quadtree)) {
+	if qt.HasChildren {
+		for _, v := range qt.Children {
+			if v != nil {
+				WalkQTLeafs(v, handler)
+			}
+		}
+	} else {
+		handler(*qt)
+	}
+}

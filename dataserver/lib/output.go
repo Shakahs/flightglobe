@@ -19,7 +19,7 @@ ORDER BY icao, aligned_measured_at DESC
 var fetchHistoryJobs = make(chan Position)
 var SendDataJobs = make(chan DataExport)
 
-func getGlobalFeed() FlightHistory {
+func GetAllPositions() FlightHistory {
 	var positions FlightHistory
 	err := DB.Select(&positions, globalFeedQuery)
 	if err != nil {
@@ -28,8 +28,8 @@ func getGlobalFeed() FlightHistory {
 	return positions
 }
 
-func SendGlobalFeed() {
-	positions := getGlobalFeed()
+func SendAllPositions() {
+	positions := GetAllPositions()
 	dpData := DecreasePrecisionOfDataset(positions, GlobalPrecision)
 	positionMap := CreateMap(dpData)
 	SendDataJobs <- DataExport{"global", positionMap}
@@ -52,7 +52,7 @@ func SendFlightHistoryWorker() {
 }
 
 func FanoutSendFlightHistory() {
-	positions := getGlobalFeed()
+	positions := GetAllPositions()
 	for _, pos := range positions {
 		fetchHistoryJobs <- pos
 	}
