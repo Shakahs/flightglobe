@@ -1,8 +1,9 @@
-package lib
+package adsbexchange
 
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Shakahs/flightglobe/dataserver/lib"
 	"github.com/asaskevich/govalidator"
 	"math"
 	"strconv"
@@ -35,11 +36,11 @@ func getRawAdsbData(resp []byte) adsbList {
 	return unmarshaledData.AcList
 }
 
-func normalizeAdsbData(rawPositions adsbList) FlightHistory {
-	var normalData FlightHistory
+func normalizeAdsbData(rawPositions adsbList) lib.FlightHistory {
+	var normalData lib.FlightHistory
 
 	for _, record := range rawPositions {
-		var normalized Position
+		var normalized lib.Position
 
 		//copy values
 		normalized.Icao = record.Icao
@@ -58,7 +59,7 @@ func normalizeAdsbData(rawPositions adsbList) FlightHistory {
 	return normalData
 }
 
-func validator(record Position) bool {
+func validator(record lib.Position) bool {
 	validatorA := govalidator.IsAlphanumeric(record.Icao) && //Icao id
 		govalidator.IsByteLength(record.Icao, 3, 10) &&
 		// latitude
@@ -76,8 +77,8 @@ func validator(record Position) bool {
 	return validatorA && validatorB
 }
 
-func validateFlightData(normalData FlightHistory) FlightHistory {
-	var validData FlightHistory
+func validateFlightData(normalData lib.FlightHistory) lib.FlightHistory {
+	var validData lib.FlightHistory
 
 	for _, record := range normalData {
 		if validator(record) {
@@ -87,7 +88,7 @@ func validateFlightData(normalData FlightHistory) FlightHistory {
 	return validData
 }
 
-func Clean(inChan chan []byte, outChan chan FlightHistory) {
+func Clean(inChan chan []byte, outChan chan lib.FlightHistory) {
 	for {
 		select {
 		case raw := <-inChan:
