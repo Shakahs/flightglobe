@@ -17,11 +17,11 @@ func main() {
 
 
 	lib.SendAllPositions()
-	lib.FanoutSendFlightHistory()
+	//lib.FanoutSendFlightHistory()
 
 	scheduler := cron.New()
 	scheduler.AddFunc("@every 30s", func() { lib.SendAllPositions() })
-	scheduler.AddFunc("@every 30s", func() { lib.FanoutSendFlightHistory() })
+	//scheduler.AddFunc("@every 30s", func() { lib.FanoutSendFlightHistory() })
 	scheduler.Start()
 
 	sigc := make(chan os.Signal, 1)

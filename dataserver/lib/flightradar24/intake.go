@@ -36,6 +36,7 @@ func buildQuadTree() *quadtree.Quadtree {
 }
 
 func retrieve(url string) []byte {
+	fmt.Println(url)
 	resp, err := http.Get(url)
 	if err != nil {
 		panic(err)
@@ -48,7 +49,8 @@ func retrieve(url string) []byte {
 func Scrape(outputChan chan []byte) {
 	qt := buildQuadTree()
 	urlList := buildUrlList(qt)
-	fmt.Println(urlList)
-	data := retrieve(urlList[0])
-	outputChan <- data
+	for _,v := range urlList {
+		data := retrieve(v)
+		outputChan <- data
+	}
 }
