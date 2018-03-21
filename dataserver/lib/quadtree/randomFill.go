@@ -37,7 +37,7 @@ func RandomFill(qt *Quadtree) {
 func PrintLeafMap(qt *Quadtree) {
 	var fc = geojson.NewFeatureCollection()
 
-	handleFeature := func(qt Quadtree) {
+	handleFeature := func(qt *Quadtree) {
 		pg := geojson.NewPolygonFeature([][][]float64{
 			{{qt.Bound().SouthWest().Lng(), qt.Bound().SouthWest().Lat()},
 				{qt.Bound().SouthEast().Lng(), qt.Bound().SouthEast().Lat()},
@@ -45,7 +45,7 @@ func PrintLeafMap(qt *Quadtree) {
 				{qt.Bound().NorthWest().Lng(), qt.Bound().NorthWest().Lat()},
 				{qt.Bound().SouthWest().Lng(), qt.Bound().SouthWest().Lat()},
 			}})
-
+		pg.Properties["count"]=len(qt.Points)
 		fc.AddFeature(pg)
 	}
 

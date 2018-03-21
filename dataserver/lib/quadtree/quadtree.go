@@ -41,6 +41,7 @@ func New(bound *geo.Bound) *Quadtree {
 	qt := &Quadtree{
 		bound: bound,
 	}
+	qt.HasChildren = false
 	return qt
 }
 
@@ -51,7 +52,7 @@ func (q *Quadtree) Bound() *geo.Bound {
 
 func (q *Quadtree) AddPoint(p *geo.Point) {
 	q.Points = append(q.Points, p)
-	if len(q.Points) > 10 {
+	if len(q.Points) > 1000 {
 		q.HasChildren = true
 		for _, v := range q.Points {
 			q.Insert(v)
@@ -115,7 +116,7 @@ func (q *Quadtree) insert(p geo.Pointer, left, right, bottom, top float64) {
 	}
 }
 
-func WalkQTLeafs(qt *Quadtree, handler func(Quadtree)) {
+func WalkQTLeafs(qt *Quadtree, handler func(*Quadtree)) {
 	if qt.HasChildren {
 		for _, v := range qt.Children {
 			if v != nil {
@@ -123,6 +124,6 @@ func WalkQTLeafs(qt *Quadtree, handler func(Quadtree)) {
 			}
 		}
 	} else {
-		handler(*qt)
+		handler(qt)
 	}
 }
