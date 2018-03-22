@@ -29,6 +29,17 @@ class CesiumProjectContents extends React.Component {
     }
   }
 
+  componentWillUpdate() {
+    console.log('suspend');
+    this.planeData.entities.suspendEvents();
+  }
+
+  componentDidUpdate() {
+    console.log('resume');
+    this.planeData.entities.resumeEvents();
+    this.props.viewer.scene.requestRender();
+  }
+
   componentWillUnmount() {
     if (this.planeData && !this.planeData.isDestroyed()) {
       this.planeData.destroy();
@@ -38,20 +49,17 @@ class CesiumProjectContents extends React.Component {
   render() {
     const { planes } = this.props;
 
-    console.log('rendering planes', planes.length);
-
     const renderedPlanes = [];
     planes.forEach((v, k) => {
       renderedPlanes.push(<CesiumEntity
         plane={ v }
         planeData={ this.planeData }
         key={ k }
-        icao={k}
+        icao={ k }
       />);
     });
 
-    console.log(renderedPlanes)
-
+    console.log('rendering planes', renderedPlanes.length);
 
     return (
       <span>
