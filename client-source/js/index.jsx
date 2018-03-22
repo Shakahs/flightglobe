@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import createSagaMiddleware from 'redux-saga';
 import { createStore, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
+import Immutable from 'immutable';
 import 'cesium/Source/Widgets/widgets.css';
 import rootReducer from './redux/rootReducer';
 import sagas from './redux/rootSaga';
@@ -14,9 +15,14 @@ import App from './components/App';
 // Create store
 const sagaMiddleware = createSagaMiddleware();
 const middleware = [sagaMiddleware];
+const composeEnhancers = composeWithDevTools({
+  serialize: {
+    immutable: Immutable,
+  },
+});
 const store = createStore(
   rootReducer,
-  undefined, composeWithDevTools(applyMiddleware(...middleware))
+  undefined, composeEnhancers(applyMiddleware(...middleware))
 );
 sagaMiddleware.run(sagas);
 

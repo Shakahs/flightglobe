@@ -1,13 +1,12 @@
 package lib
 
 import (
-	"sync"
 	"time"
 )
 
 type Position struct {
-	Id       int64     `json:"id"`
-	Icao     string    `json:"icao,omitempty"`
+	Id       int64     `json:"-"`
+	Icao     string    `json:"-"`
 	Lat      float64   `json:"lat"`
 	Lng      float64   `json:"lon"`
 	Time     time.Time `json:"time" db:"ptime"`
@@ -17,12 +16,7 @@ type Position struct {
 
 type FlightHistory = []Position
 
-type FlightDataSet map[string]FlightHistory
-
-type LockableFlightDataSet = struct {
-	sync.RWMutex
-	FlightData FlightDataSet
-}
+type FlightDataSet map[string]Position
 
 type DataExport struct {
 	channel string

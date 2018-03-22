@@ -1,11 +1,17 @@
 import { createSelector } from 'reselect';
-import { flatMapDeep } from 'lodash-es';
 
-export const getGlobalFeed = state => state.globe.flights;
+export const getThisState = state => state.get('globe');
 
 export const getPositions = createSelector(
-  [getGlobalFeed],
-  (allFlights) => {
-    return flatMapDeep(allFlights);
+  [getThisState],
+  (thisState) => {
+    return thisState.get('flights');
   }
 );
+
+// export const getPositions = createSelector(
+//   [getGlobalFeed],
+//   (allFlights) => {
+//     return flatMapDeep(allFlights);
+//   }
+// );

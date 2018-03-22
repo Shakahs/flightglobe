@@ -26,8 +26,8 @@ func SendToEndpoint() {
 				jsonValue, _ := json.Marshal(export.data)
 				resp, err := nChanClient.Post("http://localhost:8080/pub/"+export.channel, "application/json", bytes.NewBuffer(jsonValue))
 				posCount := 0
-				for _, v := range export.data {
-					posCount += len(v)
+				for range export.data {
+					posCount += 1
 				}
 				fmt.Println("Sent", posCount, "positions for", len(export.data), "flights to endpoint", export.channel)
 				if err == nil {

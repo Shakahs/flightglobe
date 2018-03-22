@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+	//TODO: create channels to give to worker threads explicitly to enforce typing
 	for w := 1; w <= 4; w++ {
 		go lib.SendToEndpoint()
 		go lib.SendFlightHistoryWorker()

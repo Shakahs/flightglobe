@@ -37,14 +37,21 @@ class CesiumProjectContents extends React.Component {
 
   render() {
     const { planes } = this.props;
+
     console.log('rendering planes', planes.length);
 
-    const renderedPlanes = map(planes, (plane) =>
-      (<CesiumEntity
-        plane={ plane }
+    const renderedPlanes = [];
+    planes.forEach((v, k) => {
+      renderedPlanes.push(<CesiumEntity
+        plane={ v }
         planeData={ this.planeData }
-        key={ plane.id }
-      />));
+        key={ k }
+        icao={k}
+      />);
+    });
+
+    console.log(renderedPlanes)
+
 
     return (
       <span>

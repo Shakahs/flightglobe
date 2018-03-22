@@ -10,8 +10,8 @@ import { shallowEqual } from '../../../utils/utils';
 export default class CesiumEntity extends Component {
   constructor(props) {
     super(props);
-    const { planeData } = this.props;
-    this.entity = planeData.entities.getOrCreateEntity(props.plane.id);
+    const { planeData, icao } = this.props;
+    this.entity = planeData.entities.getOrCreateEntity(icao);
     this.entity.name = props.plane.icao;
     this.entity.point = {
       'pixelSize': 5,
@@ -39,17 +39,18 @@ export default class CesiumEntity extends Component {
   }
 
   componentWillUnmount() {
-    this.props.planeData.entities.removeById(this.props.plane.id);
+    this.props.planeData.entities.removeById(this.props.icao);
   }
 
   updateEntity() {
+    const { plane } = this.props;
     const position = Cartesian3.fromDegrees(
-      this.props.plane.lon,
-      this.props.plane.lat,
-      this.props.plane.altitude
+      plane.get('lon'),
+      plane.get('lat'),
+      plane.get('altitude')
     );
     this.entity.position = position;
-    const heading = CesiumMath.toRadians(this.props.plane.heading - 90);
+    const heading = CesiumMath.toRadians(plane.get('heading') - 90);
     const hpr = new HeadingPitchRoll(heading, 0, 0);
     this.entity.orientation = Transforms.headingPitchRollQuaternion(position, hpr);
   }
