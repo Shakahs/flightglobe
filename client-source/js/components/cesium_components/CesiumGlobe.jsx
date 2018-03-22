@@ -43,6 +43,7 @@ export default class CesiumGlobe extends Component {
       scene3DOnly: true,
       imageryProvider,
       terrainProvider,
+      requestRenderMode : true
     });
 
     // Force immediate re-render now that the Cesium viewer is created

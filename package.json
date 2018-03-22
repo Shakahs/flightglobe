@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "axios": "^0.17.1",
-    "cesium": "^1.39.0",
+    "cesium": "^1.43.0",
     "dotenv": "^4.0.0",
     "es6-promise": "^4.1.0",
     "lodash-es": "^4.17.4",
