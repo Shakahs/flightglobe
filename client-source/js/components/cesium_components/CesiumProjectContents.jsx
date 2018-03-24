@@ -1,12 +1,13 @@
 import { connect } from 'react-redux';
 import React from 'react';
 import { bindActionCreators } from 'redux';
-import { map, eq, flatMap } from 'lodash-es';
+import { eq } from 'lodash-es';
+
 import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
 import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler';
 import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
 import Cartesian3 from 'cesium/Source/Core/Cartesian3';
-import CesiumEntity from './primitives/CesiumEntity';
+
 import { actions as globeActions, selectors as globeSelectors } from '../../redux/globe';
 
 class CesiumProjectContents extends React.Component {
@@ -28,6 +29,13 @@ class CesiumProjectContents extends React.Component {
     if (viewer) {
       viewer.dataSources.add(this.planeData);
     }
+
+    this.viewableArea = {
+      north: null,
+      south: null,
+      west: null,
+      east: null,
+    };
   }
 
   shouldComponentUpdate(nextProps) {
@@ -38,12 +46,10 @@ class CesiumProjectContents extends React.Component {
   }
 
   componentWillUpdate() {
-    console.log('suspend');
     this.planeData.entities.suspendEvents();
   }
 
   componentDidUpdate() {
-    console.log('resume');
     this.planeData.entities.resumeEvents();
     this.props.viewer.scene.requestRender();
   }
@@ -57,14 +63,11 @@ class CesiumProjectContents extends React.Component {
   render() {
     const { planes } = this.props;
 
-
     let count = 0;
-
-    // planes.entrySeq().map((v,k) => {
     const targetTime = new Date().getTime() - 1100;
     planes
-      .filter((v) => {
-        return v.get('modified') > targetTime;
+      .filter((v, k) => {
+        return v.get('modified') > targetTime || !this.planeData.entities.getById(k);
       })
       .forEach((v, k) => {
         count += 1;
