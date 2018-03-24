@@ -45,7 +45,7 @@ export default class CesiumEntity extends Component {
   }
 
   componentWillUnmount() {
-    this.props.planeData.entities.removeById(this.props.icao);
+    this.props.pointCollection.entities.removeById(this.props.icao);
   }
 
   updateEntity() {

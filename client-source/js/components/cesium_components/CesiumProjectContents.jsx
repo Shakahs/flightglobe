@@ -3,10 +3,12 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { eq } from 'lodash-es';
 
-import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
 import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler';
 import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
 import Cartesian3 from 'cesium/Source/Core/Cartesian3';
+import PointPrimitiveCollection from 'cesium/Source/Scene/PointPrimitiveCollection';
+import BlendOptions from 'cesium/Source/Scene/BlendOption';
+import NearFarScalar from 'cesium/Source/Core/NearFarScalar';
 
 import { actions as globeActions, selectors as globeSelectors } from '../../redux/globe';
 
@@ -15,8 +17,9 @@ class CesiumProjectContents extends React.Component {
     super(props);
     const { viewer } = props;
     const { scene } = viewer;
+    scene.debugShowFramesPerSecond = true;
 
-    this.planeData = new CustomDataSource('planedata');
+    this.pointCollection = scene.primitives.add(new PointPrimitiveCollection({ blendOption: BlendOptions.OPAQUE }));
 
     const handler = new ScreenSpaceEventHandler(viewer.scene.canvas);
     handler.setInputAction((click) => {
@@ -26,16 +29,14 @@ class CesiumProjectContents extends React.Component {
       }
     }, ScreenSpaceEventType.LEFT_CLICK);
 
-    if (viewer) {
-      viewer.dataSources.add(this.planeData);
-    }
-
     this.viewableArea = {
       north: null,
       south: null,
       west: null,
       east: null,
     };
+
+    this.points = {};
   }
 
   shouldComponentUpdate(nextProps) {
@@ -45,18 +46,13 @@ class CesiumProjectContents extends React.Component {
     return false;
   }
 
-  componentWillUpdate() {
-    this.planeData.entities.suspendEvents();
-  }
-
   componentDidUpdate() {
-    this.planeData.entities.resumeEvents();
     this.props.viewer.scene.requestRender();
   }
 
   componentWillUnmount() {
-    if (this.planeData && !this.planeData.isDestroyed()) {
-      this.planeData.destroy();
+    if (this.pointCollection && !this.pointCollection.isDestroyed()) {
+      this.pointCollection.destroy();
     }
   }
 
@@ -64,23 +60,32 @@ class CesiumProjectContents extends React.Component {
     const { planes } = this.props;
 
     let count = 0;
+    const scratch = new Cartesian3();
     const targetTime = new Date().getTime() - 1100;
+    const nfs = new NearFarScalar(5000, 3.25, 1000000, 1.5);
+
     planes
-      .filter((v, k) => {
-        return v.get('modified') > targetTime || !this.planeData.entities.getById(k);
+      .filter((v) => {
+        return v.get('modified') > targetTime;
       })
       .forEach((v, k) => {
         count += 1;
-        const entity = this.planeData.entities.getOrCreateEntity(k);
-        entity.point = {
-          'pixelSize': 5,
-        };
         const position = Cartesian3.fromDegrees(
           v.get('lon'),
           v.get('lat'),
-          v.get('altitude')
+          v.get('altitude'),
+          undefined,
+          scratch
         );
-        entity.position = position;
+        if (!this.points[k]) {
+          this.points[k] = this.pointCollection.add({
+            position,
+            pixelSize: 1,
+            scaleByDistance: nfs,
+          });
+        } else {
+          this.points[k].position = position;
+        }
       });
 
     console.log('rendering planes', count);

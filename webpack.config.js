@@ -89,7 +89,8 @@ if (isProduction) {
     // allChunks: true,
   }));
 
-  plugins.push(new webpack.optimize.UglifyJsPlugin());
+  //breaks the build for some reason, disable for now
+  // plugins.push(new webpack.optimize.UglifyJsPlugin());
 
   // Production rules
   rules.push({
