@@ -1,6 +1,9 @@
 package lib
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 var globalFeedQuery = `SELECT distinct on (icao) *
 FROM positions
@@ -33,6 +36,21 @@ func SendAllPositions() {
 	dpData := DecreasePrecisionOfDataset(positions, GlobalPrecision)
 	positionMap := CreateMap(dpData)
 	SendDataJobs <- DataExport{"global", positionMap}
+}
+
+func SendAllPositionsOverTime() {
+	positions := GetAllPositions()
+	dpData := DecreasePrecisionOfDataset(positions, GlobalPrecision)
+
+	dLength := len(dpData)
+	segmentSize := dLength / 29
+
+	for i := 0; i < dLength; i += segmentSize + 1 {
+		segment := positions[i : i+segmentSize]
+		positionMap := CreateMap(segment)
+		SendDataJobs <- DataExport{"global", positionMap}
+		time.Sleep(time.Second)
+	}
 }
 
 func SendFlightHistoryWorker() {

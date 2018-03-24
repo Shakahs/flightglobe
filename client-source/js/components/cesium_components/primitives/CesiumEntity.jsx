@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { eq } from 'lodash-es';
 
 import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 import HeadingPitchRoll from 'cesium/Source/Core/HeadingPitchRoll';
@@ -32,10 +33,15 @@ export default class CesiumEntity extends Component {
     this.updateEntity();
   }
 
-  componentDidUpdate(prevProps) {
-    if (!shallowEqual(this.props, prevProps)) {
-      this.updateEntity();
+  shouldComponentUpdate(nextProps) {
+    if (!eq(this.props.plane, nextProps.plane)) {
+      return true;
     }
+    return false;
+  }
+
+  componentDidUpdate() {
+    this.updateEntity();
   }
 
   componentWillUnmount() {

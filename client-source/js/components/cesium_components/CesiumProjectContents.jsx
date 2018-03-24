@@ -1,10 +1,11 @@
 import { connect } from 'react-redux';
 import React from 'react';
 import { bindActionCreators } from 'redux';
-import { map } from 'lodash-es';
+import { map, eq, flatMap } from 'lodash-es';
 import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
 import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler';
 import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
+import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 import CesiumEntity from './primitives/CesiumEntity';
 import { actions as globeActions, selectors as globeSelectors } from '../../redux/globe';
 
@@ -29,6 +30,13 @@ class CesiumProjectContents extends React.Component {
     }
   }
 
+  shouldComponentUpdate(nextProps) {
+    if (!eq(this.props.planes, nextProps.planes)) {
+      return true;
+    }
+    return false;
+  }
+
   componentWillUpdate() {
     console.log('suspend');
     this.planeData.entities.suspendEvents();
@@ -49,23 +57,31 @@ class CesiumProjectContents extends React.Component {
   render() {
     const { planes } = this.props;
 
-    const renderedPlanes = [];
-    planes.forEach((v, k) => {
-      renderedPlanes.push(<CesiumEntity
-        plane={ v }
-        planeData={ this.planeData }
-        key={ k }
-        icao={ k }
-      />);
-    });
 
-    console.log('rendering planes', renderedPlanes.length);
+    let count = 0;
 
-    return (
-      <span>
-        {renderedPlanes}
-      </span>
-    );
+    // planes.entrySeq().map((v,k) => {
+    const targetTime = new Date().getTime() - 1100;
+    planes
+      .filter((v) => {
+        return v.get('modified') > targetTime;
+      })
+      .forEach((v, k) => {
+        count += 1;
+        const entity = this.planeData.entities.getOrCreateEntity(k);
+        entity.point = {
+          'pixelSize': 5,
+        };
+        const position = Cartesian3.fromDegrees(
+          v.get('lon'),
+          v.get('lat'),
+          v.get('altitude')
+        );
+        entity.position = position;
+      });
+
+    console.log('rendering planes', count);
+    return (null);
   }
 }
 
