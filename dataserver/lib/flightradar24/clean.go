@@ -6,7 +6,6 @@ import (
 	"github.com/Shakahs/flightglobe/dataserver/lib"
 	"github.com/bitly/go-simplejson"
 	"log"
-	"time"
 )
 
 func process(data []byte) []Fr_Record {
@@ -55,7 +54,7 @@ func convert(FrData []Fr_Record) lib.FlightHistory {
 	var collector lib.FlightHistory
 	for _, v := range FrData {
 		pos := lib.Position{0, v.Icao, v.Lat, v.Lng,
-			time.Unix(v.Time, 0), v.Heading, int32(v.Altitude)}
+			v.Time, v.Heading, int32(v.Altitude)}
 		collector = append(collector, pos)
 	}
 	return collector

@@ -1,17 +1,13 @@
 package lib
 
-import (
-	"time"
-)
-
 type Position struct {
-	Id       int64     `json:"-"`
-	Icao     string    `json:"-"`
-	Lat      float64   `json:"lat"`
-	Lng      float64   `json:"lon"`
-	Time     time.Time `json:"time" db:"ptime"`
-	Heading  float64   `json:"heading"`
-	Altitude int32     `json:"altitude"` // meters
+	Id       int64   `json:"-"`
+	Icao     string  `json:"-"`
+	Lat      float64 `json:"lat"`
+	Lng      float64 `json:"lon"`
+	Time     int64   `json:"time" db:"ptime"`
+	Heading  float64 `json:"heading"`
+	Altitude int32   `json:"altitude"` // meters
 }
 
 type FlightHistory = []Position
@@ -29,4 +25,3 @@ type precisionStandards struct {
 	heading     int32
 	geohash     uint
 }
-

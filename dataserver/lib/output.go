@@ -5,9 +5,10 @@ import (
 	"time"
 )
 
-var globalFeedQuery = `SELECT distinct on (icao) *
+var globalFeedQuery = `SELECT distinct on (icao) icao, extract(epoch from ptime)::int as ptime, lat,lng,heading,altitude
 FROM positions
 where ptime  between  (CURRENT_TIMESTAMP - INTERVAL '1 minute') and CURRENT_TIMESTAMP
+and icao != ''
 order by icao,ptime desc;`
 
 var flightHistoryQuery = `with T as (
