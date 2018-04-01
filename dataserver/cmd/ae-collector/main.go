@@ -14,7 +14,7 @@ func main() {
 	rawData := make(chan []byte)
 	go adsbexchange.Intake(rawData)
 
-	cleanData := make(chan lib.FlightHistory)
+	cleanData := make(chan lib.Positions)
 	go adsbexchange.Clean(rawData, cleanData)
 
 	go lib.Persist(cleanData)

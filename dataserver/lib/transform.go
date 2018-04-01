@@ -15,18 +15,26 @@ func decreasePrecisionOfRecord(record Position, p precisionStandards) Position {
 	return record
 }
 
-func DecreasePrecisionOfDataset(data FlightHistory, p precisionStandards) FlightHistory {
-	var dpFlights FlightHistory
+func DecreasePrecisionOfDataset(data Positions, p precisionStandards) Positions {
+	var dpFlights Positions
 	for _, val := range data {
 		dpFlights = append(dpFlights, decreasePrecisionOfRecord(val, p))
 	}
 	return dpFlights
 }
 
-func CreateMap(data FlightHistory) FlightDataSet {
-	var newMap = make(FlightDataSet)
+func CreateSinglePositionMap(data Positions) SinglePositionDataset {
+	var newMap = make(SinglePositionDataset)
 	for _, pos := range data {
 		newMap[pos.Icao] = pos
+	}
+	return newMap
+}
+
+func CreateMultiplePositionMap(data Positions) MultiplePositionDataset {
+	var newMap = make(MultiplePositionDataset)
+	for _, pos := range data {
+		newMap[pos.Icao] = append(newMap[pos.Icao], pos)
 	}
 	return newMap
 }

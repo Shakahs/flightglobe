@@ -26,7 +26,7 @@ func buildUrlList(qt *quadtree.Quadtree) []string {
 
 func buildQuadTree() *quadtree.Quadtree {
 	qt := quadtree.New(geo.NewBound(180, -180, -90, 90))
-	allPositions := lib.GetAllPositions()
+	allPositions := lib.GetGlobalPositions()
 	for _, pos := range allPositions {
 		np := geo.NewPoint(pos.Lng, pos.Lat)
 		qt.Insert(np)

@@ -21,8 +21,8 @@ func getRawAdsbData(resp []byte) adsbList {
 	return unmarshaledData.AcList
 }
 
-func normalizeAdsbData(rawPositions adsbList) lib.FlightHistory {
-	var normalData lib.FlightHistory
+func normalizeAdsbData(rawPositions adsbList) lib.Positions {
+	var normalData lib.Positions
 
 	for _, record := range rawPositions {
 		var normalized lib.Position
@@ -62,8 +62,8 @@ func validator(record lib.Position) bool {
 	return validatorA && validatorB
 }
 
-func validateFlightData(normalData lib.FlightHistory) lib.FlightHistory {
-	var validData lib.FlightHistory
+func validateFlightData(normalData lib.Positions) lib.Positions {
+	var validData lib.Positions
 
 	for _, record := range normalData {
 		if validator(record) {
@@ -73,7 +73,7 @@ func validateFlightData(normalData lib.FlightHistory) lib.FlightHistory {
 	return validData
 }
 
-func Clean(inChan chan []byte, outChan chan lib.FlightHistory) {
+func Clean(inChan chan []byte, outChan chan lib.Positions) {
 	for {
 		select {
 		case raw := <-inChan:

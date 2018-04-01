@@ -8,7 +8,7 @@ import (
 var persistQuery = `INSERT INTO positions(lat, lng, heading, altitude,icao) 
           VALUES(:lat, :lng, :heading, :altitude, :icao)`
 
-func insert(newData FlightHistory) {
+func insert(newData Positions) {
 	start := time.Now()
 	tx := DB.MustBegin()
 
@@ -29,7 +29,7 @@ func insert(newData FlightHistory) {
 	fmt.Println("Insert took", elapsed)
 }
 
-func Persist(inChan chan FlightHistory) {
+func Persist(inChan chan Positions) {
 	for {
 		select {
 		case r := <-inChan:

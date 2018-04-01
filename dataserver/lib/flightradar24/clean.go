@@ -50,8 +50,8 @@ func process(data []byte) []Fr_Record {
 	return collector
 }
 
-func convert(FrData []Fr_Record) lib.FlightHistory {
-	var collector lib.FlightHistory
+func convert(FrData []Fr_Record) lib.Positions {
+	var collector lib.Positions
 	for _, v := range FrData {
 		pos := lib.Position{0, v.Icao, v.Lat, v.Lng,
 			v.Time, v.Heading, int32(v.Altitude)}
@@ -60,7 +60,7 @@ func convert(FrData []Fr_Record) lib.FlightHistory {
 	return collector
 }
 
-func Clean(inChan chan []byte, outChan chan lib.FlightHistory) {
+func Clean(inChan chan []byte, outChan chan lib.Positions) {
 	for {
 		select {
 		case raw := <-inChan:

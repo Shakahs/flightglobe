@@ -15,7 +15,7 @@ func main() {
 	rawData := make(chan []byte)
 	go flightradar24.Scrape(rawData)
 
-	cleanData := make(chan lib.FlightHistory)
+	cleanData := make(chan lib.Positions)
 	go flightradar24.Clean(rawData, cleanData)
 
 	go lib.Persist(cleanData)

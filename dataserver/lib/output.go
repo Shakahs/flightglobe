@@ -5,23 +5,16 @@ import (
 	"time"
 )
 
-var globalFeedQuery = `SELECT distinct on (icao) icao, extract(epoch from ptime)::int as ptime, lat,lng,heading,altitude
+var globalQuery = `SELECT distinct on (icao) icao, extract(epoch from ptime)::int as ptime2, lat,lng,heading,altitude
 FROM positions
-where ptime  between  (CURRENT_TIMESTAMP - INTERVAL '1 minute') and CURRENT_TIMESTAMP
-and icao != ''
-order by icao;`
+where ptime  >=  (CURRENT_TIMESTAMP - INTERVAL '1 minute') 
+and icao != '';`
 
-var flightHistoryQuery = `with T as (
-SELECT DISTINCT ON (icao, aligned_measured_at) *,
-(date_trunc('seconds', (ptime - TIMESTAMPTZ 'epoch') / 300) * 300 + TIMESTAMPTZ 'epoch') AS aligned_measured_at
+var globalQueryWithPositions = `SELECT id,icao,lat,lng,heading,altitude,extract(epoch from ptime)::int as ptime2
 FROM positions
-WHERE ptime BETWEEN (CURRENT_TIMESTAMP - INTERVAL '18 hours') AND CURRENT_TIMESTAMP
-AND icao = $1
-ORDER BY icao, aligned_measured_at DESC
-) SELECT id,icao,lat,lng,heading,altitude,ptime FROM T;`
-
-var fetchHistoryJobs = make(chan Position)
-var SendDataJobs = make(chan DataExport)
+WHERE ptime >= (CURRENT_TIMESTAMP - INTERVAL '18 hours')
+AND icao != ''
+ORDER BY ptime ASC;`
 
 func min(a, b int) int {
 	if a < b {
@@ -30,24 +23,32 @@ func min(a, b int) int {
 	return b
 }
 
-func GetAllPositions() FlightHistory {
-	var positions FlightHistory
-	err := DB.Select(&positions, globalFeedQuery)
+func runQuery(query string) Positions {
+	var positions Positions
+	err := DB.Select(&positions, query)
 	if err != nil {
 		fmt.Println(err)
 	}
 	return positions
 }
 
-func SendAllPositions() {
-	positions := GetAllPositions()
-	dpData := DecreasePrecisionOfDataset(positions, GlobalPrecision)
-	positionMap := CreateMap(dpData)
-	SendDataJobs <- DataExport{"global", positionMap}
+func GetGlobalPositions() Positions {
+	return runQuery(globalQuery)
 }
 
-func SendAllPositionsOverTime() {
-	positions := GetAllPositions()
+func getGlobalPositionsWithHistory() Positions {
+	return runQuery(globalQueryWithPositions)
+}
+
+func SendAllPositions(outgoingData chan OutgoingSinglePositionDataset) {
+	positions := GetGlobalPositions()
+	dpData := DecreasePrecisionOfDataset(positions, GlobalPrecision)
+	positionMap := CreateSinglePositionMap(dpData)
+	outgoingData <- OutgoingSinglePositionDataset{"globalSnapshot", positionMap}
+}
+
+func SendAllPositionsOverTime(outgoingData chan OutgoingSinglePositionDataset) {
+	positions := GetGlobalPositions()
 	dpData := DecreasePrecisionOfDataset(positions, GlobalPrecision)
 
 	dLength := len(dpData)
@@ -55,31 +56,19 @@ func SendAllPositionsOverTime() {
 
 	for i := 0; i < dLength; i += segmentSize + 1 {
 		segment := positions[i:min(i+segmentSize, dLength)]
-		positionMap := CreateMap(segment)
-		SendDataJobs <- DataExport{"global", positionMap}
+		positionMap := CreateSinglePositionMap(segment)
+		outgoingData <- OutgoingSinglePositionDataset{"globalStream", positionMap}
 		time.Sleep(time.Second)
 	}
 }
 
-func SendFlightHistoryWorker() {
-	for {
-		select {
-		case j := <-fetchHistoryJobs:
-			var positions FlightHistory
-			err := DB.Select(&positions, flightHistoryQuery, j.Icao)
-			if err != nil {
-				fmt.Println(err)
-			}
-			dpData := DecreasePrecisionOfDataset(positions, GlobalPrecision)
-			positionMap := CreateMap(dpData)
-			SendDataJobs <- DataExport{j.Icao, positionMap}
-		}
-	}
-}
-
-func FanoutSendFlightHistory() {
-	positions := GetAllPositions()
-	for _, pos := range positions {
-		fetchHistoryJobs <- pos
+func SendFlightHistory(outgoingData chan OutgoingFlightHistory) {
+	positions := getGlobalPositionsWithHistory()
+	//dpData := DecreasePrecisionOfDataset(positions, GlobalPrecision)
+	allFlightHistory := CreateMultiplePositionMap(positions)
+	for k, v := range allFlightHistory {
+		individualFlightHistory := make(MultiplePositionDataset)
+		individualFlightHistory[k] = allFlightHistory[k]
+		outgoingData <- OutgoingFlightHistory{channel: k, data: v}
 	}
 }

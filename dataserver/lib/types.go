@@ -5,18 +5,25 @@ type Position struct {
 	Icao     string  `json:"-"`
 	Lat      float64 `json:"lat"`
 	Lng      float64 `json:"lon"`
-	Time     int64   `json:"time" db:"ptime"`
+	Time     int64   `json:"time" db:"ptime2"`
 	Heading  float64 `json:"heading"`
 	Altitude int32   `json:"altitude"` // meters
 }
 
-type FlightHistory = []Position
+type Positions = []Position
 
-type FlightDataSet map[string]Position
+type SinglePositionDataset map[string]Position
 
-type DataExport struct {
+type MultiplePositionDataset map[string]Positions
+
+type OutgoingSinglePositionDataset struct {
 	channel string
-	data    FlightDataSet
+	data    SinglePositionDataset
+}
+
+type OutgoingFlightHistory struct {
+	channel string
+	data    Positions
 }
 
 type precisionStandards struct {

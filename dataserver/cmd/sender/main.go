@@ -10,19 +10,22 @@ import (
 )
 
 func main() {
-	//TODO: create channels to give to worker threads explicitly to enforce typing
-	for w := 1; w <= 4; w++ {
-		go lib.SendToEndpoint()
-		go lib.SendFlightHistoryWorker()
+	outgoingSinglePositionDatasets := make(chan lib.OutgoingSinglePositionDataset, 100)
+	outgoingFlightHistory := make(chan lib.OutgoingFlightHistory)
+
+	for w := 1; w <= 5; w++ {
+		go lib.ExportSinglePositionDataset(outgoingSinglePositionDatasets)
+		go lib.ExportFlightHistory(outgoingFlightHistory)
 	}
 
-
-	lib.SendAllPositionsOverTime()
-	//lib.FanoutSendFlightHistory()
+	lib.SendAllPositions(outgoingSinglePositionDatasets)
+	lib.SendAllPositionsOverTime(outgoingSinglePositionDatasets)
+	//lib.SendFlightHistory(outgoingFlightHistory)
 
 	scheduler := cron.New()
-	scheduler.AddFunc("@every 30s", func() { lib.SendAllPositionsOverTime() })
-	//scheduler.AddFunc("@every 30s", func() { lib.FanoutSendFlightHistory() })
+	scheduler.AddFunc("@every 30s", func() { lib.SendAllPositions(outgoingSinglePositionDatasets) })
+	scheduler.AddFunc("@every 30s", func() { lib.SendAllPositionsOverTime(outgoingSinglePositionDatasets) })
+	//scheduler.AddFunc("@every 30s", func() { lib.SendFlightHistory(outgoingFlightHistory) })
 	scheduler.Start()
 
 	sigc := make(chan os.Signal, 1)
