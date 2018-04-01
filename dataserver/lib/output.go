@@ -9,7 +9,7 @@ var globalFeedQuery = `SELECT distinct on (icao) icao, extract(epoch from ptime)
 FROM positions
 where ptime  between  (CURRENT_TIMESTAMP - INTERVAL '1 minute') and CURRENT_TIMESTAMP
 and icao != ''
-order by icao,ptime desc;`
+order by icao;`
 
 var flightHistoryQuery = `with T as (
 SELECT DISTINCT ON (icao, aligned_measured_at) *,
@@ -22,6 +22,13 @@ ORDER BY icao, aligned_measured_at DESC
 
 var fetchHistoryJobs = make(chan Position)
 var SendDataJobs = make(chan DataExport)
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
 
 func GetAllPositions() FlightHistory {
 	var positions FlightHistory
@@ -47,7 +54,7 @@ func SendAllPositionsOverTime() {
 	segmentSize := dLength / 29
 
 	for i := 0; i < dLength; i += segmentSize + 1 {
-		segment := positions[i : i+segmentSize]
+		segment := positions[i:min(i+segmentSize, dLength)]
 		positionMap := CreateMap(segment)
 		SendDataJobs <- DataExport{"global", positionMap}
 		time.Sleep(time.Second)
