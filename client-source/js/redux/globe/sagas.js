@@ -1,4 +1,4 @@
-import { eventChannel } from 'redux-saga';
+import { eventChannel, delay } from 'redux-saga';
 import { call, put, take } from 'redux-saga/effects';
 import { actions as globeActions } from './index';
 import { globe } from '../../api';
