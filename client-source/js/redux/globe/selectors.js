@@ -1,11 +1,14 @@
 import { createSelector } from 'reselect';
 
-export const getThisState = state => state.get('globe');
+export const getFlights = state => state.getIn(['globe', 'flights']);
+export const getLastValid = state => state.getIn(['globe', 'lastValid']);
 
 export const getPositions = createSelector(
-  [getThisState],
-  (thisState) => {
-    return thisState.get('flights');
+  [getFlights, getLastValid],
+  (allFlights, lastValid) => {
+    return allFlights.filter((v) => {
+      return v.get('added') < lastValid;
+    });
   }
 );
 

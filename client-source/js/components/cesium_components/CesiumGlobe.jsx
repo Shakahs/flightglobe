@@ -45,12 +45,12 @@ export default class CesiumGlobe extends Component {
       terrainProvider,
       requestRenderMode: true,
     });
-    this.viewer.camera.rotateLeft();
-    this.viewer.camera.changed.addEventListener(() => {
-      const ellipsoid = this.viewer.scene.globe.ellipsoid;
-      const cameraHeight = ellipsoid.cartesianToCartographic(this.viewer.camera.position).height;
-      console.log(`camera height is${ cameraHeight }`);
-    });
+    // this.viewer.camera.rotateLeft();
+    // this.viewer.camera.changed.addEventListener(() => {
+    //   const ellipsoid = this.viewer.scene.globe.ellipsoid;
+    //   const cameraHeight = ellipsoid.cartesianToCartographic(this.viewer.camera.position).height;
+    // console.log(`camera height is${ cameraHeight }`);
+    // });
 
     // Force immediate re-render now that the Cesium viewer is created
     this.setState({ viewerLoaded: true }); // eslint-disable-line react/no-did-mount-set-state

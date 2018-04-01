@@ -38,3 +38,10 @@ export function* watchRetrieveHistory() {
     }
   }
 }
+
+export function* updateValidTime() {
+  while (true) {
+    yield delay(1000 * 30);
+    yield put(globeActions.updateTime(new Date().getTime()));
+  }
+}
