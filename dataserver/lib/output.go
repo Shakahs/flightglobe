@@ -2,8 +2,8 @@ package lib
 
 import (
 	"fmt"
-	"time"
 	"sync"
+	"time"
 )
 
 var globalQuery = `SELECT distinct on (icao) icao, extract(epoch from ptime)::int as ptime2, lat,lng,heading,altitude
@@ -43,7 +43,7 @@ func getGlobalPositionsWithHistory() Positions {
 	var wg sync.WaitGroup
 	for rows.Next() {
 		wg.Add(1)
-		go func(){
+		go func() {
 			defer wg.Done()
 			var p Position
 			err = rows.StructScan(&p)
@@ -61,18 +61,16 @@ func getGlobalPositionsWithHistory() Positions {
 	return positions
 }
 
-func SendAllPositions(outgoingData chan OutgoingSinglePositionDataset) {
+func CalculatePositionSnapshot(outgoingData chan OutgoingSinglePositionDataset) {
 	positions := GetGlobalPositions()
 	dpData := DecreasePrecisionOfDataset(positions, GlobalPrecision)
+	go DeriveAllPositionsOverTime(dpData, outgoingData)
 	positionMap := CreateSinglePositionMap(dpData)
 	outgoingData <- OutgoingSinglePositionDataset{"globalSnapshot", positionMap}
 }
 
-func SendAllPositionsOverTime(outgoingData chan OutgoingSinglePositionDataset) {
-	positions := GetGlobalPositions()
-	dpData := DecreasePrecisionOfDataset(positions, GlobalPrecision)
-
-	dLength := len(dpData)
+func DeriveAllPositionsOverTime(positions Positions, outgoingData chan OutgoingSinglePositionDataset) {
+	dLength := len(positions)
 	segmentSize := dLength / 29
 
 	for i := 0; i < dLength; i += segmentSize + 1 {
@@ -83,7 +81,7 @@ func SendAllPositionsOverTime(outgoingData chan OutgoingSinglePositionDataset) {
 	}
 }
 
-func SendFlightHistory(outgoingData chan OutgoingFlightHistory) {
+func CalculateFlightHistories(outgoingData chan OutgoingFlightHistory) {
 	positions := getGlobalPositionsWithHistory()
 	//dpData := DecreasePrecisionOfDataset(positions, GlobalPrecision)
 	allFlightHistory := CreateMultiplePositionMap(positions)

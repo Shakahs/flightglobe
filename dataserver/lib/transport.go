@@ -19,7 +19,7 @@ var nChanClient = http.Client{
 	},
 }
 
-func ExportSinglePositionDataset(outgoingData chan OutgoingSinglePositionDataset) {
+func SendPositionSnapshot(outgoingData chan OutgoingSinglePositionDataset) {
 	for {
 		select {
 		case export := <-outgoingData:
@@ -41,7 +41,7 @@ func ExportSinglePositionDataset(outgoingData chan OutgoingSinglePositionDataset
 	}
 }
 
-func ExportFlightHistory(outgoingData chan OutgoingFlightHistory) {
+func SendFlightHistory(outgoingData chan OutgoingFlightHistory) {
 	for {
 		select {
 		case export := <-outgoingData:
