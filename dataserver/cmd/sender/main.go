@@ -18,14 +18,14 @@ func main() {
 		go lib.ExportFlightHistory(outgoingFlightHistory)
 	}
 
-	lib.SendAllPositions(outgoingSinglePositionDatasets)
-	lib.SendAllPositionsOverTime(outgoingSinglePositionDatasets)
-	//lib.SendFlightHistory(outgoingFlightHistory)
+	//lib.SendAllPositions(outgoingSinglePositionDatasets)
+	//lib.SendAllPositionsOverTime(outgoingSinglePositionDatasets)
+	lib.SendFlightHistory(outgoingFlightHistory)
 
 	scheduler := cron.New()
-	scheduler.AddFunc("@every 30s", func() { lib.SendAllPositions(outgoingSinglePositionDatasets) })
-	scheduler.AddFunc("@every 30s", func() { lib.SendAllPositionsOverTime(outgoingSinglePositionDatasets) })
-	//scheduler.AddFunc("@every 30s", func() { lib.SendFlightHistory(outgoingFlightHistory) })
+	//scheduler.AddFunc("@every 30s", func() { lib.SendAllPositions(outgoingSinglePositionDatasets) })
+	//scheduler.AddFunc("@every 30s", func() { lib.SendAllPositionsOverTime(outgoingSinglePositionDatasets) })
+	scheduler.AddFunc("@every 30s", func() { lib.SendFlightHistory(outgoingFlightHistory) })
 	scheduler.Start()
 
 	sigc := make(chan os.Signal, 1)

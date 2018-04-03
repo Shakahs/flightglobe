@@ -3,6 +3,7 @@ package lib
 import (
 	"fmt"
 	"time"
+	"sync"
 )
 
 var globalQuery = `SELECT distinct on (icao) icao, extract(epoch from ptime)::int as ptime2, lat,lng,heading,altitude
@@ -14,7 +15,7 @@ var globalQueryWithPositions = `SELECT id,icao,lat,lng,heading,altitude,extract(
 FROM positions
 WHERE ptime >= (CURRENT_TIMESTAMP - INTERVAL '18 hours')
 AND icao != ''
-ORDER BY ptime ASC;`
+ORDER BY ptime ASC LIMIT 100;`
 
 func min(a, b int) int {
 	if a < b {
@@ -37,7 +38,27 @@ func GetGlobalPositions() Positions {
 }
 
 func getGlobalPositionsWithHistory() Positions {
-	return runQuery(globalQueryWithPositions)
+	var positions Positions
+	rows, err := DB.Queryx(globalQueryWithPositions)
+	var wg sync.WaitGroup
+	for rows.Next() {
+		wg.Add(1)
+		go func(){
+			defer wg.Done()
+			var p Position
+			err = rows.StructScan(&p)
+			if err != nil {
+				fmt.Println(err)
+			}
+			positions = append(positions, p)
+		}()
+	}
+	wg.Wait()
+	fmt.Println("finished")
+	if err != nil {
+		fmt.Println(err)
+	}
+	return positions
 }
 
 func SendAllPositions(outgoingData chan OutgoingSinglePositionDataset) {

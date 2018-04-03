@@ -20,9 +20,26 @@
 			<index name="idx_positions_ptime" unique="NORMAL" >
 				<column name="ptime" />
 			</index>
+			<index name="positions_icao_ptime_interval_idx" unique="NORMAL" >
+				<column name="icao" />
+			</index>
 		</table>
 		<sequence name="positions_id_seq" start="1" />
 		<sequence name="positions_id_seq1" start="1" />
+		<procedure name="ptime_interval" id="Procedure_425401f" isSystem="false" params_known="y" >
+			<string><![CDATA[CREATE OR REPLACE FUNCTION public.ptime_interval(i timestamp with time zone)
+ RETURNS timestamp with time zone
+ LANGUAGE plpgsql
+ IMMUTABLE
+AS $function$
+        BEGIN
+                RETURN (date_trunc('seconds', (i - TIMESTAMPTZ 'epoch') / 300) * 300 + TIMESTAMPTZ 'epoch');
+        END;
+$function$
+]]></string>
+			<input_param name="i" jt="93" type="timestamptz" />
+			<result_param name="returnValue" jt="93" type="timestamptz" />
+		</procedure>
 	</schema>
 	<connector name="FlightglobeDB" database="PostgreSQL" driver_class="org.postgresql.Driver" driver_jar="postgresql-42.1.4.jar" driver_desc="Standard" host="localhost" port="5432" instance="flightglobe" user="flightglobe" passwd="ZmxpZ2h0Z2xvYmU=" />
 	<layout name="Default Layout" id="Layout_5a78fce" show_relation="columns" >
@@ -32,5 +49,13 @@
 For a better design create multiple layouts (diagrams) with the same or different tables.
 Right-click any table header to start Relational Data Browse (very useful) or other tools.]]></comment>
 		</callout>
+		<script name="positions_icao_ptime_interval_idx" id="Editor_37e91a3" language="SQL" >
+			<string><![CDATA[CREATE INDEX positions_icao_ptime_interval_idx ON positions ( icao );
+
+]]></string>
+		</script>
+		<browser id="Browse_36f0525" name="positions" confirm_updates="y" >
+			<browse_table schema="public" entity="positions" x="20" y="20" width="427" height="329" />
+		</browser>
 	</layout>
 </project>
