@@ -2,6 +2,8 @@ package lib
 
 import (
 	"fmt"
+	"log"
+	"strings"
 	"sync"
 	"time"
 )
@@ -11,11 +13,14 @@ FROM positions
 where ptime  >=  (CURRENT_TIMESTAMP - INTERVAL '1 minute') 
 and icao != '';`
 
-var globalQueryWithPositions = `SELECT id,icao,lat,lng,heading,altitude,extract(epoch from ptime)::int as ptime2
+var globalQueryWithPositions = `with T as (
+SELECT DISTINCT ON (icao, ptime3) *,
+(date_trunc('seconds', (ptime - TIMESTAMPTZ 'epoch') / 300) * 300 + TIMESTAMPTZ 'epoch') AS ptime3
 FROM positions
-WHERE ptime >= (CURRENT_TIMESTAMP - INTERVAL '18 hours')
-AND icao != ''
-ORDER BY ptime ASC LIMIT 100;`
+WHERE ptime BETWEEN (CURRENT_TIMESTAMP - INTERVAL '18 hours') AND CURRENT_TIMESTAMP
+AND icao = any($1)
+ORDER BY icao, ptime3 ASC
+) SELECT id,icao,lat,lng,heading,altitude,extract(epoch from ptime)::int as ptime2 FROM T;`
 
 func min(a, b int) int {
 	if a < b {
@@ -67,6 +72,7 @@ func CalculatePositionSnapshot(outgoingData chan OutgoingSinglePositionDataset) 
 	go DeriveAllPositionsOverTime(dpData, outgoingData)
 	positionMap := CreateSinglePositionMap(dpData)
 	outgoingData <- OutgoingSinglePositionDataset{"globalSnapshot", positionMap}
+	log.Printf("Snapshot query sent live positions for %d flights", len(positions))
 }
 
 func DeriveAllPositionsOverTime(positions Positions, outgoingData chan OutgoingSinglePositionDataset) {
@@ -81,13 +87,36 @@ func DeriveAllPositionsOverTime(positions Positions, outgoingData chan OutgoingS
 	}
 }
 
-func CalculateFlightHistories(outgoingData chan OutgoingFlightHistory) {
-	positions := getGlobalPositionsWithHistory()
-	//dpData := DecreasePrecisionOfDataset(positions, GlobalPrecision)
-	allFlightHistory := CreateMultiplePositionMap(positions)
-	for k, v := range allFlightHistory {
+func calculateHistoriesForIcaoRange(icaoRange []string, outgoingData chan OutgoingFlightHistory) {
+	start := time.Now()
+	arrayString := "{" + strings.Join(icaoRange[:], ",") + "}"
+	var positions Positions
+	err := DB.Select(&positions, globalQueryWithPositions, arrayString)
+	if err != nil {
+		fmt.Println(err)
+	}
+	thisFlightHistory := CreateMultiplePositionMap(positions)
+	for k, v := range thisFlightHistory {
 		individualFlightHistory := make(MultiplePositionDataset)
-		individualFlightHistory[k] = allFlightHistory[k]
+		individualFlightHistory[k] = thisFlightHistory[k]
 		outgoingData <- OutgoingFlightHistory{channel: k, data: v}
 	}
+	end := time.Since(start)
+	log.Printf("History query sent %d positions for %d flights in %s", len(positions), len(thisFlightHistory), end)
+}
+
+func CalculateFlightHistories(outgoingData chan OutgoingFlightHistory) {
+	positions := GetGlobalPositions()
+	//split all ICAOs up into 10 buckets
+	idList := [10][]string{}
+	j := 0
+	segmentSize := len(positions) / 10
+	for _, v := range positions {
+		if len(idList[j]) > (segmentSize) {
+			go calculateHistoriesForIcaoRange(idList[j], outgoingData)
+			j += 1
+		}
+		idList[j] = append(idList[j], v.Icao)
+	}
+	go calculateHistoriesForIcaoRange(idList[9], outgoingData)
 }
