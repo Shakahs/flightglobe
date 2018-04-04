@@ -12,7 +12,7 @@ import NearFarScalar from 'cesium/Source/Core/NearFarScalar';
 
 import { actions as globeActions, selectors as globeSelectors } from '../../redux/globe';
 
-class CesiumProjectContents extends React.Component {
+class CesiumContents extends React.Component {
   constructor(props) {
     super(props);
     const { viewer } = props;
@@ -101,4 +101,4 @@ const mapDispatchToProps = dispatch => ({
   globeActions: bindActionCreators(globeActions, dispatch),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CesiumProjectContents);
+export default connect(mapStateToProps, mapDispatchToProps)(CesiumContents);

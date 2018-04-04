@@ -1,5 +1,6 @@
 import React from 'react';
-import CesiumGlobe from '../cesium_components/CesiumGlobe';
+import CesiumRoot from '../cesium_components/CesiumRoot';
+
 
 class App extends React.Component {
   render() {
@@ -15,7 +16,7 @@ class App extends React.Component {
 
     return (
       <div style={ containerStyle }>
-        <CesiumGlobe
+        <CesiumRoot
           onLeftClick={ this.handleLeftClick }
         />
       </div>

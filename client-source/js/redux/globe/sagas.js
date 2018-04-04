@@ -8,7 +8,7 @@ const loc = window.location;
 
 function websocketInitChannel() {
   return eventChannel(emitter => {
-    const ws = new WebSocket(`ws://${ loc.host }/sub/global`);
+    const ws = new WebSocket(`ws://${ loc.host }/sub/globalStream`);
     ws.onmessage = e => {
       return emitter(globeActions.receiveFlights(JSON.parse(e.data)));
     };

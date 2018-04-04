@@ -1,19 +1,18 @@
+// React + Cesium implementation forked from here https://github.com/markerikson/cesium-react-webpack-demo
 import React, { Component } from 'react';
 
 import Viewer from 'cesium/Source/Widgets/Viewer/Viewer';
 import BingMapsImageryProvider from 'cesium/Source/Scene/BingMapsImageryProvider';
 import CesiumTerrainProvider from 'cesium/Source/Core/CesiumTerrainProvider';
 
+import CesiumProjectContents from './CesiumContents';
+import CesiumCameraManager from './CesiumCameraManager';
 
 const BING_MAPS_URL = '//dev.virtualearth.net';
 const BING_MAPS_KEY = 'ApDPY15x9lCXO5Hw89M1G5Q84_BlKalPbjor8GvKGj2UAnVtzlT5UT-zrylU1e48';
 const STK_TERRAIN_URL = '//assets.agi.com/stk-terrain/world';
 
-import CesiumProjectContents from './CesiumProjectContents';
-import CesiumClickHandler from './CesiumClickHandler';
-import CesiumCameraManager from './CesiumCameraManager';
-
-export default class CesiumGlobe extends Component {
+export default class CesiumRoot extends Component {
   constructor(props) {
     super(props);
     this.state = { viewerLoaded: false };

@@ -6,9 +6,7 @@ import HeadingPitchRoll from 'cesium/Source/Core/HeadingPitchRoll';
 import CesiumMath from 'cesium/Source/Core/Math';
 import Transforms from 'cesium/Source/Core/Transforms';
 
-import { shallowEqual } from '../../../utils/utils';
-
-export default class CesiumEntity extends Component {
+export default class Plane extends Component {
   constructor(props) {
     super(props);
     const { planeData, icao } = this.props;
