@@ -108,9 +108,10 @@ func calculateHistoriesForIcaoRange(icaoRange []string, outgoingData chan Outgoi
 func CalculateFlightHistories(outgoingData chan OutgoingFlightHistory) {
 	positions := GetGlobalPositions()
 	//split all ICAOs up into 10 buckets
-	idList := [10][]string{}
+	const numBuckets = 8
+	idList := [numBuckets][]string{}
 	j := 0
-	segmentSize := len(positions) / 10
+	segmentSize := len(positions) / numBuckets
 	for _, v := range positions {
 		if len(idList[j]) > (segmentSize) {
 			go calculateHistoriesForIcaoRange(idList[j], outgoingData)
@@ -118,5 +119,5 @@ func CalculateFlightHistories(outgoingData chan OutgoingFlightHistory) {
 		}
 		idList[j] = append(idList[j], v.Icao)
 	}
-	go calculateHistoriesForIcaoRange(idList[9], outgoingData)
+	go calculateHistoriesForIcaoRange(idList[numBuckets-1], outgoingData)
 }
