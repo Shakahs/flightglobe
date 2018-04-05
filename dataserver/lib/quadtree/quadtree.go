@@ -21,7 +21,7 @@ var (
 type Quadtree struct {
 	// Threshold indicates the limit of how deep the quadtree can go.
 	// Points closer than this will essentially be put in the same leaf Node and stop recursion.
-	// The correct value depends on the use case. The default is computed
+	// The correct data depends on the use case. The default is computed
 	// off the bounds to keep the tree at most 12 levels deep. So points that
 	// are closer than 1/4096 * max(bound.width, bound.height) will essentially be
 	// stored in the same leaf Node. For optimal tree performance you want this to happen
@@ -32,7 +32,7 @@ type Quadtree struct {
 	HasChildren bool
 }
 
-// A Filter is a function that returns a boolean value for a given geo.Pointer.
+// A Filter is a function that returns a boolean data for a given geo.Pointer.
 type Filter func(p geo.Pointer) bool
 
 // New creates a new quadtree for the given bound. Added points
