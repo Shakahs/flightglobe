@@ -19,6 +19,7 @@ function websocketInitChannel() {
 }
 
 export function* streamGlobalFeed() {
+  yield take(globeActions.KICKOFF);
   const channel = yield call(websocketInitChannel);
   while (true) {
     const action = yield take(channel);
@@ -44,4 +45,10 @@ export function* updateValidTime() {
     yield delay(1000 * 30);
     yield put(globeActions.updateTime(new Date().getTime()));
   }
+}
+
+export function* kickOff() {
+  const data = yield call(globe.retrieveGlobalSnapshot);
+  yield put(globeActions.receiveFlights(data));
+  yield put(globeActions.kickOff());
 }

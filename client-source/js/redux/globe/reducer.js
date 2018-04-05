@@ -11,6 +11,9 @@ export const retrieveHistory = createAction(RETRIEVE_HISTORY);
 export const UPDATE_TIME = 'globe/UPDATE_TIME';
 export const updateTime = createAction(UPDATE_TIME);
 
+export const KICKOFF = 'globe/KICKOFF';
+export const kickOff = createAction(KICKOFF);
+
 const initialState = fromJS({ flights: {}, lastValid: new Date().getTime() + 30000 });
 
 const mergeFlights = (state, payload) => {
