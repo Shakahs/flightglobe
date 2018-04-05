@@ -47,6 +47,7 @@ class CesiumContents extends React.Component {
   }
 
   componentDidUpdate() {
+    this.updatePlanes();
     this.props.viewer.scene.requestRender();
   }
 
@@ -56,7 +57,7 @@ class CesiumContents extends React.Component {
     }
   }
 
-  render() {
+  updatePlanes() {
     const { planes } = this.props;
 
     let count = 0;
@@ -82,6 +83,7 @@ class CesiumContents extends React.Component {
             position,
             pixelSize: 1,
             scaleByDistance: nfs,
+            id: { icao: k },
           });
         } else {
           this.points[k].position = position;
@@ -89,9 +91,12 @@ class CesiumContents extends React.Component {
       });
 
     console.log('rendering planes', count);
+  }
+  render() {
     return (null);
   }
 }
+
 
 const mapStateToProps = state => ({
   planes: globeSelectors.getPositions(state),
