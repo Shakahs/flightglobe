@@ -7,9 +7,13 @@ export const getLastValid = state => state.getIn(['globe', 'lastValid']);
 export const getPositions = createSelector(
   [getFlights, getLastValid],
   (allFlights, lastValid) => {
+    const targetTime = new Date().getTime() - 1100;
     return allFlights.filter((v) => {
       return v.get('added') < lastValid;
-    });
+    })
+      .filter((v) => {
+        return v.get('modified') > targetTime;
+      });
   }
 );
 

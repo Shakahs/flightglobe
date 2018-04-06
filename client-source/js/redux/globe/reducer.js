@@ -1,6 +1,6 @@
 import { createAction } from 'redux-actions';
 import { mapValues } from 'lodash-es';
-import { Map, fromJS } from 'immutable';
+import { fromJS } from 'immutable';
 
 export const RECEIVE_FLIGHTS = 'globe/RECEIVE_FLIGHTS';
 export const receiveFlights = createAction(RECEIVE_FLIGHTS);

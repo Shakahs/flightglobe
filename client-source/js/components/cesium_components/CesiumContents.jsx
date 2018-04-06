@@ -62,15 +62,10 @@ class CesiumContents extends React.Component {
 
     let count = 0;
     const scratch = new Cartesian3();
-    const targetTime = new Date().getTime() - 1100;
     const nfs = new NearFarScalar(5000, 3.25, 1000000, 1.5);
 
     planes
-      .filter((v) => {
-        return v.get('modified') > targetTime;
-      })
       .forEach((v, k) => {
-        count += 1;
         const position = Cartesian3.fromDegrees(
           v.get('lon'),
           v.get('lat'),
@@ -79,6 +74,7 @@ class CesiumContents extends React.Component {
           scratch
         );
         if (!this.points[k]) {
+          count += 1;
           this.points[k] = this.pointCollection.add({
             position,
             pixelSize: 1,
