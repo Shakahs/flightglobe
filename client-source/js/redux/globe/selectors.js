@@ -13,6 +13,9 @@ export const getPositions = createSelector(
     })
       .filter((v) => {
         return v.get('modified') > targetTime;
+      })
+      .map(v => {
+        return v.getIn(['positions', -1]);
       });
   }
 );
