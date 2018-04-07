@@ -8,6 +8,9 @@ import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler'
 import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
 import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 import PointPrimitiveCollection from 'cesium/Source/Scene/PointPrimitiveCollection';
+import PolylineCollection from 'cesium/Source/Scene/PolylineCollection';
+import Matrix4 from 'cesium/Source/Core/Matrix4';
+
 import BlendOptions from 'cesium/Source/Scene/BlendOption';
 import NearFarScalar from 'cesium/Source/Core/NearFarScalar';
 
@@ -17,13 +20,15 @@ const scratch = new Cartesian3();
 const nfs = new NearFarScalar(5000, 3.25, 1000000, 1.5);
 
 class PlaneObj extends Object {
-  constructor(store, pointCollection, icao) {
+  constructor(icao, store, pointCollection, polylineCollection) {
     super();
     this.store = store;
     this.pointCollection = pointCollection;
+    this.polylineCollection = polylineCollection;
     this.icao = icao;
     this.data = null;
     this.point = null;
+    this.polyline = null;
     this.updatePosition = this.updatePosition.bind(this);
     this.handleStoreUpdate = this.handleStoreUpdate.bind(this);
     this.unsubscribe = this.store.subscribe(this.handleStoreUpdate);
@@ -38,6 +43,12 @@ class PlaneObj extends Object {
       undefined,
       scratch
     );
+    const polylineCoords = [];
+    this.data.get('positions').forEach((polyPosition) => {
+      polylineCoords.push(polyPosition.get('lon'));
+      polylineCoords.push(polyPosition.get('lat'));
+      polylineCoords.push(polyPosition.get('altitude'));
+    });
     if (this.point === null) {
       this.point = this.pointCollection.add({
         position,
@@ -47,6 +58,16 @@ class PlaneObj extends Object {
       });
     } else {
       this.point.position = position;
+    }
+    if (this.polyline === null && this.data.get('positions').size >= 2) {
+      this.polyline = this.polylineCollection.add({
+        positions: Cartesian3.fromDegreesArrayHeights(polylineCoords),
+        width: 1,
+        // material : Cesium.Color.RED
+      });
+    } else if (this.polyline !== null && this.data.get('positions').size >= 2) {
+      console.log('add', polylineCoords);
+      this.polyline.positions = polylineCoords;
     }
   }
 
@@ -67,6 +88,7 @@ class CesiumContents extends React.Component {
     scene.debugShowFramesPerSecond = true;
 
     this.pointCollection = scene.primitives.add(new PointPrimitiveCollection({ blendOption: BlendOptions.OPAQUE }));
+    this.polylineCollection = scene.primitives.add(new PolylineCollection());
 
     const handler = new ScreenSpaceEventHandler(viewer.scene.canvas);
     handler.setInputAction((click) => {
@@ -112,7 +134,7 @@ class CesiumContents extends React.Component {
       .forEach((v, k) => {
         if (!this.points[k]) {
           count += 1;
-          this.points[k] = new PlaneObj(this.context.store, this.pointCollection, k);
+          this.points[k] = new PlaneObj(k, this.context.store, this.pointCollection, this.polylineCollection);
         }
       });
     this.props.viewer.scene.requestRender();

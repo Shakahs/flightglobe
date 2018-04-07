@@ -1,6 +1,6 @@
 import { createAction } from 'redux-actions';
 import { forOwn } from 'lodash-es';
-import { Map, List, fromJS } from 'immutable';
+import { Map, List, fromJS, is } from 'immutable';
 
 export const RECEIVE_FLIGHTS = 'globe/RECEIVE_FLIGHTS';
 export const receiveFlights = createAction(RECEIVE_FLIGHTS);
@@ -22,12 +22,18 @@ const mergeFlights = (state, payload) => {
 
   const newState = state.withMutations(mut => {
     forOwn(payload, (entry, key) => {
+      const pData = Map({ ...entry });
       mut.setIn(['flights', key, 'modified'], timeNow);
       if (!state.hasIn(['flights', key, 'positions'])) {
         mut.setIn(['flights', key, 'added'], timeNow);
-        mut.setIn(['flights', key, 'positions'], List([Map({ ...entry })]));
+        mut.setIn(['flights', key, 'positions'], List([pData]));
       } else {
-        mut.updateIn(['flights', key, 'positions'], list => list.push(Map({ ...entry })).takeLast(5));
+        mut.updateIn(['flights', key, 'positions'], list => {
+          if (!is(pData, list.get(-1))) {
+            return list.push(pData).takeLast(5);
+          }
+          return list;
+        });
       }
     });
     return mut;
