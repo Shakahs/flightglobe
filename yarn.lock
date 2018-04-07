@@ -278,7 +278,7 @@ autoprefixer@^6.3.1:
     normalize-range "^0.1.2"
     num2fraction "^1.2.2"
     postcss "^5.2.16"
-    postcss-value-parser "^3.2.3"
+    postcss-data-parser "^3.2.3"
 
 awesome-typescript-loader@^3.4.1:
   version "3.4.1"
@@ -560,13 +560,13 @@ cache-base@^1.0.1:
   dependencies:
     collection-visit "^1.0.0"
     component-emitter "^1.2.1"
-    get-value "^2.0.6"
-    has-value "^1.0.0"
+    get-data "^2.0.6"
+    has-data "^1.0.0"
     isobject "^3.0.1"
-    set-value "^2.0.0"
+    set-data "^2.0.0"
     to-object-path "^0.3.0"
-    union-value "^1.0.0"
-    unset-value "^1.0.0"
+    union-data "^1.0.0"
+    unset-data "^1.0.0"
 
 caller-path@^0.1.0:
   version "0.1.0"
@@ -1030,7 +1030,7 @@ css-loader@^0.28.4:
     postcss-modules-local-by-default "^1.2.0"
     postcss-modules-scope "^1.1.0"
     postcss-modules-values "^1.3.0"
-    postcss-value-parser "^3.3.0"
+    postcss-data-parser "^3.3.0"
     source-list-map "^2.0.0"
 
 css-select-base-adapter@~0.1.0:
@@ -1123,7 +1123,7 @@ cssnano@^3.10.0:
     postcss-reduce-transforms "^1.0.3"
     postcss-svgo "^2.1.1"
     postcss-unique-selectors "^2.0.2"
-    postcss-value-parser "^3.2.3"
+    postcss-data-parser "^3.2.3"
     postcss-zindex "^2.0.1"
 
 csso@^3.3.1:
@@ -2186,7 +2186,7 @@ get-stream@^3.0.0:
 
 get-value@^2.0.3, get-value@^2.0.6:
   version "2.0.6"
-  resolved "https://registry.yarnpkg.com/get-value/-/get-value-2.0.6.tgz#dc15ca1c672387ca76bd37ac0a395ba2042a2c28"
+  resolved "https://registry.yarnpkg.com/get-data/-/get-data-2.0.6.tgz#dc15ca1c672387ca76bd37ac0a395ba2042a2c28"
 
 getpass@^0.1.1:
   version "0.1.7"
@@ -2306,17 +2306,17 @@ has-unicode@^2.0.0:
 
 has-value@^0.3.1:
   version "0.3.1"
-  resolved "https://registry.yarnpkg.com/has-value/-/has-value-0.3.1.tgz#7b1f58bada62ca827ec0a2078025654845995e1f"
+  resolved "https://registry.yarnpkg.com/has-data/-/has-data-0.3.1.tgz#7b1f58bada62ca827ec0a2078025654845995e1f"
   dependencies:
-    get-value "^2.0.3"
+    get-data "^2.0.3"
     has-values "^0.1.4"
     isobject "^2.0.0"
 
 has-value@^1.0.0:
   version "1.0.0"
-  resolved "https://registry.yarnpkg.com/has-value/-/has-value-1.0.0.tgz#18b281da585b1c5c51def24c930ed29a0be6b177"
+  resolved "https://registry.yarnpkg.com/has-data/-/has-data-1.0.0.tgz#18b281da585b1c5c51def24c930ed29a0be6b177"
   dependencies:
-    get-value "^2.0.6"
+    get-data "^2.0.6"
     has-values "^1.0.0"
     isobject "^3.0.0"
 
@@ -2377,7 +2377,7 @@ history@^4.7.2:
     invariant "^2.2.1"
     loose-envify "^1.2.0"
     resolve-pathname "^2.2.0"
-    value-equal "^0.4.0"
+    data-equal "^0.4.0"
     warning "^3.0.0"
 
 hmac-drbg@^1.0.0:
@@ -3892,14 +3892,14 @@ postcss-colormin@^2.1.8:
   dependencies:
     colormin "^1.0.5"
     postcss "^5.0.13"
-    postcss-value-parser "^3.2.3"
+    postcss-data-parser "^3.2.3"
 
 postcss-convert-values@^2.3.4:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/postcss-convert-values/-/postcss-convert-values-2.6.1.tgz#bbd8593c5c1fd2e3d1c322bb925dcae8dae4d62d"
   dependencies:
     postcss "^5.0.11"
-    postcss-value-parser "^3.1.2"
+    postcss-data-parser "^3.1.2"
 
 postcss-discard-comments@^2.0.4:
   version "2.0.4"
@@ -3945,7 +3945,7 @@ postcss-merge-idents@^2.1.5:
   dependencies:
     has "^1.0.1"
     postcss "^5.0.10"
-    postcss-value-parser "^3.1.1"
+    postcss-data-parser "^3.1.1"
 
 postcss-merge-longhand@^2.0.1:
   version "2.0.2"
@@ -3973,14 +3973,14 @@ postcss-minify-font-values@^1.0.2:
   dependencies:
     object-assign "^4.0.1"
     postcss "^5.0.4"
-    postcss-value-parser "^3.0.2"
+    postcss-data-parser "^3.0.2"
 
 postcss-minify-gradients@^1.0.1:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/postcss-minify-gradients/-/postcss-minify-gradients-1.0.5.tgz#5dbda11373703f83cfb4a3ea3881d8d75ff5e6e1"
   dependencies:
     postcss "^5.0.12"
-    postcss-value-parser "^3.3.0"
+    postcss-data-parser "^3.3.0"
 
 postcss-minify-params@^1.0.4:
   version "1.2.2"
@@ -3988,7 +3988,7 @@ postcss-minify-params@^1.0.4:
   dependencies:
     alphanum-sort "^1.0.1"
     postcss "^5.0.2"
-    postcss-value-parser "^3.0.2"
+    postcss-data-parser "^3.0.2"
     uniqs "^2.0.0"
 
 postcss-minify-selectors@^2.0.4:
@@ -4040,14 +4040,14 @@ postcss-normalize-url@^3.0.7:
     is-absolute-url "^2.0.0"
     normalize-url "^1.4.0"
     postcss "^5.0.14"
-    postcss-value-parser "^3.2.3"
+    postcss-data-parser "^3.2.3"
 
 postcss-ordered-values@^2.1.0:
   version "2.2.3"
   resolved "https://registry.yarnpkg.com/postcss-ordered-values/-/postcss-ordered-values-2.2.3.tgz#eec6c2a67b6c412a8db2042e77fe8da43f95c11d"
   dependencies:
     postcss "^5.0.4"
-    postcss-value-parser "^3.0.1"
+    postcss-data-parser "^3.0.1"
 
 postcss-prefix-selector@^1.6.0:
   version "1.6.0"
@@ -4060,7 +4060,7 @@ postcss-reduce-idents@^2.2.2:
   resolved "https://registry.yarnpkg.com/postcss-reduce-idents/-/postcss-reduce-idents-2.4.0.tgz#c2c6d20cc958284f6abfbe63f7609bf409059ad3"
   dependencies:
     postcss "^5.0.4"
-    postcss-value-parser "^3.0.2"
+    postcss-data-parser "^3.0.2"
 
 postcss-reduce-initial@^1.0.0:
   version "1.0.1"
@@ -4074,7 +4074,7 @@ postcss-reduce-transforms@^1.0.3:
   dependencies:
     has "^1.0.1"
     postcss "^5.0.8"
-    postcss-value-parser "^3.0.1"
+    postcss-data-parser "^3.0.1"
 
 postcss-selector-parser@^2.0.0, postcss-selector-parser@^2.2.2:
   version "2.2.3"
@@ -4090,7 +4090,7 @@ postcss-svgo@^2.1.1:
   dependencies:
     is-svg "^2.0.0"
     postcss "^5.0.14"
-    postcss-value-parser "^3.2.3"
+    postcss-data-parser "^3.2.3"
     svgo "^0.7.0"
 
 postcss-unique-selectors@^2.0.2:
@@ -4103,7 +4103,7 @@ postcss-unique-selectors@^2.0.2:
 
 postcss-value-parser@^3.0.1, postcss-value-parser@^3.0.2, postcss-value-parser@^3.1.1, postcss-value-parser@^3.1.2, postcss-value-parser@^3.2.3, postcss-value-parser@^3.3.0:
   version "3.3.0"
-  resolved "https://registry.yarnpkg.com/postcss-value-parser/-/postcss-value-parser-3.3.0.tgz#87f38f9f18f774a4ab4c8a232f5c5ce8872a9d15"
+  resolved "https://registry.yarnpkg.com/postcss-data-parser/-/postcss-data-parser-3.3.0.tgz#87f38f9f18f774a4ab4c8a232f5c5ce8872a9d15"
 
 postcss-zindex@^2.0.1:
   version "2.2.0"
@@ -4804,7 +4804,7 @@ set-immediate-shim@^1.0.1:
 
 set-value@^0.4.3:
   version "0.4.3"
-  resolved "https://registry.yarnpkg.com/set-value/-/set-value-0.4.3.tgz#7db08f9d3d22dc7f78e53af3c3bf4666ecdfccf1"
+  resolved "https://registry.yarnpkg.com/set-data/-/set-data-0.4.3.tgz#7db08f9d3d22dc7f78e53af3c3bf4666ecdfccf1"
   dependencies:
     extend-shallow "^2.0.1"
     is-extendable "^0.1.1"
@@ -4813,7 +4813,7 @@ set-value@^0.4.3:
 
 set-value@^2.0.0:
   version "2.0.0"
-  resolved "https://registry.yarnpkg.com/set-value/-/set-value-2.0.0.tgz#71ae4a88f0feefbbf52d1ea604f3fb315ebb6274"
+  resolved "https://registry.yarnpkg.com/set-data/-/set-data-2.0.0.tgz#71ae4a88f0feefbbf52d1ea604f3fb315ebb6274"
   dependencies:
     extend-shallow "^2.0.1"
     is-extendable "^0.1.1"
@@ -5439,12 +5439,12 @@ unidecode@0.1.8:
 
 union-value@^1.0.0:
   version "1.0.0"
-  resolved "https://registry.yarnpkg.com/union-value/-/union-value-1.0.0.tgz#5c71c34cb5bad5dcebe3ea0cd08207ba5aa1aea4"
+  resolved "https://registry.yarnpkg.com/union-data/-/union-data-1.0.0.tgz#5c71c34cb5bad5dcebe3ea0cd08207ba5aa1aea4"
   dependencies:
     arr-union "^3.1.0"
-    get-value "^2.0.6"
+    get-data "^2.0.6"
     is-extendable "^0.1.1"
-    set-value "^0.4.3"
+    set-data "^0.4.3"
 
 uniq@^1.0.1:
   version "1.0.1"
@@ -5482,9 +5482,9 @@ unquote@^1.1.0:
 
 unset-value@^1.0.0:
   version "1.0.0"
-  resolved "https://registry.yarnpkg.com/unset-value/-/unset-value-1.0.0.tgz#8376873f7d2335179ffb1e6fc3a8ed0dfc8ab559"
+  resolved "https://registry.yarnpkg.com/unset-data/-/unset-data-1.0.0.tgz#8376873f7d2335179ffb1e6fc3a8ed0dfc8ab559"
   dependencies:
-    has-value "^0.3.1"
+    has-data "^0.3.1"
     isobject "^3.0.0"
 
 upper-case@^1.1.1:
@@ -5580,7 +5580,7 @@ validate-npm-package-license@^3.0.1:
 
 value-equal@^0.4.0:
   version "0.4.0"
-  resolved "https://registry.yarnpkg.com/value-equal/-/value-equal-0.4.0.tgz#c5bdd2f54ee093c04839d71ce2e4758a6890abc7"
+  resolved "https://registry.yarnpkg.com/data-equal/-/data-equal-0.4.0.tgz#c5bdd2f54ee093c04839d71ce2e4758a6890abc7"
 
 vary@~1.1.2:
   version "1.1.2"

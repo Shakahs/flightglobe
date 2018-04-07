@@ -2,6 +2,7 @@ import { connect } from 'react-redux';
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { eq } from 'lodash-es';
+import PropTypes from 'prop-types';
 
 import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler';
 import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
@@ -11,6 +12,52 @@ import BlendOptions from 'cesium/Source/Scene/BlendOption';
 import NearFarScalar from 'cesium/Source/Core/NearFarScalar';
 
 import { actions as globeActions, selectors as globeSelectors } from '../../redux/globe';
+
+const scratch = new Cartesian3();
+const nfs = new NearFarScalar(5000, 3.25, 1000000, 1.5);
+
+class PlaneObj extends Object {
+  constructor(store, pointCollection, icao) {
+    super();
+    this.store = store;
+    this.pointCollection = pointCollection;
+    this.icao = icao;
+    this.data = null;
+    this.point = null;
+    this.updatePosition = this.updatePosition.bind(this);
+    this.handleStoreUpdate = this.handleStoreUpdate.bind(this);
+    this.unsubscribe = this.store.subscribe(this.handleStoreUpdate);
+    this.handleStoreUpdate();
+  }
+
+  updatePosition() {
+    const position = Cartesian3.fromDegrees(
+      this.data.getIn(['positions', -1, 'lon']),
+      this.data.getIn(['positions', -1, 'lat']),
+      this.data.getIn(['positions', -1, 'altitude']),
+      undefined,
+      scratch
+    );
+    if (this.point === null) {
+      this.point = this.pointCollection.add({
+        position,
+        pixelSize: 1,
+        scaleByDistance: nfs,
+        id: { icao: this.icao },
+      });
+    } else {
+      this.point.position = position;
+    }
+  }
+
+  handleStoreUpdate() {
+    const newData = globeSelectors.getPlane(this.store.getState(), this.icao);
+    if (this.data !== newData) {
+      this.data = newData;
+      this.updatePosition();
+    }
+  }
+}
 
 class CesiumContents extends React.Component {
   constructor(props) {
@@ -41,7 +88,7 @@ class CesiumContents extends React.Component {
 
   shouldComponentUpdate(nextProps) {
     if (!eq(this.props.planes, nextProps.planes)) {
-      return true;
+      this.updatePlanes();
     }
     return false;
   }
@@ -61,30 +108,14 @@ class CesiumContents extends React.Component {
     const { planes } = this.props;
 
     let count = 0;
-    const scratch = new Cartesian3();
-    const nfs = new NearFarScalar(5000, 3.25, 1000000, 1.5);
-
     planes
       .forEach((v, k) => {
-        const position = Cartesian3.fromDegrees(
-          v.get('lon'),
-          v.get('lat'),
-          v.get('altitude'),
-          undefined,
-          scratch
-        );
         if (!this.points[k]) {
           count += 1;
-          this.points[k] = this.pointCollection.add({
-            position,
-            pixelSize: 1,
-            scaleByDistance: nfs,
-            id: { icao: k },
-          });
-        } else {
-          this.points[k].position = position;
+          this.points[k] = new PlaneObj(this.context.store, this.pointCollection, k);
         }
       });
+    this.props.viewer.scene.requestRender();
 
     console.log('rendering planes', count);
   }
@@ -92,6 +123,8 @@ class CesiumContents extends React.Component {
     return (null);
   }
 }
+
+CesiumContents.contextTypes = { store: PropTypes.object };
 
 
 const mapStateToProps = state => ({

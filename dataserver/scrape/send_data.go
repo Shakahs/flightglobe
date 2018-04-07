@@ -100,8 +100,8 @@ func SendGlobalFeed() {
 //		hashedLocations[hash] = append(hashedLocations[hash], val)
 //	}
 //
-//	for key, value := range hashedLocations {
-//		nchan <- dataExport{key, value}
+//	for key, data := range hashedLocations {
+//		nchan <- dataExport{key, data}
 //	}
 //
 //	fmt.Println("Sent", len(localData), "flights to", len(hashedLocations), "channels")

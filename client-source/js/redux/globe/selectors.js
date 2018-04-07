@@ -20,8 +20,8 @@ export const getPositions = createSelector(
   }
 );
 
-export const getPlaneRaw = (state, props) => {
-  return state.getIn(['globe', 'flights', props.icao]);
+export const getPlaneRaw = (state, icao) => {
+  return state.getIn(['globe', 'flights', icao]);
 };
 
 export const getPlane = createCachedSelector(
@@ -29,4 +29,4 @@ export const getPlane = createCachedSelector(
   (thisPlane) => {
     return thisPlane;
   }
-)((state, props) => props.icao);
+)((state, icao) => icao);
