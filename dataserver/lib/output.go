@@ -77,14 +77,14 @@ func CalculatePositionSnapshot(outgoingData chan OutgoingSinglePositionDataset) 
 
 func DeriveAllPositionsOverTime(positions Positions, outgoingData chan OutgoingSinglePositionDataset) {
 	dLength := len(positions)
-	segmentSize := dLength / 5
+	segmentSize := dLength / 29
 
 	for i := 0; i < dLength; i += segmentSize + 1 {
 		segment := positions[i:min(i+segmentSize, dLength)]
 		positionMap := CreateSinglePositionMap(segment)
 		outgoingData <- OutgoingSinglePositionDataset{"globalStream", positionMap}
 		log.Printf("Global stream sent live positions for %d flights", segmentSize)
-		time.Sleep(time.Second*6)
+		time.Sleep(time.Second)
 	}
 }
 

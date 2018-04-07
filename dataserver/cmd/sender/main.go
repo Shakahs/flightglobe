@@ -19,11 +19,11 @@ func main() {
 	}
 
 	lib.CalculatePositionSnapshot(outgoingPositionSnapshot)
-	lib.CalculateFlightHistories(outgoingFlightHistory)
+	//lib.CalculateFlightHistories(outgoingFlightHistory)
 
 	scheduler := cron.New()
-	scheduler.AddFunc("@every 32s", func() { lib.CalculatePositionSnapshot(outgoingPositionSnapshot) })
-	scheduler.AddFunc("@every 32s", func() { lib.CalculateFlightHistories(outgoingFlightHistory) })
+	scheduler.AddFunc("@every 30s", func() { lib.CalculatePositionSnapshot(outgoingPositionSnapshot) })
+	//scheduler.AddFunc("@every 32s", func() { lib.CalculateFlightHistories(outgoingFlightHistory) })
 	scheduler.Start()
 
 	sigc := make(chan os.Signal, 1)
