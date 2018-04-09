@@ -29,17 +29,18 @@ const scratch = new Cartesian3();
 const nfs = new NearFarScalar(5000, 3.25, 1000000, 1.5);
 
 class PlaneObj extends Object {
-  constructor(icao, store, planeData) {
+  constructor(icao, store, pointCollection) {
     super();
     this.store = store;
-    this.planeData = planeData;
+    this.pointCollection = pointCollection;
     this.icao = icao;
     this.data = null;
-    this.entity = null;
+    this.point = null;
     // this.polyline = null;
-    this.updatePosition = this.updatePosition.bind(this);
+
     this.handleStoreUpdate = this.handleStoreUpdate.bind(this);
-    this.createPosition = this.createPosition.bind(this);
+    this.updatePosition = this.updatePosition.bind(this);
+    // this.createPosition = this.createPosition.bind(this);
     this.unsubscribe = this.store.subscribe(this.handleStoreUpdate);
 
     this.sampledPosition = new SampledPositionProperty();
@@ -49,18 +50,18 @@ class PlaneObj extends Object {
     this.handleStoreUpdate();
   }
 
-  createPosition() {
-    return Cartesian3.fromDegrees(
-      this.data.getIn(['positions', -1, 'lon']),
-      this.data.getIn(['positions', -1, 'lat']),
-      this.data.getIn(['positions', -1, 'altitude']),
-      undefined,
-      scratch
-    );
-  }
+  // createPosition() {
+  //   return Cartesian3.fromDegrees(
+  //     this.data.getIn(['positions', -1, 'lon']),
+  //     this.data.getIn(['positions', -1, 'lat']),
+  //     this.data.getIn(['positions', -1, 'altitude']),
+  //     undefined,
+  //     scratch
+  //   );
+  // }
 
   updatePosition() {
-    this.planeData.entities.suspendEvents();
+    // this.planeData.entities.suspendEvents();
     const position = Cartesian3.fromDegrees(
       this.data.getIn(['positions', -1, 'lon']),
       this.data.getIn(['positions', -1, 'lat']),
@@ -76,28 +77,27 @@ class PlaneObj extends Object {
     //   polylineCoords.push(polyPosition.get('lat'));
     //   polylineCoords.push(polyPosition.get('altitude'));
     // });
-    if (this.entity === null) {
+    if (this.point === null) {
       this.sampledPosition.addSample(now, position);
       // const newDate = JulianDate.now();
       // JulianDate.addSeconds(JulianDate.now(), 60, newDate);
       // this.sampledPosition.addSample(newDate, position);
-      this.entity = this.planeData.entities.add({
-        availability: new TimeIntervalCollection([
-          new TimeInterval({
-            start: now,
-            stop: JulianDate.addDays(now, 3, JulianDate.now()),
-          })]),
+      this.point = this.pointCollection.add({
+        // availability: new TimeIntervalCollection([
+        //   new TimeInterval({
+        //     start: now,
+        //     stop: JulianDate.addDays(now, 3, JulianDate.now()),
+        //   })]),
         position: this.sampledPosition,
         // position,
-        point: {
-          pixelSize: 1,
-          scaleByDistance: nfs,
-          id: { icao: this.icao },
-        },
-        path: {
-        // leadTime: new ConstantProperty(15),
-          trailTime: new ConstantProperty(60),
-        },
+        pixelSize: 1,
+        scaleByDistance: nfs,
+        id: { icao: this.icao },
+        // ,
+        //  path: {
+        //  leadTime: new ConstantProperty(15),
+        // trailTime: new ConstantProperty(60),
+        // },
       });
     } else {
       this.sampledPosition.addSample(future, position);
@@ -113,7 +113,7 @@ class PlaneObj extends Object {
     //   console.log('add', polylineCoords);
     //   this.polyline.positions = polylineCoords;
     // }
-    this.planeData.entities.resumeEvents();
+    // this.planeData.entities.resumeEvents();
   }
 
   handleStoreUpdate() {
@@ -132,10 +132,10 @@ class CesiumContents extends React.Component {
     const { scene } = viewer;
     scene.debugShowFramesPerSecond = true;
 
-    this.planeData = new CustomDataSource('planedata');
+    // this.planeData = new CustomDataSource('planedata');
     this.pointCollection = scene.primitives.add(new PointPrimitiveCollection({ blendOption: BlendOptions.OPAQUE }));
     this.polylineCollection = scene.primitives.add(new PolylineCollection());
-    viewer.dataSources.add(this.planeData);
+    // viewer.dataSources.add(this.planeData);
 
     const handler = new ScreenSpaceEventHandler(viewer.scene.canvas);
     handler.setInputAction((click) => {
@@ -181,7 +181,7 @@ class CesiumContents extends React.Component {
       .forEach((v, k) => {
         if (!this.points[k]) {
           count += 1;
-          this.points[k] = new PlaneObj(k, this.context.store, this.planeData);
+          this.points[k] = new PlaneObj(k, this.context.store, this.pointCollection);
         }
       });
     this.props.viewer.scene.requestRender();
