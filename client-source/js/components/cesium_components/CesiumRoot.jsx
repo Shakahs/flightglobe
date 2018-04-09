@@ -42,7 +42,8 @@ export default class CesiumRoot extends Component {
       scene3DOnly: true,
       imageryProvider,
       terrainProvider,
-      requestRenderMode: true,
+      requestRenderMode: false,
+      shouldAnimate: true,
     });
     // this.viewer.camera.rotateLeft();
     // this.viewer.camera.changed.addEventListener(() => {
