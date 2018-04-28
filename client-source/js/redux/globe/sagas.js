@@ -8,7 +8,7 @@ const loc = window.location;
 
 function websocketInitChannel() {
   return eventChannel(emitter => {
-    const ws = new WebSocket(`ws://${ loc.host }/sub/globalStream`);
+    const ws = new WebSocket(`ws://${ loc.host }/sub/globalSnapshot`);
     ws.onmessage = e => {
       return emitter(globeActions.receiveFlights(JSON.parse(e.data)));
     };
@@ -48,7 +48,7 @@ export function* updateValidTime() {
 }
 
 export function* kickOff() {
-  const data = yield call(globe.retrieveGlobalSnapshot);
-  yield put(globeActions.receiveFlights(data));
+  // const data = yield call(globe.retrieveGlobalSnapshot);
+  // yield put(globeActions.receiveFlights(data));
   yield put(globeActions.kickOff());
 }

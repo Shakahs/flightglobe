@@ -7,7 +7,7 @@ services:
      - "443:443"
   db:
     image: postgres
-    command: postgres -B 1GB -d 2
+    command: postgres -B 1GB
     ports:
       - 5432:5432
     environment:

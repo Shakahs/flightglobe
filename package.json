@@ -39,6 +39,7 @@
   "dependencies": {
     "axios": "^0.17.1",
     "cesium": "^1.43.0",
+    "dexie": "^2.0.2",
     "dotenv": "^4.0.0",
     "es6-promise": "^4.1.0",
     "immutable": "^3.8.2",
