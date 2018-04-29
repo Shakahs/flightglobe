@@ -7,6 +7,7 @@ import Viewer from 'cesium/Source/Widgets/Viewer/Viewer';
 import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
 
+import { globe } from './api';
 
 let state =  Map()
 const mergeData = (state,newData)=>{
@@ -14,19 +15,19 @@ const mergeData = (state,newData)=>{
 }
 
 const loc = window.location;
-const wsStream = new Observable((observer) => {
+const populate$ = Observable.fromPromise(globe.retrieveGlobalSnapshot())
+const wsStream$ = new Observable((observer) => {
     const socket = new WebSocket(`ws://${ loc.host }/sub/globalStream`);
     socket.addEventListener('message', (e) => observer.next(e));
     return () => socket.close();
 });
 
-const wsStreamShare = wsStream
+const wsStreamShare$ = wsStream$
     .map((event)=>JSON.parse(event['data']))
     .share();
 
-// const logStream = wsStreamShare.subscribe((data)=>{
-//     state = state.merge(data)
-// })
+const dataStream = wsStreamShare$
+    .merge(populate$)
 
 const viewer = new Viewer('cesiumContainer', {
     animation: false,
@@ -52,7 +53,7 @@ const planeData = new CustomDataSource('planedata');
 viewer.dataSources.add(planeData);
 
 const scratchC3 = new Cartesian3();
-const updatePlanes = wsStreamShare.subscribe((data)=>{
+const updatePlanes = dataStream.subscribe((data)=>{
     planeData.entities.suspendEvents();
     forOwn(data,(v,k)=>{
         const entity = planeData.entities.getOrCreateEntity(k)
