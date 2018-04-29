@@ -125,7 +125,7 @@ module.exports = {
   devtool: isProduction ? false : 'source-map',
   context: __dirname,
   entry: {
-    js: './client-source/js/index.jsx',
+    js: './client-source/js/new_index.ts',
   },
   output: {
     path: path.resolve(__dirname, 'client-build'),
