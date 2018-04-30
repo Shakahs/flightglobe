@@ -5,7 +5,7 @@ import NearFarScalar from 'cesium/Source/Core/NearFarScalar';
 const nfScalar = new NearFarScalar(5000, 3.25, 1000000, 1.5);
 
 export default class PlaneObj extends Object {
-  constructor(planeData, icao, position, now) {
+  constructor(planeData, icao, position, date) {
     super();
 
     this.planeData = planeData;
@@ -19,7 +19,7 @@ export default class PlaneObj extends Object {
 
     this.updatePosition = this.updatePosition.bind(this);
 
-    this.sampledPosition.addSample(now, position);
+    this.sampledPosition.addSample(date, position);
     this.entity = this.planeData.entities.add({
       point: {
         pixelSize: 2,
@@ -30,7 +30,7 @@ export default class PlaneObj extends Object {
     });
   }
 
-  updatePosition(future, position) {
-    this.sampledPosition.addSample(future, position);
+  updatePosition(position, date) {
+    this.sampledPosition.addSample(date, position);
   }
 }
