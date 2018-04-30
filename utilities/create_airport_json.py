@@ -25,7 +25,7 @@ with open('airports.csv','r',encoding='utf-8') as csvfile:
                 newObj[pair[0]]=row[pair[1]]
 
         if('altitude' in newObj):
-            newObj['altitude'] = int(newObj['altitude'])
+            newObj['altitude'] = int(int(newObj['altitude']) / 3.28)
 
         allAirports[row['ident']]=newObj
         # print(row['ident'],newObj['name'])
