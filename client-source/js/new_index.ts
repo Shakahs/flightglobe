@@ -7,8 +7,10 @@ import Viewer from 'cesium/Source/Widgets/Viewer/Viewer';
 import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
 import NearFarScalar from 'cesium/Source/Core/NearFarScalar';
+import JulianDate from 'cesium/Source/Core/JulianDate';
 
 import { globe } from './api';
+import Plane from './plane';
 
 let state =  Map()
 const mergeData = (state,newData)=>{
@@ -53,9 +55,12 @@ const planeData = new CustomDataSource('planedata');
 viewer.dataSources.add(planeData);
 
 const scratchC3 = new Cartesian3();
-const nfScalar = new NearFarScalar(5000, 3.25, 1000000, 1.5);
+
 const knownPlanes = {}
+
 const updatePlanes = dataStream.subscribe((data)=>{
+    let now = JulianDate.now();
+    let future = JulianDate.addSeconds(now, 30, JulianDate.now());
     planeData.entities.suspendEvents();
     forOwn(data,(v,k)=>{
         const newPosition = Cartesian3.fromDegrees(
@@ -67,16 +72,9 @@ const updatePlanes = dataStream.subscribe((data)=>{
         );
 
         if(!has(knownPlanes,k)) {
-            knownPlanes[k] = planeData.entities.add({
-                point: {
-                    pixelSize: 2,
-                },
-                scaleByDistance: nfScalar,
-                id: k,
-                position: newPosition,
-            });
+            knownPlanes[k] = new Plane(planeData,k,newPosition,now)
         } else {
-            knownPlanes[k].position = newPosition
+            knownPlanes[k].updatePosition(future,newPosition)
         }
     })
     planeData.entities.resumeEvents();
