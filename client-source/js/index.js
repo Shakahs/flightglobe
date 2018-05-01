@@ -3,7 +3,7 @@ import dataStream$ from './dataStreams';
 import updatePlanes from './updatePlanes';
 import { planeData } from './cesium';
 
-dataStream$.subscribe((data) => {
+dataStream$.first().subscribe((data) => {
   planeData.entities.suspendEvents();
   updatePlanes(planeData, data);
   planeData.entities.resumeEvents();
