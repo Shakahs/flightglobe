@@ -16,6 +16,6 @@ const wsStreamShare$ = wsStream$
   .share();
 
 const dataStream$ = wsStreamShare$
-  .merge(populate$)
+  .merge(populate$);
 
 export default dataStream$;
