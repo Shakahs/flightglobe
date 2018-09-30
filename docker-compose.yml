@@ -3,7 +3,20 @@ services:
   redis:
     image: redislabs/rejson
     ports:
-    -  "6379:6379"
+      -  "6379:6379"
+  benthos:
+    image: jeffail/benthos
+    ports:
+      -  "4195:4195"
+    links:
+      - redis
+    environment:
+      INPUT_TYPE: redis_pubsub
+      INPUT_REDIS_PUBSUB_URL: tcp://redis:6379
+      INPUT_REDIS_PUBSUB_CHANNELS: new_data
+      OUTPUT_TYPE: redis_pubsub
+      OUTPUT_REDIS_PUBSUB_URL: tcp://redis:6379
+      OUTPUT_REDIS_PUBSUB_CHANNEL: persist_data
 #  web:
 #    build: .
 #    ports:

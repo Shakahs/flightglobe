@@ -27,6 +27,8 @@ func checkKeyExists(){
 			panic(err)
 		}
 		fmt.Println("Key",redisDataKey, "did not exist, was created")
+	} else {
+		fmt.Println("Confirmed that key", redisDataKey, "exists")
 	}
 }
 
@@ -51,7 +53,6 @@ func persist(){
 		if pos.Icao != "" {
 			reJsonClient.JsonSet(redisDataKey, fmt.Sprintf(".%s", pos.Icao), msg.Payload)
 		}
-
 	}
 }
 
