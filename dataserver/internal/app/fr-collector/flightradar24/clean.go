@@ -2,7 +2,6 @@ package flightradar24
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"github.com/bitly/go-simplejson"
 	"log"
@@ -67,7 +66,7 @@ func Clean(inChan chan []byte, outChan chan pkg.Positions) {
 			FrData := process(raw)
 			ConvertedData := convert(FrData)
 			outChan <- ConvertedData
-			fmt.Println(len(ConvertedData), "records provided")
+			//fmt.Println(len(ConvertedData), "records provided")
 		}
 	}
 }

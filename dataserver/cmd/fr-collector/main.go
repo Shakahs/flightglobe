@@ -11,9 +11,10 @@ import (
 	"syscall"
 )
 
-var redisdb = pkg.ProvideRedisClient()
+var redisdb = pkg.ProvideReJSONClient()
 
 var redisPubChannel = os.Getenv("REDIS_PUB_CHANNEL")
+var redisDataKey = os.Getenv("REDIS_DATA_KEY")
 
 func publishPosition(allpos pkg.Positions){
 	published := 0
@@ -27,10 +28,10 @@ func publishPosition(allpos pkg.Positions){
 		}
 		published++
 	}
-	fmt.Println("published", published, "positions")
+	fmt.Println("published", published, "positions downstream")
 }
 
-func PublishPositions(inChan chan pkg.Positions) {
+func publishPositions(inChan chan pkg.Positions) {
 	for {
 		select {
 		case r := <-inChan:
@@ -39,6 +40,20 @@ func PublishPositions(inChan chan pkg.Positions) {
 	}
 }
 
+func getPositionMap() pkg.SinglePositionDataset {
+	rawData, err := redisdb.JsonGet(redisDataKey).Bytes()
+	if err != nil {
+		panic(err)
+	}
+
+	var pMap pkg.SinglePositionDataset
+	err = json.Unmarshal(rawData, &pMap)
+	if err != nil {
+		panic(err)
+	}
+
+	return pMap
+}
 
 func main() {
 
@@ -46,16 +61,26 @@ func main() {
 		panic("redisPubChannel env variable missing")
 	}
 
+	if redisDataKey == "" {
+		panic("redisDataKey env variable missing")
+	}
+
 	rawData := make(chan []byte)
-	go flightradar24.Scrape(rawData)
+
+	doScrape := func() {
+		pMap := getPositionMap()
+		flightradar24.Scrape(pMap, rawData)
+	}
+
+	go doScrape()
 
 	cleanData := make(chan pkg.Positions)
 	go flightradar24.Clean(rawData, cleanData)
 
-	go PublishPositions(cleanData)
+	go publishPositions(cleanData)
 
 	scheduler := cron.New()
-	scheduler.AddFunc("@every 30s", func() { flightradar24.Scrape(rawData) })
+	scheduler.AddFunc("@every 30s", doScrape)
 	scheduler.Start()
 
 	sigc := make(chan os.Signal, 1)

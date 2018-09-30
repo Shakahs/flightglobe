@@ -19,23 +19,29 @@ func buildUrlList(qt *quadtree.Quadtree) []string {
 	urlList := []string{}
 	buildUrlList := func(qt *quadtree.Quadtree) {
 		urlList = append(urlList, generateURL(qt))
+		if len(qt.Points) > 1000 {
+			fmt.Println("Found quadtree with",len(qt.Points),"children")
+		}
 	}
 	quadtree.WalkQTLeafs(qt, buildUrlList)
 	return urlList
 }
 
-func buildQuadTree(allPos pkg.Positions) *quadtree.Quadtree {
+func buildQuadTree(allPos pkg.SinglePositionDataset) *quadtree.Quadtree {
 	qt := quadtree.New(geo.NewBound(180, -180, -90, 90))
+	qtMembers := 0
 	for _, pos := range allPos {
 		np := geo.NewPoint(pos.Lng, pos.Lat)
 		qt.Insert(np)
+		qtMembers++
 	}
 	//quadtree.PrintLeafMap(qt)
+	fmt.Println("Built quadtree with", qtMembers, "members")
 	return qt
 }
 
 func retrieve(url string) []byte {
-	fmt.Println(url)
+	//fmt.Println(url)
 	resp, err := http.Get(url)
 	if err != nil {
 		panic(err)
@@ -45,11 +51,9 @@ func retrieve(url string) []byte {
 	return body
 }
 
-func Scrape(outputChan chan []byte) {
-	//allPositions := lib.GetGlobalPositions()
-	var allPositions pkg.Positions //use nil value for now
-	qt := buildQuadTree(allPositions)   //should be empty quadtree with default bounds
-	urlList := buildUrlList(qt)         //should be 1 url
+func Scrape(pMap pkg.SinglePositionDataset, outputChan chan []byte) {
+	qt := buildQuadTree(pMap)
+	urlList := buildUrlList(qt)
 	for _,v := range urlList {
 		data := retrieve(v)
 		outputChan <- data

@@ -36,6 +36,7 @@ func persist() {
 	defer ticker.Stop()
 
 	persistedCount := 0
+	droppedCount := 0
 
 	for {
 		select {
@@ -53,12 +54,19 @@ func persist() {
 
 			//only persist if we have an ICAO, persisting an empty ICAO erases the ReJSON container
 			if pos.Icao != "" {
-				reJsonClient.JsonSet(redisDataKey, fmt.Sprintf(".%s", pos.Icao), msg.Payload)
+				_, err := reJsonClient.JsonSet(redisDataKey, fmt.Sprintf(".$%s", pos.Icao), msg.Payload).Result()
+				if err != nil {
+					fmt.Println("Payload:",pos.Icao, pos)
+					panic(err)
+				}
 				persistedCount++
+			} else {
+				droppedCount++
 			}
 		case <-ticker.C:
-			fmt.Println(persistedCount, "positions saved in past 5 seconds")
+			fmt.Println(persistedCount, "positions saved,", droppedCount, "positions dropped in past 5 seconds")
 			persistedCount = 0
+			droppedCount = 0
 		}
 	}
 }
