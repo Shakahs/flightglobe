@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 var goRedisClient = redis.NewClient(&redis.Options{
@@ -36,22 +37,33 @@ func persist(){
 	pubsub := reJsonClient.Subscribe(redisSubChannel)
 	ch := pubsub.Channel()
 
+	ticker := time.NewTicker(time.Second * 5)
+	defer ticker.Stop()
+
+	persistedCount := 0
+
 	for {
-		msg, ok := <-ch
-		if !ok {
-			break
-		}
+		select {
+			case msg, ok := <-ch:
+				if !ok {
+					break
+				}
 
-		//deserialize so we can get the ICAO.
-		var pos lib.Position
-		err := json.Unmarshal([]byte(msg.Payload), &pos) //get msg string, convert to byte array for unmarshal
-		if err != nil {
-			log.Fatal("unmarshal error", err)
-		}
+				//deserialize so we can get the ICAO.
+				var pos lib.Position
+				err := json.Unmarshal([]byte(msg.Payload), &pos) //get msg string, convert to byte array for unmarshal
+				if err != nil {
+					log.Fatal("unmarshal error", err)
+				}
 
-		//only persist if we have an ICAO, persisting an empty ICAO erases the ReJSON container
-		if pos.Icao != "" {
-			reJsonClient.JsonSet(redisDataKey, fmt.Sprintf(".%s", pos.Icao), msg.Payload)
+				//only persist if we have an ICAO, persisting an empty ICAO erases the ReJSON container
+				if pos.Icao != "" {
+					reJsonClient.JsonSet(redisDataKey, fmt.Sprintf(".%s", pos.Icao), msg.Payload)
+					persistedCount++
+				}
+			case <-ticker.C:
+				fmt.Println(persistedCount, "positions saved in past 5 seconds")
+				persistedCount = 0
 		}
 	}
 }
