@@ -3,9 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/KromDaniel/rejonson"
 	"github.com/Shakahs/flightglobe/dataserver/lib"
-	"github.com/go-redis/redis"
 	"log"
 	"os"
 	"os/signal"
@@ -13,10 +11,7 @@ import (
 	"time"
 )
 
-var goRedisClient = redis.NewClient(&redis.Options{
-	Addr: os.Getenv("REDIS_URL"),
-})
-var reJsonClient = rejonson.ExtendClient(goRedisClient)
+var reJsonClient = lib.ProvideReJSONClient()
 
 var redisSubChannel = os.Getenv("REDIS_SUB_CHANNEL")
 var redisDataKey = os.Getenv("REDIS_DATA_KEY")
@@ -69,6 +64,10 @@ func persist() {
 }
 
 func main() {
+
+	if redisSubChannel == "" || redisDataKey == "" {
+		panic("Required env variable missing")
+	}
 
 	checkKeyExists()
 	go persist()

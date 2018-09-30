@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Shakahs/flightglobe/dataserver/lib"
-	"github.com/go-redis/redis"
 	"github.com/jmoiron/sqlx"
 	"log"
 	"os"
@@ -54,9 +53,7 @@ func insert(newData lib.Position) {
 //	fmt.Println("Insert took", elapsed)
 //}
 
-var goRedisClient = redis.NewClient(&redis.Options{
-	Addr: os.Getenv("REDIS_URL"),
-})
+var goRedisClient = lib.ProvideRedisClient()
 var redisSubChannel = os.Getenv("REDIS_SUB_CHANNEL")
 
 func subscribe() {

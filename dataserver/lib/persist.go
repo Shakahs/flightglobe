@@ -3,16 +3,10 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-redis/redis"
 	"os"
 )
 
-
-
-
-var redisdb = redis.NewClient(&redis.Options{
-	Addr: os.Getenv("REDIS_URL"),
-})
+var redisdb = ProvideRedisClient()
 
 var redisPubChannel = os.Getenv("REDIS_PUB_CHANNEL")
 
