@@ -10,8 +10,12 @@ import (
 
 
 func ProvideRedisClient() *redis.Client {
+	redisAddress := os.Getenv("REDIS_URL")
+	if redisAddress == "" {
+		panic("REDIS_URL env variable missing")
+	}
 	goRedisClient := redis.NewClient(&redis.Options{
-		Addr: os.Getenv("REDIS_URL"),
+		Addr: redisAddress,
 	})
 	return goRedisClient
 }
