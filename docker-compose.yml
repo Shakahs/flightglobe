@@ -17,17 +17,17 @@ services:
       OUTPUT_TYPE: redis_pubsub
       OUTPUT_REDIS_PUBSUB_URL: tcp://redis:6379
       OUTPUT_REDIS_PUBSUB_CHANNEL: persist_data
+  db:
+    image: pipelinedb/pipelinedb
+    ports:
+      - 5432:5432
+#    environment:
+#      PIPELINEDB_PASSWORD: flightglobe
+#      PIPELINEDB_USER: flightglobe
+#      PIPELINEDB_DB: flightglobe
+
 #  web:
 #    build: .
 #    ports:
 #     - "8080:80"
 #     - "443:443"
-#  db:
-#    image: postgres
-#    command: postgres -B 1GB
-#    ports:
-#      - 5432:5432
-#    environment:
-#      POSTGRES_PASSWORD: flightglobe
-#      POSTGRES_USER: flightglobe
-
