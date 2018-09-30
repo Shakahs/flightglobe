@@ -1,9 +1,4 @@
-package lib
-
-import (
-	"log"
-	"time"
-)
+package deprecated
 
 var globalQuery = `SELECT distinct on (icao) icao, extract(epoch from ptime)::int as ptime2, lat,lng,heading,altitude
 FROM positions
@@ -72,18 +67,18 @@ func min(a, b int) int {
 //	log.Printf("Snapshot query sent live positions for %d flights", len(positions))
 //}
 
-func DeriveAllPositionsOverTime(positions Positions, outgoingData chan OutgoingSinglePositionDataset) {
-	dLength := len(positions)
-	segmentSize := dLength / 29
-
-	for i := 0; i < dLength; i += segmentSize + 1 {
-		segment := positions[i:min(i+segmentSize, dLength)]
-		positionMap := CreateSinglePositionMap(segment)
-		outgoingData <- OutgoingSinglePositionDataset{"globalStream", positionMap}
-		log.Printf("Global stream sent live positions for %d flights", segmentSize)
-		time.Sleep(time.Second)
-	}
-}
+//func DeriveAllPositionsOverTime(positions Positions, outgoingData chan OutgoingSinglePositionDataset) {
+//	dLength := len(positions)
+//	segmentSize := dLength / 29
+//
+//	for i := 0; i < dLength; i += segmentSize + 1 {
+//		segment := positions[i:min(i+segmentSize, dLength)]
+//		positionMap := CreateSinglePositionMap(segment)
+//		outgoingData <- OutgoingSinglePositionDataset{"globalStream", positionMap}
+//		log.Printf("Global stream sent live positions for %d flights", segmentSize)
+//		time.Sleep(time.Second)
+//	}
+//}
 
 //func calculateHistoriesForIcaoRange(icaoRange []string, outgoingData chan OutgoingFlightHistory) {
 //	start := time.Now()

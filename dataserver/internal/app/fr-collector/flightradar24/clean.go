@@ -3,7 +3,7 @@ package flightradar24
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Shakahs/flightglobe/dataserver/lib"
+	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"github.com/bitly/go-simplejson"
 	"log"
 )
@@ -50,17 +50,17 @@ func process(data []byte) []Fr_Record {
 	return collector
 }
 
-func convert(FrData []Fr_Record) lib.Positions {
-	var collector lib.Positions
+func convert(FrData []Fr_Record) pkg.Positions {
+	var collector pkg.Positions
 	for _, v := range FrData {
-		pos := lib.Position{0, v.Icao, v.Lat, v.Lng,
+		pos := pkg.Position{0, v.Icao, v.Lat, v.Lng,
 			v.Time, v.Heading, int32(v.Altitude)}
 		collector = append(collector, pos)
 	}
 	return collector
 }
 
-func Clean(inChan chan []byte, outChan chan lib.Positions) {
+func Clean(inChan chan []byte, outChan chan pkg.Positions) {
 	for {
 		select {
 		case raw := <-inChan:

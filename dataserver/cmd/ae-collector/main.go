@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/Shakahs/flightglobe/dataserver/lib"
-	"github.com/Shakahs/flightglobe/dataserver/lib/adsbexchange"
+	"github.com/Shakahs/flightglobe/dataserver/internal"
+	"github.com/Shakahs/flightglobe/dataserver/internal/adsbexchange"
 	"os"
 	"os/signal"
 	"syscall"
@@ -14,10 +14,10 @@ func main() {
 	rawData := make(chan []byte)
 	go adsbexchange.Intake(rawData)
 
-	cleanData := make(chan lib.Positions)
+	cleanData := make(chan internal.Positions)
 	go adsbexchange.Clean(rawData, cleanData)
 
-	go lib.Persist(cleanData)
+	go internal.Persist(cleanData)
 
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc,

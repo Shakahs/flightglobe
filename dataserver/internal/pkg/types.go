@@ -1,4 +1,4 @@
-package lib
+package pkg
 
 type Position struct {
 	Id       int64   `json:"-"`

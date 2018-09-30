@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Shakahs/flightglobe/dataserver/lib"
+	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"github.com/jmoiron/sqlx"
 	"log"
 	"os"
@@ -18,7 +18,7 @@ var persistQuery = `INSERT INTO position_stream (lat, lng, heading, altitude, ic
 var DB = sqlx.MustConnect("pgx",
 	"postgres://pipeline:pipeline@localhost/pipeline")
 
-func insert(newData lib.Position) {
+func insert(newData pkg.Position) {
 	tx := DB.MustBegin()
 
 	_, err := tx.NamedExec(persistQuery, newData)
@@ -53,7 +53,7 @@ func insert(newData lib.Position) {
 //	fmt.Println("Insert took", elapsed)
 //}
 
-var goRedisClient = lib.ProvideRedisClient()
+var goRedisClient = pkg.ProvideRedisClient()
 var redisSubChannel = os.Getenv("REDIS_SUB_CHANNEL")
 
 func subscribe() {
@@ -73,7 +73,7 @@ func subscribe() {
 			}
 
 			//deserialize so we can get the ICAO.
-			var pos lib.Position
+			var pos pkg.Position
 			err := json.Unmarshal([]byte(msg.Payload), &pos) //get msg string, convert to byte array for unmarshal
 			if err != nil {
 				log.Fatal("unmarshal error", err)

@@ -1,4 +1,4 @@
-package lib
+package pkg
 
 import (
 	"github.com/KromDaniel/rejonson"

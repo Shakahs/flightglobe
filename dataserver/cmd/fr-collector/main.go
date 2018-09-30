@@ -1,21 +1,21 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/Shakahs/flightglobe/dataserver/lib"
-	"github.com/Shakahs/flightglobe/dataserver/lib/flightradar24"
+	"github.com/Shakahs/flightglobe/dataserver/internal/app/fr-collector/flightradar24"
+	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"github.com/robfig/cron"
 	"os"
 	"os/signal"
 	"syscall"
-	"encoding/json"
 )
 
-var redisdb = lib.ProvideRedisClient()
+var redisdb = pkg.ProvideRedisClient()
 
 var redisPubChannel = os.Getenv("REDIS_PUB_CHANNEL")
 
-func publishPosition(allpos lib.Positions){
+func publishPosition(allpos pkg.Positions){
 	published := 0
 	for _, pos := range(allpos){
 		marshaled, err := json.Marshal(pos)
@@ -30,7 +30,7 @@ func publishPosition(allpos lib.Positions){
 	fmt.Println("published", published, "positions")
 }
 
-func PublishPositions(inChan chan lib.Positions) {
+func PublishPositions(inChan chan pkg.Positions) {
 	for {
 		select {
 		case r := <-inChan:
@@ -49,7 +49,7 @@ func main() {
 	rawData := make(chan []byte)
 	go flightradar24.Scrape(rawData)
 
-	cleanData := make(chan lib.Positions)
+	cleanData := make(chan pkg.Positions)
 	go flightradar24.Clean(rawData, cleanData)
 
 	go PublishPositions(cleanData)

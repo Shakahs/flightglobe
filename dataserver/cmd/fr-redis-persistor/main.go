@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Shakahs/flightglobe/dataserver/lib"
+	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"log"
 	"os"
 	"os/signal"
@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-var reJsonClient = lib.ProvideReJSONClient()
+var reJsonClient = pkg.ProvideReJSONClient()
 
 var redisSubChannel = os.Getenv("REDIS_SUB_CHANNEL")
 var redisDataKey = os.Getenv("REDIS_DATA_KEY")
@@ -45,7 +45,7 @@ func persist() {
 			}
 
 			//deserialize so we can get the ICAO.
-			var pos lib.Position
+			var pos pkg.Position
 			err := json.Unmarshal([]byte(msg.Payload), &pos) //get msg string, convert to byte array for unmarshal
 			if err != nil {
 				log.Fatal("unmarshal error", err)
