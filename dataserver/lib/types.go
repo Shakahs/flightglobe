@@ -2,7 +2,7 @@ package lib
 
 type Position struct {
 	Id       int64   `json:"-"`
-	Icao     string  `json:"-"`
+	Icao     string  `json:"icao"`
 	Lat      float64 `json:"lat"`
 	Lng      float64 `json:"lon"`
 	Time     int64   `json:"time" db:"ptime2"`

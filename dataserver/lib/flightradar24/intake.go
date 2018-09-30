@@ -24,14 +24,13 @@ func buildUrlList(qt *quadtree.Quadtree) []string {
 	return urlList
 }
 
-func buildQuadTree() *quadtree.Quadtree {
+func buildQuadTree(allPos lib.Positions) *quadtree.Quadtree {
 	qt := quadtree.New(geo.NewBound(180, -180, -90, 90))
-	allPositions := lib.GetGlobalPositions()
-	for _, pos := range allPositions {
+	for _, pos := range allPos {
 		np := geo.NewPoint(pos.Lng, pos.Lat)
 		qt.Insert(np)
 	}
-	quadtree.PrintLeafMap(qt)
+	//quadtree.PrintLeafMap(qt)
 	return qt
 }
 
@@ -47,8 +46,10 @@ func retrieve(url string) []byte {
 }
 
 func Scrape(outputChan chan []byte) {
-	qt := buildQuadTree()
-	urlList := buildUrlList(qt)
+	//allPositions := lib.GetGlobalPositions()
+	var allPositions lib.Positions //use nil value for now
+	qt := buildQuadTree(allPositions) //should be empty quadtree with default bounds
+	urlList := buildUrlList(qt) //should be 1 url
 	for _,v := range urlList {
 		data := retrieve(v)
 		outputChan <- data

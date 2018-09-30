@@ -1,16 +1,20 @@
 version: '2'
 services:
-  web:
-    build: .
+  redis:
+    image: redis
     ports:
-     - "8080:80"
-     - "443:443"
-  db:
-    image: postgres
-    command: postgres -B 1GB
-    ports:
-      - 5432:5432
-    environment:
-      POSTGRES_PASSWORD: flightglobe
-      POSTGRES_USER: flightglobe
+    -  "6379:6379"
+#  web:
+#    build: .
+#    ports:
+#     - "8080:80"
+#     - "443:443"
+#  db:
+#    image: postgres
+#    command: postgres -B 1GB
+#    ports:
+#      - 5432:5432
+#    environment:
+#      POSTGRES_PASSWORD: flightglobe
+#      POSTGRES_USER: flightglobe
 
