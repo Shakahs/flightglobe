@@ -36,14 +36,19 @@ func ProvideReJSONClient() *rejonson.Client {
 //var DB = sqlx.MustConnect("pgx",
 //	"postgres://flightglobe:flightglobe@localhost/flightglobe")
 
-func GetPositionMap(c *rejonson.Client, dataKey string) SinglePositionDataset {
+func GetPositionMapRaw(c *rejonson.Client, dataKey string) []byte {
 	rawData, err := c.JsonGet(dataKey).Bytes()
 	if err != nil {
 		panic(err)
 	}
+	return rawData
+}
+
+func GetPositionMap(c *rejonson.Client, dataKey string) SinglePositionDataset {
+	rawData := GetPositionMapRaw(c, dataKey)
 
 	var pMap SinglePositionDataset
-	err = json.Unmarshal(rawData, &pMap)
+	err := json.Unmarshal(rawData, &pMap)
 	if err != nil {
 		panic(err)
 	}
