@@ -4,6 +4,7 @@ import updatePlanes from './updatePlanes';
 import { planeData } from './cesium';
 
 dataStream$.subscribe((data) => {
+  console.log('position update received');
   planeData.entities.suspendEvents();
   updatePlanes(planeData, data);
   planeData.entities.resumeEvents();

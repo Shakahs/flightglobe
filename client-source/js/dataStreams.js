@@ -6,7 +6,7 @@ const loc = window.location;
 const populate$ = Observable.fromPromise(globe.retrieveGlobalSnapshot());
 
 const wsStream$ = new Observable((observer) => {
-  const socket = new WebSocket(`ws://${ loc.host }/sub/globalStream`);
+  const socket = new WebSocket(`ws://${ loc.host }/sub`);
   socket.addEventListener('message', (e) => observer.next(e));
   return () => socket.close();
 });

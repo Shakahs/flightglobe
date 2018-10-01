@@ -21,8 +21,19 @@ func sendFull(c *websocket.Conn) error {
 	if err != nil {
 		return errors.New("sendFull failed")
 	}
+	fmt.Println("sendFull completed")
 	return nil
 }
+
+func readLoop(c *websocket.Conn) {
+	for {
+		if _, _, err := c.NextReader(); err != nil {
+			c.Close()
+			break
+		}
+	}
+}
+
 
 func maintainConnection(w http.ResponseWriter, r *http.Request) {
 	c, err := upgrader.Upgrade(w, r, nil)
@@ -30,7 +41,10 @@ func maintainConnection(w http.ResponseWriter, r *http.Request) {
 		log.Print("upgrade:", err)
 		return
 	}
+
 	defer c.Close()
+	go readLoop(c)
+
 	fmt.Println("connection opened")
 
 	ticker := time.NewTicker(time.Second * 5)
@@ -49,6 +63,6 @@ func maintainConnection(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/", maintainConnection)
+	http.HandleFunc("/sub", maintainConnection)
 	log.Fatal(http.ListenAndServe("localhost:8080", nil))
 }
