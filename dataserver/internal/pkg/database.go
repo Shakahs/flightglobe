@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"encoding/json"
 	"github.com/KromDaniel/rejonson"
 	"github.com/go-redis/redis"
 	_ "github.com/jackc/pgx/stdlib"
@@ -34,3 +35,19 @@ func ProvideReJSONClient() *rejonson.Client {
 
 //var DB = sqlx.MustConnect("pgx",
 //	"postgres://flightglobe:flightglobe@localhost/flightglobe")
+
+func GetPositionMap(c *rejonson.Client, dataKey string) SinglePositionDataset {
+	rawData, err := c.JsonGet(dataKey).Bytes()
+	if err != nil {
+		panic(err)
+	}
+
+	var pMap SinglePositionDataset
+	err = json.Unmarshal(rawData, &pMap)
+	if err != nil {
+		panic(err)
+	}
+
+	return pMap
+}
+

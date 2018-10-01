@@ -40,21 +40,6 @@ func publishPositions(inChan chan pkg.Positions) {
 	}
 }
 
-func getPositionMap() pkg.SinglePositionDataset {
-	rawData, err := redisdb.JsonGet(redisDataKey).Bytes()
-	if err != nil {
-		panic(err)
-	}
-
-	var pMap pkg.SinglePositionDataset
-	err = json.Unmarshal(rawData, &pMap)
-	if err != nil {
-		panic(err)
-	}
-
-	return pMap
-}
-
 func main() {
 
 	if redisPubChannel == "" {
@@ -68,7 +53,7 @@ func main() {
 	rawData := make(chan []byte)
 
 	doScrape := func() {
-		pMap := getPositionMap()
+		pMap := pkg.GetPositionMap(redisdb, redisDataKey)
 		flightradar24.Scrape(pMap, rawData)
 	}
 
