@@ -21,11 +21,37 @@ services:
     image: pipelinedb/pipelinedb
     ports:
       - 5432:5432
-#    environment:
-#      PIPELINEDB_PASSWORD: flightglobe
-#      PIPELINEDB_USER: flightglobe
-#      PIPELINEDB_DB: flightglobe
-
+  fr-collector:
+    image: gcr.io/flight-globe/fr-collector
+    links:
+    - redis
+    depends_on:
+    - fr-redis-persistor
+    environment:
+      REDIS_URL: redis:6379
+      REDIS_PUB_CHANNEL: new_data
+      REDIS_DATA_KEY: flight_positions
+  fr-redis-persistor:
+    image: gcr.io/flight-globe/fr-redis-persistor
+    links:
+    - redis
+    environment:
+      REDIS_URL: redis:6379
+      REDIS_SUB_CHANNEL: new_data
+      REDIS_DATA_KEY: flight_positions
+  server:
+    image: gcr.io/flight-globe/server
+    links:
+    - redis
+    ports:
+      - 5000:8080
+    environment:
+      REDIS_URL: redis:6379
+      REDIS_DATA_KEY: flight_positions
+#  static:
+#    image: gcr.io/flight-globe/static
+#    ports:
+#    - 3000:80
 #  web:
 #    build: .
 #    ports:

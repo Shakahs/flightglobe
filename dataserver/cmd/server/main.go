@@ -63,6 +63,8 @@ func maintainConnection(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	fs := http.FileServer(http.Dir("/var/flightglobe/static"))
+	http.Handle("/", fs)
 	http.HandleFunc("/sub", maintainConnection)
-	log.Fatal(http.ListenAndServe("localhost:8080", nil))
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
