@@ -6,3 +6,6 @@
 /webpack-stats.json
 /.env
 /client-build/
+dataserver/cmd/fr-collector/fr-collector
+dataserver/cmd/fr-redis-persistor/fr-redis-persistor
+dataserver/cmd/server/server
