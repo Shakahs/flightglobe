@@ -14,4 +14,4 @@ from position_stream
 CREATE CONTINUOUS VIEW flight_tracks as
 SELECT DISTINCT ON (icao, ptime3) icao, lat, lng,
 date_round(ptime,'30 seconds') AS ptime3
-FROM position_stream
+FROM position_stream;

@@ -1,0 +1,49 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: pipelinedb-access
+  labels:
+    app: "pipelinedb"
+spec:
+  selector:
+    app: pipelinedb
+  type: NodePort
+  ports:
+  - port: 5432
+    nodePort: 32001
+    protocol: TCP
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: pipelinedb
+  labels:
+    app: "pipelinedb"
+spec:
+  selector:
+    app: pipelinedb
+  ports:
+  - protocol: TCP
+    port: 5432
+---
+apiVersion: "extensions/v1beta1"
+kind: "Deployment"
+metadata:
+  name: "pipelinedb"
+  labels:
+    app: "pipelinedb"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pipelinedb
+  template:
+    metadata:
+      labels:
+        app: pipelinedb
+    spec:
+      containers:
+      - name: "pipelinedb"
+        image: pipelinedb/pipelinedb
+        ports:
+        - containerPort: 5432
