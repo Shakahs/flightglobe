@@ -1,0 +1,29 @@
+apiVersion: "extensions/v1beta1"
+kind: "Deployment"
+metadata:
+  name: "fr-redis-persistor-deployment"
+  labels:
+    app: fr-redis-persistor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fr-redis-persistor
+  template:
+    metadata:
+      labels:
+        app: fr-redis-persistor
+    spec:
+      containers:
+      - name: fr-redis-persistor
+        image: gcr.io/flight-globe/fr-redis-persistor
+        imagePullPolicy: Always
+        env:
+        - name: REDIS_ADDRESS
+          value: redis-service
+        - name: REDIS_PORT
+          value: "6379"
+        - name: REDIS_SUB_CHANNEL
+          value: new_data
+        - name: REDIS_DATA_KEY
+          value: flight_positions

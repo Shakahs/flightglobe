@@ -1,0 +1,26 @@
+apiVersion: "extensions/v1beta1"
+kind: "Deployment"
+metadata:
+  name: "fr-collector-deployment"
+  labels:
+    app: "fr-collector"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "fr-collector"
+  template:
+    metadata:
+      labels:
+        app: "fr-collector"
+    spec:
+      containers:
+      - name: "fr-collector"
+        image: gcr.io/flight-globe/fr-collector
+        env:
+        - name: REDIS_URL
+          value: redis_pubsub
+        - name: REDIS_PUB_CHANNEL
+          value: new_data
+        - name: REDIS_DATA_KEY
+          value: flight_positions

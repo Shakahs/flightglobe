@@ -1,0 +1,34 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: redis-service
+  labels:
+    app: "redis"
+spec:
+  selector:
+    app: redis-app
+  ports:
+  - protocol: TCP
+    port: 6379
+---
+apiVersion: "extensions/v1beta1"
+kind: "Deployment"
+metadata:
+  name: "redis-deployment"
+  labels:
+    app: "redis"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-app
+  template:
+    metadata:
+      labels:
+        app: redis-app
+    spec:
+      containers:
+      - name: "redis"
+        image: redislabs/rejson
+        ports:
+        - containerPort: 6379
