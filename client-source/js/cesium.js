@@ -19,8 +19,8 @@ const viewer = new Viewer('cesiumContainer', {
   scene3DOnly: true,
   // imageryProvider,
   // terrainProvider,
-  requestRenderMode: false,
-  shouldAnimate: true,
+  requestRenderMode: true,
+  // shouldAnimate: true,
   // automaticallyTrackDataSourceClocks: false,
 });
 
