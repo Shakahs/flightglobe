@@ -1,0 +1,45 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: fg-server
+  labels:
+    app: "fg-server"
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    nodePort: 32000
+    protocol: TCP
+    name: http
+  selector:
+    app: fg-server
+---
+apiVersion: "extensions/v1beta1"
+kind: "Deployment"
+metadata:
+  name: "fg-server"
+  labels:
+    app: fg-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fg-server
+  template:
+    metadata:
+      labels:
+        app: fg-server
+    spec:
+      containers:
+      - name: fg-server
+        image: gcr.io/flight-globe/fg-server
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        - name: REDIS_ADDRESS
+          value: redis-service
+        - name: REDIS_PORT
+          value: "6379"
+        - name: REDIS_DATA_KEY
+          value: flight_positions

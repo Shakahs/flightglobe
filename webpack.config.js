@@ -11,7 +11,7 @@ const CopywebpackPlugin = require('copy-webpack-plugin');
 const nodeEnv = process.env.NODE_ENV || 'development';
 const isProduction = nodeEnv === 'production';
 
-const buildPath = path.join(__dirname, './client-build');
+const buildPath = path.join(__dirname, './dataserver/cmd/server/static');
 const jsSourcePath = path.join(__dirname, './client-source/js');
 const imgPath = path.join(__dirname, './client-source/assets/images');
 const iconPath = path.join(__dirname, './client-source/assets/icons');
@@ -128,7 +128,7 @@ module.exports = {
     js: './client-source/js/index.js',
   },
   output: {
-    path: path.resolve(__dirname, 'client-build'),
+    path: buildPath,
     publicPath: '/',
     filename: 'app-[hash].js',
     sourcePrefix: '',

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/KromDaniel/rejonson"
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
@@ -12,11 +13,9 @@ import (
 )
 
 var upgrader = websocket.Upgrader{} // use default options
-var connRedis = pkg.ProvideReJSONClient()
-var redisDataKey = os.Getenv("REDIS_DATA_KEY")
 
-func sendFull(c *websocket.Conn) error {
-	data := pkg.GetPositionMapRaw(connRedis, redisDataKey)
+func sendFull(c *websocket.Conn, r *rejonson.Client, redisDataKey string) error {
+	data := pkg.GetPositionMapRaw(r, redisDataKey)
 	err := c.WriteMessage(1, data)
 	if err != nil {
 		return errors.New("sendFull failed")
@@ -36,14 +35,20 @@ func readLoop(c *websocket.Conn) {
 
 
 func maintainConnection(w http.ResponseWriter, r *http.Request) {
-	c, err := upgrader.Upgrade(w, r, nil)
+	redisDataKey := os.Getenv("REDIS_DATA_KEY")
+	redisAddress := os.Getenv("REDIS_ADDRESS")
+	redisPort := os.Getenv("REDIS_PORT")
+	var redisConn = pkg.ProvideReJSONClient(fmt.Sprintf("%s:%s",
+		redisAddress, redisPort))
+
+	wsConn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Print("upgrade:", err)
 		return
 	}
 
-	defer c.Close()
-	go readLoop(c)
+	defer wsConn.Close()
+	go readLoop(wsConn)
 
 	fmt.Println("connection opened")
 
@@ -52,7 +57,7 @@ func maintainConnection(w http.ResponseWriter, r *http.Request) {
 	for {
 		select {
 		case <-ticker.C:
-			err = sendFull(c)
+			err = sendFull(wsConn, redisConn, redisDataKey)
 			if err != nil {
 				log.Println("write:", err, "closing connection")
 				return
@@ -63,6 +68,16 @@ func maintainConnection(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	redisDataKey := os.Getenv("REDIS_DATA_KEY")
+	redisAddress := os.Getenv("REDIS_ADDRESS")
+	redisPort := os.Getenv("REDIS_PORT")
+
+	for _,v := range([]string{redisDataKey, redisAddress, redisPort}) {
+		if v == "" {
+			panic(fmt.Sprintf("%s env variable not provided", v))
+		}
+	}
+
 	fs := http.FileServer(http.Dir("/var/flightglobe/static"))
 	http.Handle("/", fs)
 	http.HandleFunc("/sub", maintainConnection)
