@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/KromDaniel/rejonson"
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"log"
 	"os"
@@ -11,14 +12,11 @@ import (
 	"time"
 )
 
-var reJsonClient = pkg.ProvideReJSONClient()
 
-var redisSubChannel = os.Getenv("REDIS_SUB_CHANNEL")
-var redisDataKey = os.Getenv("REDIS_DATA_KEY")
 
-func checkKeyExists() {
-	if reJsonClient.Exists(redisDataKey).Val() == 0 {
-		_, err := reJsonClient.JsonSet(redisDataKey, ".", "{}").Result()
+func checkKeyExists(c *rejonson.Client, redisDataKey string) {
+	if c.Exists(redisDataKey).Val() == 0 {
+		_, err := c.JsonSet(redisDataKey, ".", "{}").Result()
 		if err != nil {
 			panic(err)
 		}
@@ -28,8 +26,8 @@ func checkKeyExists() {
 	}
 }
 
-func persist() {
-	pubsub := reJsonClient.Subscribe(redisSubChannel)
+func persist(c *rejonson.Client, redisSubChannel string,redisDataKey string ) {
+	pubsub := c.Subscribe(redisSubChannel)
 	ch := pubsub.Channel()
 
 	ticker := time.NewTicker(time.Second * 5)
@@ -54,7 +52,7 @@ func persist() {
 
 			//only persist if we have an ICAO, persisting an empty ICAO erases the ReJSON container
 			if pos.Icao != "" {
-				_, err := reJsonClient.JsonSet(redisDataKey, fmt.Sprintf(".$%s", pos.Icao), msg.Payload).Result()
+				_, err := c.JsonSet(redisDataKey, fmt.Sprintf(".$%s", pos.Icao), msg.Payload).Result()
 				if err != nil {
 					fmt.Println("Payload:",pos.Icao, pos)
 					panic(err)
@@ -73,12 +71,24 @@ func persist() {
 
 func main() {
 
+	for _, pair := range os.Environ() {
+		fmt.Println(pair)
+	}
+
+	 redisSubChannel := os.Getenv("REDIS_SUB_CHANNEL")
+	 redisDataKey := os.Getenv("REDIS_DATA_KEY")
+	 redisAddress := os.Getenv("REDIS_ADDRESS")
+	 redisPort := os.Getenv("REDIS_PORT")
+
 	if redisSubChannel == "" || redisDataKey == "" {
 		panic("Required env variable missing")
 	}
 
-	checkKeyExists()
-	go persist()
+	reJsonClient := pkg.ProvideReJSONClient(fmt.Sprintf("%s:%s",
+		redisAddress, redisPort))
+
+	checkKeyExists(reJsonClient, redisDataKey)
+	go persist(reJsonClient, redisSubChannel, redisDataKey)
 
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc,

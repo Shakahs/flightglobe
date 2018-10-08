@@ -36,7 +36,8 @@ services:
     links:
     - redis
     environment:
-      REDIS_URL: redis:6379
+      REDIS_ADDRESS: redis
+      REDIS_PORT: 6379
       REDIS_SUB_CHANNEL: new_data
       REDIS_DATA_KEY: flight_positions
   server:

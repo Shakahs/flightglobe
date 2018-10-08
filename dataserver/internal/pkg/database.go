@@ -5,16 +5,11 @@ import (
 	"github.com/KromDaniel/rejonson"
 	"github.com/go-redis/redis"
 	_ "github.com/jackc/pgx/stdlib"
-	"os"
 )
 
 
 
-func ProvideRedisClient() *redis.Client {
-	redisAddress := os.Getenv("REDIS_URL")
-	if redisAddress == "" {
-		panic("REDIS_URL env variable missing")
-	}
+func ProvideRedisClient(redisAddress string) *redis.Client {
 	goRedisClient := redis.NewClient(&redis.Options{
 		Addr: redisAddress,
 	})
@@ -26,8 +21,8 @@ func RedisReJSONExtender(c *redis.Client) *rejonson.Client {
 	return rJsonClient
 }
 
-func ProvideReJSONClient() *rejonson.Client {
-	originalClient := ProvideRedisClient()
+func ProvideReJSONClient(redisAddress string) *rejonson.Client {
+	originalClient := ProvideRedisClient(redisAddress)
 	extendedClient := RedisReJSONExtender(originalClient)
 	return extendedClient
 }
