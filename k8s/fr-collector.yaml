@@ -17,9 +17,12 @@ spec:
       containers:
       - name: "fr-collector"
         image: gcr.io/flight-globe/fr-collector
+        imagePullPolicy: Always
         env:
-        - name: REDIS_URL
-          value: redis_pubsub
+        - name: REDIS_ADDRESS
+          value: redis-service
+        - name: REDIS_PORT
+          value: "6379"
         - name: REDIS_PUB_CHANNEL
           value: new_data
         - name: REDIS_DATA_KEY

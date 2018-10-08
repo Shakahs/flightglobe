@@ -12,20 +12,6 @@ import (
 	"time"
 )
 
-
-
-func checkKeyExists(c *rejonson.Client, redisDataKey string) {
-	if c.Exists(redisDataKey).Val() == 0 {
-		_, err := c.JsonSet(redisDataKey, ".", "{}").Result()
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println("Key", redisDataKey, "did not exist, was created")
-	} else {
-		fmt.Println("Confirmed that key", redisDataKey, "exists")
-	}
-}
-
 func persist(c *rejonson.Client, redisSubChannel string,redisDataKey string ) {
 	pubsub := c.Subscribe(redisSubChannel)
 	ch := pubsub.Channel()
@@ -87,7 +73,7 @@ func main() {
 	reJsonClient := pkg.ProvideReJSONClient(fmt.Sprintf("%s:%s",
 		redisAddress, redisPort))
 
-	checkKeyExists(reJsonClient, redisDataKey)
+	pkg.EnsureJSONKeyExists(reJsonClient, redisDataKey)
 	go persist(reJsonClient, redisSubChannel, redisDataKey)
 
 	sigc := make(chan os.Signal, 1)

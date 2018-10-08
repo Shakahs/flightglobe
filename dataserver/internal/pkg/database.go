@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/KromDaniel/rejonson"
 	"github.com/go-redis/redis"
 	_ "github.com/jackc/pgx/stdlib"
@@ -51,3 +52,16 @@ func GetPositionMap(c *rejonson.Client, dataKey string) SinglePositionDataset {
 	return pMap
 }
 
+func EnsureJSONKeyExists(c *rejonson.Client, redisDataKey string) error {
+	if c.Exists(redisDataKey).Val() == 0 {
+		_, err := c.JsonSet(redisDataKey, ".", "{}").Result()
+		if err != nil {
+			return err
+		}
+		fmt.Println("Key", redisDataKey, "did not exist, was created")
+	} else {
+		fmt.Println("Confirmed that key", redisDataKey, "exists")
+	}
+
+	return nil
+}
