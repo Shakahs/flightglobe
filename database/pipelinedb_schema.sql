@@ -7,8 +7,9 @@ CREATE STREAM position_stream (
 	altitude             integer  NOT NULL
 );
 
-CREATE CONTINUOUS VIEW flight_tracks_aggregated as
-SELECT DISTINCT ON (icao, ptime_bucket) icao, date_round(ptime,'30 seconds') AS ptime_bucket,
+CREATE CONTINUOUS VIEW flight_tracks_aggregated
+WITH (ttl = '1 hour', ttl_column = 'ptime_bucket')
+AS SELECT DISTINCT ON (icao, ptime_bucket) icao, date_round(ptime,'30 seconds') AS ptime_bucket,
 lat, lng, heading, altitude
 FROM position_stream;
 
