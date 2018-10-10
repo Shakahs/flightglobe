@@ -12,7 +12,15 @@ import (
 	"time"
 )
 
-var upgrader = websocket.Upgrader{} // use default options
+var upgrader =  websocket.Upgrader{}
+
+//use this upgrader if frontend app and backend server will be on different domains,
+// otherwise the browser will be unable to connect via Websocket due to security policy
+//var upgrader =  websocket.Upgrader{
+//	CheckOrigin: func(r *http.Request) bool {
+//		return true
+//	},
+//}
 
 func sendFull(c *websocket.Conn, r *rejonson.Client, redisDataKey string) error {
 	data := pkg.GetPositionMapRaw(r, redisDataKey)
