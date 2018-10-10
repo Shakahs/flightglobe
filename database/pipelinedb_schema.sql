@@ -24,6 +24,17 @@ CREATE TABLE flight_tracks_export  (
 );
 CREATE INDEX idx_flight_tracks_export_id ON flight_tracks_export ( id );
 
+CREATE OR REPLACE FUNCTION insert_track_position()
+  RETURNS trigger AS
+  $$
+  BEGIN
+    INSERT INTO flight_tracks_export (icao, ptime, lat, lng, heading, altitude)
+    VALUES (NEW.icao, NEW.ptime, NEW.lat, NEW.lng, NEW.heading, NEW.altitude);
+    RETURN NEW;
+  END;
+  $$
+  LANGUAGE plpgsql;
+
 CREATE CONTINUOUS TRANSFORM flight_tracks_exporter as
 SELECT (new).icao::char(6), (new).ptime_bucket::timestamptz as ptime, (new).lat::real, (new).lng::real,
  (new).heading::real, (new).altitude::real
