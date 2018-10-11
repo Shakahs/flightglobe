@@ -1,4 +1,4 @@
-CREATE STREAM position_stream (
+CREATE STREAM IF NOT EXISTS position_stream (
   icao                 char(6)  NOT NULL,
 	ptime                timestamptz DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	lat                  real  NOT NULL,
@@ -13,7 +13,7 @@ AS SELECT DISTINCT ON (icao, ptime_bucket) icao, date_round(ptime,'30 seconds') 
 lat, lng, heading, altitude
 FROM position_stream;
 
-CREATE TABLE flight_tracks_export  (
+CREATE TABLE IF NOT EXISTS flight_tracks_export  (
 	id                   bigserial  NOT NULL,
   icao                 char(6)  NOT NULL,
 	ptime                timestamptz NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE flight_tracks_export  (
 	heading              real  NOT NULL,
 	altitude             integer  NOT NULL
 );
-CREATE INDEX idx_flight_tracks_export_id ON flight_tracks_export ( id );
+CREATE INDEX IF NOT EXISTS idx_flight_tracks_export_id ON flight_tracks_export ( id );
 
 CREATE OR REPLACE FUNCTION insert_track_position()
   RETURNS trigger AS
