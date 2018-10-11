@@ -7,7 +7,7 @@
 /.env
 /client-build/
 dataserver/cmd/fr-collector/fr-collector
-dataserver/cmd/fr-redis-persistor/fr-redis-persistor
+dataserver/cmd/redis-point-persistor/redis-point-persistor
 dataserver/cmd/fg-server/fg-server
 dataserver/cmd/fg-server/static
 dataserver/cmd/fr-db-persistor/fr-db-persistor

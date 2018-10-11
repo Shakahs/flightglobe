@@ -1,22 +1,22 @@
 apiVersion: "extensions/v1beta1"
 kind: "Deployment"
 metadata:
-  name: "fr-redis-persistor-deployment"
+  name: "redis-point-persistor"
   labels:
-    app: fr-redis-persistor
+    app: redis-point-persistor
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: fr-redis-persistor
+      app: redis-point-persistor
   template:
     metadata:
       labels:
-        app: fr-redis-persistor
+        app: redis-point-persistor
     spec:
       containers:
-      - name: fr-redis-persistor
-        image: gcr.io/flight-globe/fr-redis-persistor
+      - name: redis-point-persistor
+        image: gcr.io/flight-globe/redis-point-persistor
         imagePullPolicy: Always
         env:
         - name: REDIS_ADDRESS
