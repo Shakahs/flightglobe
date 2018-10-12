@@ -32,11 +32,13 @@
     "svg-sprite-loader": "^3.0.5",
     "svgo": "^1.0.1",
     "svgo-loader": "^2.0.0",
+    "ts-loader": "^5.2.1",
     "typescript": "^3.1.3",
     "url-loader": "^0.6.2",
-    "webpack": "^3.6.0",
+    "webpack": "^4.20.2",
     "webpack-bundle-analyzer": "^2.9.0",
-    "webpack-dev-server": "^2.9.4"
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.9"
   },
   "dependencies": {
     "axios": "^0.17.1",

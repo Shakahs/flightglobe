@@ -1,7 +1,7 @@
 import SampledPositionProperty from 'cesium/Source/DataSources/SampledPositionProperty';
 import ExtrapolationType from 'cesium/Source/Core/ExtrapolationType';
 import NearFarScalar from 'cesium/Source/Core/NearFarScalar';
-import {Icao, Plane} from './index'
+import {Icao, Plane} from './types'
 import {Cartesian3, PointGraphics, Entity} from "cesium";
 
 const nfScalar = new NearFarScalar(5000, 3.25, 1000000, 1.5);
