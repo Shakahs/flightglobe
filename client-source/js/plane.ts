@@ -1,6 +1,4 @@
-import SampledPositionProperty from 'cesium/Source/DataSources/SampledPositionProperty';
-import ExtrapolationType from 'cesium/Source/Core/ExtrapolationType';
-import NearFarScalar from 'cesium/Source/Core/NearFarScalar';
+import {NearFarScalar} from 'cesium';
 import {Icao, Plane} from './types'
 import {Cartesian3, PointGraphics, Entity} from "cesium";
 
@@ -23,7 +21,8 @@ export default class PlaneObj extends Plane {
     // this.sampledPosition.addSample(date, position);
     
     this.entity = this.planeData.entities.add(new Entity({
-        point: new PointGraphics({pixelSize: 2, scaleByDistance: nfScalar}),
+        // point: new PointGraphics({pixelSize: 2, scaleByDistance: nfScalar}),
+        point: new PointGraphics({pixelSize: 2}),
         // position: this.sampledPosition,
         position,
         id: this.icao,
