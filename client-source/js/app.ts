@@ -1,7 +1,7 @@
 import 'cesium/Source/Widgets/widgets.css';
 import dataStream$ from './dataStreams';
 import updatePlanes from './updatePlanes';
-import { viewer, planeData } from './cesium';
+import { viewer, planeData } from './globe';
 
 dataStream$.subscribe((data) => {
   console.log('position update received');

@@ -1,9 +1,9 @@
-import Viewer from 'cesium/Source/Widgets/Viewer/Viewer';
-import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
+import {Viewer} from 'cesium';
+import {CustomDataSource} from 'cesium';
 import axios from 'axios';
 
-import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler';
-import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
+import {ScreenSpaceEventHandler} from 'cesium';
+import {ScreenSpaceEventType} from 'cesium';
 import loadAirports from './airports';
 
 const airportDataRaw = require('../resources/airports.json');
@@ -27,7 +27,7 @@ const viewer = new Viewer('cesiumContainer', {
   // automaticallyTrackDataSourceClocks: false,
 });
 
-const planeData = new CustomDataSource('planes');
+const planeData:CustomDataSource = new CustomDataSource('planes');
 viewer.dataSources.add(planeData);
 // const dsClock = new Clock({
 //   currentTime: JulianDate.fromIso8601(DateTime.utc().minus({ seconds: 90 }).toISO()),

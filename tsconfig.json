@@ -7,10 +7,11 @@
     "jsx": "react",             // use typescript to transpile jsx to js
     "target": "es6",            // specify ECMAScript target version
     "allowJs": true,             // allow a partial TypeScript and JavaScript codebase
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "noEmit": true,
+    "strict":true,
+    "noImplicitAny": false,
   },
-  "include": [
-    "./client-source/"
-  ],
+  "include": [ "client-source/**/*" ],
   "exclude": ["./node_modules/"]
 }

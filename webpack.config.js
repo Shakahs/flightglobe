@@ -125,7 +125,7 @@ module.exports = {
   devtool: isProduction ? false : 'source-map',
   context: __dirname,
   entry: {
-    js: './client-source/js/index.js',
+    js: './client-source/js/app.ts',
   },
   output: {
     path: buildPath,

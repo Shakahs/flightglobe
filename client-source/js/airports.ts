@@ -1,8 +1,8 @@
 import { forOwn } from 'lodash-es';
 
-import Cartesian3 from 'cesium/Source/Core/Cartesian3';
-import LabelStyle from 'cesium/Source/Scene/LabelStyle';
-import DistanceDisplayCondition from 'cesium/Source/Core/DistanceDisplayCondition';
+import {Cartesian3} from 'cesium';
+import {LabelStyle} from 'cesium';
+import {DistanceDisplayCondition} from 'cesium';
 
 const ddCondition = new DistanceDisplayCondition(0.0, 100000);
 const scratchC3 = new Cartesian3();

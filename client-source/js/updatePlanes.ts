@@ -1,7 +1,7 @@
 import { forOwn, has } from 'lodash-es';
 
-import Cartesian3 from 'cesium/Source/Core/Cartesian3';
-import JulianDate from 'cesium/Source/Core/JulianDate';
+import {Cartesian3, CustomDataSource} from 'cesium';
+import {JulianDate} from 'cesium';
 
 import Plane from './plane';
 
@@ -34,7 +34,7 @@ const updatePlanes = (planeData, data) => {
     // );
 
     if (!has(knownPlanes, k)) {
-      knownPlanes[k] = new Plane(planeData, k, newPosition, now);
+      knownPlanes[k] = new Plane(planeData, k, newPosition);
     } else {
       knownPlanes[k].updatePosition(newPosition, future);
     }
