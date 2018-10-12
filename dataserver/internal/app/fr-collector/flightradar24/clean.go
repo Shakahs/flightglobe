@@ -5,6 +5,7 @@ import (
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"github.com/bitly/go-simplejson"
 	"log"
+	"time"
 )
 
 func process(data []byte) []Fr_Record {
@@ -53,7 +54,7 @@ func convert(FrData []Fr_Record) pkg.Positions {
 	var collector pkg.Positions
 	for _, v := range FrData {
 		pos := pkg.Position{0, v.Icao, v.Lat, v.Lng,
-			v.Time, v.Heading, int32(v.Altitude)}
+			time.Unix(v.Time,0).UTC(), v.Heading, int32(v.Altitude)}
 		collector = append(collector, pos)
 	}
 	return collector

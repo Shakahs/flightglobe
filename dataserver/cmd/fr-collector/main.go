@@ -55,7 +55,7 @@ func main() {
 	var redisdb = pkg.ProvideReJSONClient(fmt.Sprintf("%s:%s",
 		redisAddress, redisPort))
 
-	err := pkg.EnsureJSONKeyExists(redisdb, redisDataKey)
+	_,err := pkg.EnsureJSONKeyExists(redisdb, redisDataKey, "{}")
 	if err != nil {
 		panic("Unable to ensure critical JSON key exists")
 	}
