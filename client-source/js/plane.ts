@@ -1,8 +1,10 @@
-import {NearFarScalar} from 'cesium';
-import {Icao, Plane} from './types'
-import {Cartesian3, PointGraphics, Entity} from "cesium";
+import * as Cesium from 'cesium';
 
-const nfScalar = new NearFarScalar(5000, 3.25, 1000000, 1.5);
+// import {NearFarScalar} from 'cesium';
+import {Icao, Plane} from './types'
+// import {Cartesian3, PointGraphics, Entity} from "cesium";
+
+const nfScalar = new Cesium.NearFarScalar(5000, 3.25, 1000000, 1.5);
 
 export default class PlaneObj extends Plane {
   constructor(planeData, icao, position) {
@@ -20,9 +22,9 @@ export default class PlaneObj extends Plane {
 
     // this.sampledPosition.addSample(date, position);
     
-    this.entity = this.planeData.entities.add(new Entity({
+    this.entity = this.planeData.entities.add(new Cesium.Entity({
         // point: new PointGraphics({pixelSize: 2, scaleByDistance: nfScalar}),
-        point: new PointGraphics({pixelSize: 2}),
+        point: new Cesium.PointGraphics({pixelSize: 2}),
         // position: this.sampledPosition,
         position,
         id: this.icao,

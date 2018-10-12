@@ -1,19 +1,25 @@
 import { forOwn, has } from 'lodash-es';
 
-import {Cartesian3, CustomDataSource} from 'cesium';
-import {JulianDate} from 'cesium';
+import * as Cesium from 'cesium';
+
+// import Cartesian3  from 'cesium/Source/Core/Cartesian3'
+// const JulianDate = require('cesium/Source/Core/JulianDate')
+// const CustomDataSource = require('cesium/Source/DataSources/CustomDataSource')
+
+// import { Cartesian3, CustomDataSource} from 'cesium';
+// import {JulianDate} from 'cesium';
 
 import Plane from './plane';
 import {FlightPositionMap, PlaneMap} from "./types";
 
-const scratchC3 = new Cartesian3();
+const scratchC3 = new Cesium.Cartesian3()
 // const scratchJulian = JulianDate.now();
 const knownPlanes:PlaneMap = {};
 
 
-const updatePlanes = (planeData: CustomDataSource, data: FlightPositionMap):void => {
-  const now = JulianDate.now();
-  const future = JulianDate.addSeconds(now, 30, JulianDate.now());
+const updatePlanes = (planeData: Cesium.CustomDataSource, data: FlightPositionMap):void => {
+  const now = Cesium.JulianDate.now();
+  const future = Cesium.JulianDate.addSeconds(now, 30, Cesium.JulianDate.now());
 
   forOwn(data, (v, k) => {
     // const diff = DateTime
@@ -22,7 +28,7 @@ const updatePlanes = (planeData: CustomDataSource, data: FlightPositionMap):void
     //   .toObject();
     // console.log(`position age is ${ diff.seconds } seconds`);
 
-    const newPosition = Cartesian3.fromDegrees(
+    const newPosition = Cesium.Cartesian3.fromDegrees(
       v.longitude,
       v.latitude,
       v.altitude,

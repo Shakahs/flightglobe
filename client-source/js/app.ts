@@ -1,4 +1,5 @@
-import 'cesium/Source/Widgets/widgets.css';
+
+import 'cesiumSource/Widgets/widgets.css';
 import dataStream$ from './dataStreams';
 import updatePlanes from './updatePlanes';
 import { viewer, planeData } from './globe';

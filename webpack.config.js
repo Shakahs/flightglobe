@@ -7,6 +7,8 @@ const path = require('path');
 const cesiumSource = 'node_modules/cesium/Source';
 const cesiumWorkers = '../Build/Cesium/Workers';
 
+console.log(path.resolve(__dirname, cesiumSource))
+
 module.exports = {
   entry: './client-source/js/app.ts',
   devtool: 'inline-source-map',
@@ -31,20 +33,6 @@ module.exports = {
           'file-loader',
         ],
       },
-      {
-        // Remove pragmas
-        test: /\.js$/,
-        enforce: 'pre',
-        include: path.resolve(__dirname, cesiumSource),
-        use: [{
-          loader: 'strip-pragma-loader',
-          options: {
-            pragmas: {
-              debug: false,
-            },
-          },
-        }],
-      },
     ],
   },
   output: {
@@ -65,7 +53,8 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js'],
     alias: {
       // Cesium module name
-      cesium: path.resolve(__dirname, cesiumSource),
+      cesium: path.resolve(__dirname, cesiumSource, 'Cesium.js'),
+      cesiumSource: path.resolve(__dirname, cesiumSource),
     },
   },
   plugins: [
