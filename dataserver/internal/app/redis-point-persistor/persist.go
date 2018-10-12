@@ -29,35 +29,32 @@ func persistLatestPosition(c *rejonson.Client, redisDataKey string, pos pkg.Posi
 	return err
 }
 
-func persistTrack(c *rejonson.Client, pos pkg.Position, rawPos string) {
+func persistTrack(c *rejonson.Client, pos pkg.Position, rawPos string) error {
 	trackKey := fmt.Sprintf("track:$%s", pos.Icao)
 	_, err := pkg.EnsureJSONKeyExists(c, trackKey, "[]")
 	if err != nil {
-		fmt.Println("Unable to ensure track key exists", trackKey)
-		panic(err)
+		return err
 	}
 
 	var track pkg.Positions
 	rawTrack, err := c.JsonGet(trackKey).Bytes()
 	if err != nil {
-		fmt.Println("Unable to retrieve track", trackKey)
-		panic(err)
+		return err
 	}
 
 	err = json.Unmarshal(rawTrack, &track)
 	if err != nil {
-		fmt.Println(string(rawTrack))
-		fmt.Println("Unable to unmarshal track from JSON", trackKey)
-		panic(err)
+		return err
 	}
 
 	if shouldSaveTrack(track, pos) { //compare last element of existing track to this new element
 		_, err = c.JsonArrAppend(trackKey, ".", rawPos).Result()
 		if err != nil {
-			fmt.Println("Unable to append track to Redis JSON array", trackKey)
-			panic(err)
+			return err
 		}
 	}
+
+	return nil
 }
 
 func Persist(c *rejonson.Client, redisSubChannel string, redisDataKey string) {
@@ -88,10 +85,13 @@ func Persist(c *rejonson.Client, redisSubChannel string, redisDataKey string) {
 			if pos.Icao != "" {
 				err := persistLatestPosition(c, redisDataKey, pos, msg.Payload)
 				if err != nil {
-					log.Fatal()
+					log.Println("Encountered an error saving position for ", pos.Icao)
 				}
 
-				persistTrack(c, pos, msg.Payload)
+				err = persistTrack(c, pos, msg.Payload)
+				if err != nil {
+					log.Println("Encountered an error saving track for ", pos.Icao)
+				}
 
 				persistedCount++
 			} else {
@@ -101,6 +101,12 @@ func Persist(c *rejonson.Client, redisSubChannel string, redisDataKey string) {
 			fmt.Println(persistedCount, "positions saved,", droppedCount, "positions dropped in past 5 seconds")
 			persistedCount = 0
 			droppedCount = 0
+
+			//ensure the primary data key exists (if Redis loses data) without checking it on every Position set
+			_, err := pkg.EnsureJSONKeyExists(c, redisDataKey, "{}")
+			if err != nil {
+				log.Fatal("Unable to ensure required key exists")
+			}
 		}
 	}
 }
