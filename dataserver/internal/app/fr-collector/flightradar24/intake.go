@@ -31,7 +31,7 @@ func buildQuadTree(allPos pkg.SinglePositionDataset) *quadtree.Quadtree {
 	qt := quadtree.New(geo.NewBound(180, -180, -90, 90))
 	qtMembers := 0
 	for _, pos := range allPos {
-		np := geo.NewPoint(pos.Lng, pos.Lat)
+		np := geo.NewPoint(pos.Longitude, pos.Latitude)
 		qt.Insert(np)
 		qtMembers++
 	}

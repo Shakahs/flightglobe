@@ -13,9 +13,9 @@ import (
 )
 
 func shouldSaveTrack(track pkg.Positions, new pkg.Position) bool {
-	if len(track) == 0 {return true} //empty track
-	old := track[len(track)-1] //get last recorded position
-	if old.Lat == new.Lat && old.Lng == new.Lng {return false} //identical coordinates
+	if len(track) == 0 {return true}                                                 //empty track
+	old := track[len(track)-1]                                                       //get last recorded position
+	if old.Latitude == new.Latitude && old.Longitude == new.Longitude {return false} //identical coordinates
 	delta := new.Time.Sub(old.Time)
 	if delta.Minutes() < 1 {return false} //less than 1 minute difference
 	return true

@@ -2,8 +2,8 @@ package deprecated
 
 //
 //func decreasePrecisionOfRecord(record Position, p precisionStandards) Position {
-//	newLat, _ := decimal.NewFromFloat(record.Lat).Round(p.coordinates).Float64()
-//	record.Lat = newLat
+//	newLat, _ := decimal.NewFromFloat(record.Latitude).Round(p.coordinates).Float64()
+//	record.Latitude = newLat
 //
 //	newLng, _ := decimal.NewFromFloat(record.Lng).Round(p.coordinates).Float64()
 //	record.Lng = newLng

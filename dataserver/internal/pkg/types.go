@@ -3,13 +3,13 @@ package pkg
 import "time"
 
 type Position struct {
-	Id       int64   `json:"-"`
-	Icao     string  `json:"icao"`
-	Lat      float64 `json:"lat"`
-	Lng      float64 `json:"lon"`
-	Time     time.Time   `json:"time" db:"ptime2"`
-	Heading  float64 `json:"heading"`
-	Altitude int32   `json:"altitude"` // feet
+	Id        int64     `json:"-"`
+	Icao      string    `json:"icao"`
+	Latitude  float64   `json:"lat"`
+	Longitude float64   `json:"lon"`
+	Time      time.Time `json:"time" db:"ptime2"`
+	Heading   float64   `json:"heading"`
+	Altitude  int32     `json:"altitude"` // feet
 }
 
 type Positions = []Position
