@@ -6,7 +6,10 @@ import {ScreenSpaceEventHandler} from 'cesium';
 import {ScreenSpaceEventType} from 'cesium';
 import loadAirports from './airports';
 
+const planeData:CustomDataSource = new CustomDataSource('planes');
 const airportDataRaw = require('../resources/airports.json');
+const airportData = new CustomDataSource('airports');
+loadAirports(airportData, airportDataRaw);
 
 const viewer = new Viewer('cesiumContainer', {
   animation: false,
@@ -27,25 +30,14 @@ const viewer = new Viewer('cesiumContainer', {
   // automaticallyTrackDataSourceClocks: false,
 });
 
-const planeData:CustomDataSource = new CustomDataSource('planes');
-viewer.dataSources.add(planeData);
-// const dsClock = new Clock({
-//   currentTime: JulianDate.fromIso8601(DateTime.utc().minus({ seconds: 90 }).toISO()),
-// });
-// planeData.clock = dsClock;
-
 viewer.scene.debugShowFramesPerSecond = true;
-// viewer.clock.currentTime = dsClock.currentTime.clone();
-
-const airportData = new CustomDataSource('airports');
+viewer.dataSources.add(planeData);
 viewer.dataSources.add(airportData);
 
-loadAirports(airportData, airportDataRaw);
-
-const { scene } = viewer;
-const handler = new ScreenSpaceEventHandler(scene.canvas);
+// @ts-ignore: using canvas here is correct, the installed Cesium type definition is incorrect (@types/cesium 1.47.3)
+const handler = new ScreenSpaceEventHandler(viewer.scene.canvas); //ts-ignore
 handler.setInputAction(async (click) => {
-  const pickedObject = scene.pick(click.position);
+  const pickedObject = viewer.scene.pick(click.position);
   if (pickedObject) {
     const trackURL = `/track?icao=${ pickedObject.id._id }`;
     console.log(trackURL);
