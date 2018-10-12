@@ -63,6 +63,23 @@ func persistTrack(c *rejonson.Client, pos pkg.Position, rawPos string) error {
 	return nil
 }
 
+//remove stale positions from our JSON map of current positions
+func cleanStalePositions(c *rejonson.Client, redisDataKey string) (int, error) {
+	deleteCount := 0
+	currentData := pkg.GetPositionMap(c, redisDataKey)
+	for k, pos := range currentData {
+		age := time.Now().UTC().Sub(pos.Time)
+		if age.Minutes() > 5 {
+			_, err := c.JsonDel(redisDataKey, k).Result()
+			if err != nil {
+				return deleteCount, err
+			}
+			deleteCount++
+		}
+	}
+	return deleteCount, nil
+}
+
 func Persist(c *rejonson.Client, redisSubChannel string, redisDataKey string) {
 	pubsub := c.Subscribe(redisSubChannel)
 	ch := pubsub.Channel()
@@ -104,12 +121,18 @@ func Persist(c *rejonson.Client, redisSubChannel string, redisDataKey string) {
 				droppedCount++
 			}
 		case <-ticker.C:
-			fmt.Println(persistedCount, "positions saved,", droppedCount, "positions dropped in past 5 seconds")
+			log.Println(persistedCount, "positions saved,", droppedCount, "positions dropped in past 5 seconds")
 			persistedCount = 0
 			droppedCount = 0
 
+			deleted, err := cleanStalePositions(c, redisDataKey)
+			if err != nil {
+				log.Fatal("Clean expired positions failed", err)
+			}
+			log.Println(deleted, "stale positions removed")
+
 			//ensure the primary data key exists (if Redis loses data) without checking it on every Position set
-			_, err := pkg.EnsureJSONKeyExists(c, redisDataKey, "{}")
+			_, err = pkg.EnsureJSONKeyExists(c, redisDataKey, "{}")
 			if err != nil {
 				log.Fatal("Unable to ensure required key exists")
 			}
