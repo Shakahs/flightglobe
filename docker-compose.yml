@@ -41,14 +41,15 @@ services:
       REDIS_PORT: 6379
       REDIS_SUB_CHANNEL: new_data
       REDIS_DATA_KEY: flight_positions
-  server:
-    image: gcr.io/flight-globe/server
+  fg-server:
+    image: fg-server
     links:
     - redis
     ports:
       - 5000:8080
     environment:
-      REDIS_URL: redis:6379
+      REDIS_ADDRESS: redis
+      REDIS_PORT: 6379
       REDIS_DATA_KEY: flight_positions
 #  static:
 #    image: gcr.io/flight-globe/static

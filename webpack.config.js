@@ -7,7 +7,7 @@ const path = require('path');
 const cesiumSource = 'node_modules/cesium/Source';
 const cesiumWorkers = '../Build/Cesium/Workers';
 
-console.log(path.resolve(__dirname, cesiumSource))
+console.log(path.resolve(__dirname, cesiumSource));
 
 module.exports = {
   entry: './client-source/js/app.ts',
@@ -37,7 +37,7 @@ module.exports = {
   },
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'client-build'),
+    path: path.resolve(__dirname, 'dataserver/cmd/fg-server/static'),
     // Needed by Cesium for multiline strings
     sourcePrefix: '',
   },
@@ -71,5 +71,33 @@ module.exports = {
     }),
 
   ],
+  devServer: {
+    port: 3000,
+    // inline: !isProduction,
+    // hot: !isProduction,
+    host: '0.0.0.0',
+    disableHostCheck: true,
+    proxy: [
+      {
+        context: ['/api', '/cesium', '/data', '/updates', '/sub', '/track'],
+        target: `http://localhost:${ process.env.PORT }`,
+        ws: true,
+      },
+    ],
+    stats: {
+      assets: true,
+      children: false,
+      chunks: false,
+      hash: false,
+      modules: false,
+      publicPath: false,
+      timings: true,
+      version: false,
+      warnings: true,
+      colors: {
+        green: '\u001b[32m',
+      },
+    },
+  },
 };
 
