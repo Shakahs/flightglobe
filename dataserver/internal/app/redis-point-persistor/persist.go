@@ -54,6 +54,12 @@ func persistTrack(c *rejonson.Client, pos pkg.Position, rawPos string) error {
 		}
 	}
 
+	expireAt, err := time.ParseDuration("10m")
+	_, err = c.Expire(trackKey, expireAt).Result()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
