@@ -1,6 +1,9 @@
 import Viewer from 'cesium/Source/Widgets/Viewer/Viewer';
 import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
+import axios from 'axios';
 
+import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler';
+import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
 import loadAirports from './airports';
 
 const airportDataRaw = require('../resources/airports.json');
@@ -38,5 +41,17 @@ const airportData = new CustomDataSource('airports');
 viewer.dataSources.add(airportData);
 
 loadAirports(airportData, airportDataRaw);
+
+const { scene } = viewer;
+const handler = new ScreenSpaceEventHandler(scene.canvas);
+handler.setInputAction(async (click) => {
+  const pickedObject = scene.pick(click.position);
+  if (pickedObject) {
+    const trackURL = `/track?icao=${ pickedObject.id._id }`;
+    console.log(trackURL);
+    const {data} = await axios.get(trackURL);
+    console.log(data);
+  }
+}, ScreenSpaceEventType.LEFT_CLICK);
 
 export { viewer, planeData, airportData };

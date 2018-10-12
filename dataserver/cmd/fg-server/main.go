@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-var upgrader =  websocket.Upgrader{}
+var upgrader = websocket.Upgrader{}
 
 //use this upgrader if frontend app and backend server will be on different domains,
 // otherwise the browser will be unable to connect via Websocket due to security policy
@@ -41,14 +41,7 @@ func readLoop(c *websocket.Conn) {
 	}
 }
 
-
 func maintainConnection(w http.ResponseWriter, r *http.Request) {
-	redisDataKey := os.Getenv("REDIS_DATA_KEY")
-	redisAddress := os.Getenv("REDIS_ADDRESS")
-	redisPort := os.Getenv("REDIS_PORT")
-	var redisConn = pkg.ProvideReJSONClient(fmt.Sprintf("%s:%s",
-		redisAddress, redisPort))
-
 	wsConn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Print("upgrade:", err)
@@ -75,19 +68,44 @@ func maintainConnection(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("connection closing")
 }
 
-func main() {
-	redisDataKey := os.Getenv("REDIS_DATA_KEY")
-	redisAddress := os.Getenv("REDIS_ADDRESS")
-	redisPort := os.Getenv("REDIS_PORT")
+func provideTrack(w http.ResponseWriter, r *http.Request) {
+	icao := r.URL.Query().Get("icao")
+	trackKey := fmt.Sprintf("track:%s", icao)
+	trackRaw, err := redisConn.JsonGet(trackKey).Bytes()
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Could not retrieve track: " + trackKey))
+		log.Println("Failed request for track", trackKey)
+	} else {
+		w.Write(trackRaw)
+		log.Println("Sent track:", trackKey)
+	}
+}
 
-	for _,v := range([]string{redisDataKey, redisAddress, redisPort}) {
+var redisDataKey string
+var redisAddress string
+var redisPort string
+var redisConn *rejonson.Client
+
+func init() {
+	redisDataKey = os.Getenv("REDIS_DATA_KEY")
+	redisAddress = os.Getenv("REDIS_ADDRESS")
+	redisPort = os.Getenv("REDIS_PORT")
+
+	for _, v := range []string{redisDataKey, redisAddress, redisPort} {
 		if v == "" {
 			panic(fmt.Sprintf("%s env variable not provided", v))
 		}
 	}
 
+	redisConn = pkg.ProvideReJSONClient(fmt.Sprintf("%s:%s",
+		redisAddress, redisPort))
+}
+
+func main() {
 	fs := http.FileServer(http.Dir("/var/flightglobe/static"))
 	http.Handle("/", fs)
 	http.HandleFunc("/sub", maintainConnection)
+	http.HandleFunc("/track", provideTrack)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
