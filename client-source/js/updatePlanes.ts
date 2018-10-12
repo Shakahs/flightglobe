@@ -4,13 +4,14 @@ import {Cartesian3, CustomDataSource} from 'cesium';
 import {JulianDate} from 'cesium';
 
 import Plane from './plane';
+import {FlightPositionMap, PlaneMap} from "./types";
 
 const scratchC3 = new Cartesian3();
 // const scratchJulian = JulianDate.now();
-const knownPlanes = {};
+const knownPlanes:PlaneMap = {};
 
 
-const updatePlanes = (planeData, data) => {
+const updatePlanes = (planeData: CustomDataSource, data: FlightPositionMap):void => {
   const now = JulianDate.now();
   const future = JulianDate.addSeconds(now, 30, JulianDate.now());
 
@@ -22,8 +23,8 @@ const updatePlanes = (planeData, data) => {
     // console.log(`position age is ${ diff.seconds } seconds`);
 
     const newPosition = Cartesian3.fromDegrees(
-      v.lon,
-      v.lat,
+      v.longitude,
+      v.latitude,
       v.altitude,
       undefined,
       scratchC3

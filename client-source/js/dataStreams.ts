@@ -1,21 +1,19 @@
 import { Observable } from 'rxjs';
 import { globe } from './api';
+import {FlightPosition, FlightPositionMap} from "./types";
 
 const loc = window.location;
 
-const populate$ = Observable.fromPromise(globe.retrieveGlobalSnapshot());
+// const wsStream$ = new Observable((observer) => {
+//   const socket = new WebSocket();
+//   socket.addEventListener('message', (e:MessageEvent) => observer.next(e.data));
+//   return () => socket.close();
+// });
 
-const wsStream$ = new Observable((observer) => {
-  const socket = new WebSocket(`ws://${ loc.host }/sub`);
-  socket.addEventListener('message', (e) => observer.next(e));
-  return () => socket.close();
-});
+let wsStream$ = Observable.webSocket<string>(`ws://${ loc.host }/sub`);
 
 const wsStreamShare$ = wsStream$
-  .map((event) => JSON.parse(event.data))
+  .map<string, FlightPositionMap>((data) => JSON.parse(data))
   .share();
 
-const dataStream$ = wsStreamShare$
-  .merge(populate$);
-
-export default dataStream$;
+export default wsStreamShare$;
