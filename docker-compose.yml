@@ -22,17 +22,18 @@ services:
     ports:
       - 5432:5432
   fr-collector:
-    image: gcr.io/flight-globe/fr-collector
+    image: fr-collector
     links:
     - redis
     depends_on:
-    - fr-redis-persistor
+    - redis-point-persistor
     environment:
-      REDIS_URL: redis:6379
+      REDIS_ADDRESS: redis
+      REDIS_PORT: 6379
       REDIS_PUB_CHANNEL: new_data
       REDIS_DATA_KEY: flight_positions
-  fr-redis-persistor:
-    image: gcr.io/flight-globe/redis-point-persistor
+  redis-point-persistor:
+    image: redis-point-persistor
     links:
     - redis
     environment:
