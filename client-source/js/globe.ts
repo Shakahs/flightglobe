@@ -36,8 +36,10 @@ viewer.scene.debugShowFramesPerSecond = true;
 viewer.dataSources.add(planeData);
 viewer.dataSources.add(airportData);
 
-// @ts-ignore: using canvas here is correct, the installed Cesium type definition is incorrect (@types/cesium 1.47.3)
-const handler = new ScreenSpaceEventHandler(viewer.scene.canvas); //ts-ignore
+
+const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas); //ts-ignore
+// @ts-ignore: the installed Cesium type definition is incorrect (@types/cesium 1.47.3),
+// setInputAction will pass an argument (click in this case)
 handler.setInputAction(async (click) => {
   const pickedObject = viewer.scene.pick(click.position);
   if (pickedObject) {
