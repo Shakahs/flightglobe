@@ -12,7 +12,7 @@
     "@types/cesium": "^1.47.3",
     "@types/geojson": "^7946.0.0",
     "@types/lodash-es": "^4.17.1",
-    "@types/node": "^9.3.0",
+    "@types/node": "^10.11.7",
     "@types/redux-saga": "^0.10.5",
     "awesome-typescript-loader": "^5.2.1",
     "copy-webpack-plugin": "^4.5.3",

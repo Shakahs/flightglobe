@@ -10,6 +10,7 @@ const cesiumWorkers = '../Build/Cesium/Workers';
 console.log(path.resolve(__dirname, cesiumSource));
 
 module.exports = {
+  mode: 'development',
   entry: './client-source/js/app.ts',
   devtool: 'inline-source-map',
   module: {
