@@ -7,8 +7,6 @@ const path = require('path');
 const cesiumSource = 'node_modules/cesium/Source';
 const cesiumWorkers = '../Build/Cesium/Workers';
 
-console.log(path.resolve(__dirname, cesiumSource));
-
 module.exports = {
   mode: 'development',
   entry: './client-source/js/app.ts',
@@ -31,7 +29,7 @@ module.exports = {
       {
         test: /\.(png|svg|jpg|gif)$/,
         use: [
-          'file-loader',
+          'url-loader',
         ],
       },
     ],
