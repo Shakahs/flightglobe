@@ -9,7 +9,7 @@ import * as Cesium from 'cesium';
 // import { Cartesian3, CustomDataSource} from 'cesium';
 // import {JulianDate} from 'cesium';
 
-import Plane from './plane';
+import {planeMaker} from './plane';
 import {FlightPositionMap, PlaneMap} from "./types";
 
 const scratchC3 = new Cesium.Cartesian3()
@@ -21,7 +21,7 @@ const updatePlanes = (planeData: Cesium.CustomDataSource, data: FlightPositionMa
   const now = Cesium.JulianDate.now();
   const future = Cesium.JulianDate.addSeconds(now, 30, Cesium.JulianDate.now());
 
-  forOwn(data, (v, k) => {
+  forOwn(data, (v, icao) => {
     // const diff = DateTime
     //   .utc()
     //   .diff(DateTime.fromMillis(v.time * 1000, { zone: 'utc' }), 'seconds')
@@ -40,10 +40,10 @@ const updatePlanes = (planeData: Cesium.CustomDataSource, data: FlightPositionMa
     //   scratchJulian
     // );
 
-    if (!has(knownPlanes, k)) {
-      knownPlanes[k] = new Plane(planeData, k, newPosition);
+    if (!has(knownPlanes, icao)) {
+      knownPlanes[icao] = planeMaker(planeData, icao, newPosition);
     } else {
-      knownPlanes[k].updatePosition(newPosition, future);
+      knownPlanes[icao].updatePosition(newPosition, future);
     }
   });
 };

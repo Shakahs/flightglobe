@@ -1,18 +1,20 @@
-import {Icao} from "./types";
 import * as Cesium from 'cesium';
-
-export * from './types'
 // import {Cartesian3, CustomDataSource, Entity, JulianDate} from "cesium";
 
-export declare class Plane {
-    constructor(planeData: Cesium.CustomDataSource, icao: Icao, position: Cesium.Cartesian3);
+// export declare class Plane {
+//     constructor(planeData: Cesium.CustomDataSource, icao: Icao, position: Cesium.Cartesian3);
+//
+//     planeData:Cesium.CustomDataSource;
+//     entity: Cesium.Entity;
+//     icao: Icao;
+//
+//     updatePosition(position: Cesium.Cartesian3, date: Cesium.JulianDate): void;
+//     // myMethod(opts: MyClass.MyClassMethodOptions): number;
+// }
 
-    planeData:Cesium.CustomDataSource;
+export interface Plane {
     entity: Cesium.Entity;
-    icao: Icao;
-
-    public updatePosition(position: Cesium.Cartesian3, date: Cesium.JulianDate): void;
-    // myMethod(opts: MyClass.MyClassMethodOptions): number;
+    updatePosition: (position: Cesium.Cartesian3, date: Cesium.JulianDate) => void;
 }
 
 export declare function updatePlanes(planeData: Cesium.CustomDataSource): any;
