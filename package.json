@@ -4,7 +4,7 @@
   "main": "server/index.js",
   "scripts": {
     "dev": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js",
-    "build": "rm -rf .dataserver/cmd/server/static/ && NODE_ENV=\"production\" webpack --profile --json > webpack-stats.json",
+    "build": "rm -rf .dataserver/cmd/server/static/ && NODE_ENV=\"production\" ./node_modules/webpack/bin/webpack.js --profile --json > webpack-stats.json",
     "lint-break-on-errors": "eslint ./client-source/js ./webpack.config.js -f table --ext .js --ext .jsx",
     "lint": "eslint ./client-source/js ./webpack.config.js -f table --ext .js --ext .jsx || true"
   },
