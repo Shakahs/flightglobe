@@ -14,7 +14,7 @@ import * as Cesium from 'cesium';
 
 export interface Plane {
     entity: Cesium.Entity;
-    updatePosition: (position: Cesium.Cartesian3, date: Cesium.JulianDate) => void;
+    updatePosition: (position: Cesium.Cartesian3) => void;
 }
 
 export declare function updatePlanes(planeData: Cesium.CustomDataSource): any;

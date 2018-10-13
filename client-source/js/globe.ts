@@ -37,7 +37,7 @@ viewer.dataSources.add(planeData);
 viewer.dataSources.add(airportData);
 
 
-const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas); //ts-ignore
+const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
 // @ts-ignore: the installed Cesium type definition is incorrect (@types/cesium 1.47.3),
 // setInputAction will pass an argument (click in this case)
 handler.setInputAction(async (click) => {

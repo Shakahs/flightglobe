@@ -18,8 +18,8 @@ const knownPlanes:PlaneMap = {};
 
 
 const updatePlanes = (planeData: Cesium.CustomDataSource, data: FlightPositionMap):void => {
-  const now = Cesium.JulianDate.now();
-  const future = Cesium.JulianDate.addSeconds(now, 30, Cesium.JulianDate.now());
+  // const now = Cesium.JulianDate.now();
+  // const future = Cesium.JulianDate.addSeconds(now, 30, Cesium.JulianDate.now());
 
   forOwn(data, (v, icao) => {
     // const diff = DateTime
@@ -43,7 +43,7 @@ const updatePlanes = (planeData: Cesium.CustomDataSource, data: FlightPositionMa
     if (!has(knownPlanes, icao)) {
       knownPlanes[icao] = planeMaker(planeData, icao, newPosition);
     } else {
-      knownPlanes[icao].updatePosition(newPosition, future);
+      knownPlanes[icao].updatePosition(newPosition);
     }
   });
 };
