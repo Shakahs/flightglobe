@@ -6,13 +6,20 @@ import (
 )
 
 func TestIsPositionValid(t *testing.T) {
-	var testPos = pkg.Position{Icao:"abc"}
-	if IsPositionValid(testPos) != true {
-		t.Errorf("Valid position marked as invalid: %s", testPos.Icao)
+
+	testTable := []struct {
+		pos            pkg.Position
+		expectedResult bool
+	}{
+		{pos: pkg.Position{Icao: "abc"}, expectedResult: true},
+		{pos: pkg.Position{}, expectedResult: false},
 	}
 
-	testPos = pkg.Position{}
-	if IsPositionValid(testPos) != false {
-		t.Errorf("Invalid position marked as valid: %s", testPos.Icao)
+	for _, entry := range testTable {
+		actualResult := IsPositionValid(entry.pos)
+		if actualResult != entry.expectedResult {
+			t.Errorf("Validation result of %s incorrect, got: %t, want: %t.",
+				entry.pos.Icao, actualResult, entry.expectedResult)
+		}
 	}
 }
