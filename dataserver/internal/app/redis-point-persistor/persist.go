@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func isPositionValid(newPos pkg.Position) bool {
+func IsPositionValid(newPos pkg.Position) bool {
 	if newPos.Icao == "" {
 		return false
 	} //blank ICAO
@@ -27,7 +27,7 @@ func arePositionsIdentical(oldPos pkg.Position, newPos pkg.Position) bool {
 }
 
 func shouldSavePosition(oldPos pkg.Position, newPos pkg.Position) bool {
-	if !isPositionValid(newPos) {
+	if !IsPositionValid(newPos) {
 		return false
 	} //failed validation
 
@@ -38,7 +38,7 @@ func shouldSavePosition(oldPos pkg.Position, newPos pkg.Position) bool {
 }
 
 func shouldSaveTrackPosition(track pkg.Positions, newPos pkg.Position) bool {
-	if !isPositionValid(newPos) {
+	if !IsPositionValid(newPos) {
 		return false
 	} //failed validation
 
