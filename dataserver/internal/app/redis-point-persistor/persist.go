@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/KromDaniel/rejonson"
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
+	"github.com/go-redis/redis"
 	"github.com/pkg/errors"
 	"log"
 	"time"
@@ -59,6 +60,28 @@ func shouldSaveTrackPosition(track pkg.Positions, newPos pkg.Position) bool {
 	return true
 }
 
+func generatePointKeyName(icao string) string {
+	return fmt.Sprintf("position:%s", icao)
+}
+
+func getLatestPosition(c *rejonson.Client, icao string) (pkg.Position, error) {
+	var oldPos pkg.Position
+
+	currentPosRaw, err := c.Get(generatePointKeyName(icao)).Bytes()
+	if err == redis.Nil {
+		return oldPos, err
+	} else if err != nil {
+		return oldPos, errors.New("Could not retrieve position:" + err.Error())
+	}
+
+	err = json.Unmarshal(currentPosRaw, &oldPos)
+	if err != nil {
+		return oldPos, errors.New("Could not unmarshal position:" + err.Error())
+	}
+
+	return oldPos, nil
+}
+
 func persistLatestPosition(c *rejonson.Client, redisDataKey string, rawPos string) (bool, error) {
 	var newPos pkg.Position
 	err := json.Unmarshal([]byte(rawPos), &newPos) //get msg string, convert to byte array for unmarshal
@@ -66,21 +89,13 @@ func persistLatestPosition(c *rejonson.Client, redisDataKey string, rawPos strin
 		log.Fatal("unmarshal error", err)
 	}
 
-	JSONPath := fmt.Sprintf(".$%s", newPos.Icao)
-	var oldPos pkg.Position
-
-	currentPosRaw, err := c.JsonGet(redisDataKey, JSONPath).Bytes()
-	if err != nil {
-		return false, errors.New("Could not retrieve existing position:" + err.Error())
-	}
-
-	err = json.Unmarshal(currentPosRaw, &oldPos)
-	if err != nil {
-		return false, errors.New("Could not unmarshal existing position:" + err.Error())
+	oldPos, err := getLatestPosition(c, newPos.Icao)
+	if err != redis.Nil && err != nil {
+		return false, errors.New("Could not retrieve old position:" + err.Error())
 	}
 
 	if shouldSavePosition(oldPos, newPos) {
-		_, err = c.JsonSet(redisDataKey, JSONPath, rawPos).Result()
+		_, err = c.Set(generatePointKeyName(newPos.Icao), rawPos, time.Minute*10).Result()
 		if err != nil {
 			return false, errors.New("Could not save new position:" + err.Error())
 		}
