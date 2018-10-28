@@ -1,9 +1,7 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/KromDaniel/rejonson"
 	"github.com/Shakahs/flightglobe/dataserver/internal/app/fr-collector/flightradar24"
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"github.com/robfig/cron"
@@ -12,50 +10,29 @@ import (
 	"syscall"
 )
 
-var redisPubChannel = os.Getenv("REDIS_PUB_CHANNEL")
-var redisDataKey = os.Getenv("REDIS_DATA_KEY")
+var redisPubChannel string
+var redisDataKey string
+var redisAddress string
+var redisPort string
 
-func publishPosition(allpos pkg.Positions, c *rejonson.Client){
-	published := 0
-	for _, pos := range(allpos){
-		marshaled, err := json.Marshal(pos)
-		if err == nil {
-			err = c.Publish(redisPubChannel,  string(marshaled[:])).Err()
-			if err != nil {
-				panic(err)
-			}
-		}
-		published++
-	}
-	fmt.Println("published", published, "positions downstream")
-}
+func init() {
+	redisPubChannel = os.Getenv("REDIS_PUB_CHANNEL")
+	redisDataKey = os.Getenv("REDIS_DATA_KEY")
+	redisAddress = os.Getenv("REDIS_ADDRESS")
+	redisPort = os.Getenv("REDIS_PORT")
 
-func publishPositions(inChan chan pkg.Positions, c *rejonson.Client) {
-	for {
-		select {
-		case r := <-inChan:
-			publishPosition(r, c)
+	for _, v := range []string{redisPubChannel, redisDataKey, redisAddress, redisPort} {
+		if v == "" {
+			panic(fmt.Sprintf("%s env variable not provided", v))
 		}
 	}
 }
 
 func main() {
-
-	redisPubChannel := os.Getenv("REDIS_PUB_CHANNEL")
-	redisDataKey := os.Getenv("REDIS_DATA_KEY")
-	redisAddress := os.Getenv("REDIS_ADDRESS")
-	redisPort := os.Getenv("REDIS_PORT")
-
-	for _,v := range([]string{redisPubChannel, redisDataKey, redisAddress, redisPort}) {
-		if v == "" {
-			panic(fmt.Sprintf("%s env variable not provided", v))
-		}
-	}
-
 	var redisdb = pkg.ProvideReJSONClient(fmt.Sprintf("%s:%s",
 		redisAddress, redisPort))
 
-	_,err := pkg.EnsureJSONKeyExists(redisdb, redisDataKey, "{}")
+	_, err := pkg.EnsureJSONKeyExists(redisdb, redisDataKey, "{}")
 	if err != nil {
 		panic("Unable to ensure critical JSON key exists")
 	}
@@ -72,7 +49,7 @@ func main() {
 	cleanData := make(chan pkg.Positions)
 	go flightradar24.Clean(rawData, cleanData)
 
-	go publishPositions(cleanData, redisdb)
+	go pkg.PublishPositions(cleanData, redisdb, redisPubChannel)
 
 	scheduler := cron.New()
 	scheduler.AddFunc("@every 30s", doScrape)

@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/KromDaniel/rejonson"
 	"github.com/go-redis/redis"
 	_ "github.com/jackc/pgx/stdlib"
@@ -60,4 +61,28 @@ func EnsureJSONKeyExists(c *rejonson.Client, redisDataKey string, data string) (
 	}
 
 	return true, nil
+}
+
+func publishPosition(allpos Positions, c *rejonson.Client, redisPubChannel string){
+	published := 0
+	for _, pos := range(allpos){
+		marshaled, err := json.Marshal(pos)
+		if err == nil {
+			err = c.Publish(redisPubChannel,  string(marshaled[:])).Err()
+			if err != nil {
+				panic(err)
+			}
+		}
+		published++
+	}
+	fmt.Println("published", published, "positions downstream")
+}
+
+func PublishPositions(inChan chan Positions, c *rejonson.Client, pubChannel string) {
+	for {
+		select {
+		case r := <-inChan:
+			publishPosition(r, c, pubChannel)
+		}
+	}
 }
