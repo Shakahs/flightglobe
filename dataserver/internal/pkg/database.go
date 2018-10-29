@@ -92,6 +92,9 @@ func publishPositions(c *redis.Client, pubChannel string, newData Positions) (in
 func PublishPositionsFromChan(inChan chan Positions, c *redis.Client, pubChannel string) {
 	counter := ratecounter.NewRateCounter(5 * time.Second)
 
+	ticker := time.NewTicker(time.Second * 5)
+	defer ticker.Stop()
+
 	for {
 		select {
 		case newData := <-inChan:
@@ -102,7 +105,8 @@ func PublishPositionsFromChan(inChan chan Positions, c *redis.Client, pubChannel
 
 			counter.Incr(publishCount)
 
-			fmt.Printf("publishing %d 5 seconds\n", counter.Rate())
+		case <-ticker.C:
+			fmt.Printf("published %d positions in the past 5 seconds\n", counter.Rate())
 		}
 	}
 }

@@ -36,7 +36,7 @@ func buildQuadTree(allPos pkg.SinglePositionDataset) *quadtree.Quadtree {
 		qtMembers++
 	}
 	//quadtree.PrintLeafMap(qt)
-	fmt.Println("Built quadtree with", qtMembers, "members")
+	//fmt.Println("Built quadtree with", qtMembers, "members")
 	return qt
 }
 

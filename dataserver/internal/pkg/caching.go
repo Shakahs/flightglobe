@@ -5,7 +5,7 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
-func SaveToCache(c *cache.Cache, rawPos string) error {
+func SavePositionToCache(c *cache.Cache, rawPos string) error {
 	var newPos Position
 	err := json.Unmarshal([]byte(rawPos), &newPos)
 	if err != nil {
@@ -15,4 +15,18 @@ func SaveToCache(c *cache.Cache, rawPos string) error {
 	c.Set(newPos.Icao, rawPos, 0)
 
 	return nil
+}
+
+func RetrievePositionsFromCache(c *cache.Cache) (SinglePositionDataset, error) {
+	data := make(SinglePositionDataset)
+	items := c.Items()
+	for k, v := range items {
+		var pos Position
+		err := json.Unmarshal([]byte(v.Object.(string)), &pos)
+		if err != nil {
+			return data, err
+		}
+		data[k] = pos
+	}
+	return data, nil
 }

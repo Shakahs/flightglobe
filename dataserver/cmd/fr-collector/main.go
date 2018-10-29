@@ -6,6 +6,7 @@ import (
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"github.com/patrickmn/go-cache"
 	"github.com/robfig/cron"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -38,8 +39,10 @@ func main() {
 
 	rawData := make(chan []byte)
 	doScrape := func() {
-		//pMap := pkg.GetPositionMap(redisdb, redisDataKey)
-		var pMap pkg.SinglePositionDataset
+		pMap, err := pkg.RetrievePositionsFromCache(positionCache)
+		if err != nil {
+			log.Fatal(err)
+		}
 		flightradar24.Scrape(pMap, rawData)
 	}
 
@@ -66,7 +69,7 @@ func main() {
 				break
 			}
 
-			pkg.SaveToCache(positionCache, msg.Payload)
+			pkg.SavePositionToCache(positionCache, msg.Payload)
 
 		case <-sigc:
 			fmt.Println("Received signal, quitting")
