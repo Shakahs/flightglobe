@@ -10,7 +10,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 )
 
 var redisPubChannel string
@@ -27,7 +26,7 @@ func init() {
 
 	pkg.CheckEnvVars(redisPubChannel, redisSubChannel, redisAddress, redisPort)
 
-	positionCache = cache.New(5*time.Minute, 6*time.Minute)
+	positionCache = pkg.ProvideCache()
 }
 
 func main() {
