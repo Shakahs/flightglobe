@@ -4,16 +4,19 @@ import (
 	"fmt"
 	"github.com/Shakahs/flightglobe/dataserver/internal/app/fr-collector/flightradar24"
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
+	"github.com/patrickmn/go-cache"
 	"github.com/robfig/cron"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 var redisPubChannel string
 var redisSubChannel string
 var redisAddress string
 var redisPort string
+var positionCache *cache.Cache
 
 func init() {
 	redisPubChannel = os.Getenv("REDIS_PUB_CHANNEL")
@@ -22,14 +25,18 @@ func init() {
 	redisPort = os.Getenv("REDIS_PORT")
 
 	pkg.CheckEnvVars(redisPubChannel, redisSubChannel, redisAddress, redisPort)
+
+	positionCache = cache.New(5*time.Minute, 6*time.Minute)
 }
 
 func main() {
 	var redisdb = pkg.ProvideRedisClient(fmt.Sprintf("%s:%s",
 		redisAddress, redisPort))
 
-	rawData := make(chan []byte)
+	pubsub := redisdb.Subscribe(redisSubChannel)
+	ch := pubsub.Channel()
 
+	rawData := make(chan []byte)
 	doScrape := func() {
 		//pMap := pkg.GetPositionMap(redisdb, redisDataKey)
 		var pMap pkg.SinglePositionDataset
@@ -37,10 +44,8 @@ func main() {
 	}
 
 	go doScrape()
-
 	cleanData := make(chan pkg.Positions)
 	go flightradar24.Clean(rawData, cleanData)
-
 	go pkg.PublishPositionsFromChan(cleanData, redisdb, redisPubChannel)
 
 	scheduler := cron.New()
@@ -56,6 +61,13 @@ func main() {
 
 	for {
 		select {
+		case msg, ok := <-ch:
+			if !ok {
+				break
+			}
+
+			pkg.SaveToCache(positionCache, msg.Payload)
+
 		case <-sigc:
 			fmt.Println("Received signal, quitting")
 			scheduler.Stop()
