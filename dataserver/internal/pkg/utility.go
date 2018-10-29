@@ -12,11 +12,11 @@ func CheckEnvVars(vars ...string) {
 	}
 }
 
-func UnmarshalPosition(rawPos string) (Position, error) {
+func UnmarshalPosition(rawPos string) (*Position, error) {
 	var unmarshaledPos Position
 	err := json.Unmarshal([]byte(rawPos), &unmarshaledPos) //get msg string, convert to byte array for unmarshal
 	if err != nil {
-		return unmarshaledPos, err
+		return &unmarshaledPos, err
 	}
-	return unmarshaledPos, nil
+	return &unmarshaledPos, nil
 }

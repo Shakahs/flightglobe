@@ -17,7 +17,7 @@ func ProvideRedisClient(redisAddress string) *redis.Client {
 	return goRedisClient
 }
 
-func publishPosition(c *redis.Client, pubChannel string, newPos Position) error {
+func PublishPosition(c *redis.Client, pubChannel string, newPos *Position) error {
 	marshaled, err := json.Marshal(newPos)
 	if err != nil {
 		return err
@@ -34,7 +34,7 @@ func publishPosition(c *redis.Client, pubChannel string, newPos Position) error 
 func publishPositions(c *redis.Client, pubChannel string, newData Positions) (int64, error) {
 	publishCount := int64(0)
 	for _, newPos := range newData {
-		err := publishPosition(c, pubChannel, newPos)
+		err := PublishPosition(c, pubChannel, &newPos)
 		if err != nil {
 			return publishCount, err
 		}

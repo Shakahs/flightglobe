@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func isPositionValid(newPos pkg.Position) bool {
+func isPositionValid(newPos *pkg.Position) bool {
 	if newPos.Icao == "" {
 		return false
 	} //blank ICAO
@@ -19,7 +19,7 @@ func isPositionValid(newPos pkg.Position) bool {
 	return true
 }
 
-func arePositionsIdentical(oldPos pkg.Position, newPos pkg.Position) bool {
+func arePositionsIdentical(oldPos *pkg.Position, newPos *pkg.Position) bool {
 	if oldPos.Latitude == newPos.Latitude && oldPos.Longitude == newPos.Longitude {
 		return true
 	} //identical coordinates
@@ -27,7 +27,7 @@ func arePositionsIdentical(oldPos pkg.Position, newPos pkg.Position) bool {
 	return false
 }
 
-func shouldSavePosition(oldPos pkg.Position, newPos pkg.Position) bool {
+func shouldSavePosition(oldPos *pkg.Position, newPos *pkg.Position) bool {
 	if !isPositionValid(newPos) {
 		return false
 	} //failed validation
@@ -64,37 +64,33 @@ func generatePointKeyName(icao string) string {
 	return fmt.Sprintf("position:%s", icao)
 }
 
-func getLatestPosition(c *redis.Client, icao string) (pkg.Position, error) {
+func getLatestPosition(c *redis.Client, icao string) (*pkg.Position, error) {
 	var oldPos pkg.Position
 
 	oldPosRaw, err := c.Get(generatePointKeyName(icao)).Bytes()
 	if err == redis.Nil {
-		return oldPos, err
+		return &oldPos, err
 	} else if err != nil {
-		return oldPos, errors.New("Could not retrieve position:" + err.Error())
+		return &oldPos, errors.New("Could not retrieve position:" + err.Error())
 	}
 
 	err = json.Unmarshal(oldPosRaw, &oldPos)
 	if err != nil {
-		return oldPos, errors.New("Could not unmarshal position:" + err.Error())
+		return &oldPos, errors.New("Could not unmarshal position:" + err.Error())
 	}
 
-	return oldPos, nil
+	return &oldPos, nil
 }
 
-func persistLatestPosition(c *redis.Client, rawPos string) (bool, error) {
-	newPos, err := pkg.UnmarshalPosition(rawPos)
-	if err != nil {
-		return false, err
-	}
+func persistLatestPosition(c *redis.Client, newPos *pkg.Position, rawPos *string) (bool, error) {
 
 	oldPos, err := getLatestPosition(c, newPos.Icao)
 	if err != redis.Nil && err != nil {
 		return false, errors.New("Could not retrieve old position:" + err.Error())
 	}
 
-	if shouldSavePosition(oldPos, newPos) {
-		_, err = c.Set(generatePointKeyName(newPos.Icao), rawPos, time.Minute*10).Result()
+	if err == redis.Nil || shouldSavePosition(oldPos, newPos) {
+		_, err = c.Set(generatePointKeyName(newPos.Icao), *rawPos, time.Minute*10).Result()
 		if err != nil {
 			return false, errors.New("Could not save new position:" + err.Error())
 		}
@@ -151,6 +147,7 @@ func Persist(c *redis.Client, redisSubChannel string, redisPubChannel string) {
 	defer ticker.Stop()
 
 	persistCounter := ratecounter.NewRateCounter(5 * time.Second)
+	publishCounter := ratecounter.NewRateCounter(5 * time.Second)
 	dropCounter := ratecounter.NewRateCounter(5 * time.Second)
 
 	for {
@@ -160,9 +157,22 @@ func Persist(c *redis.Client, redisSubChannel string, redisPubChannel string) {
 				break
 			}
 
-			wasPointPersisted, err := persistLatestPosition(c, msg.Payload)
+			newPos, err := pkg.UnmarshalPosition(msg.Payload)
+			if err != nil {
+				log.Println("Unable to unmarshal Position from pubsub feed")
+				break
+			}
+
+			wasPointPersisted, err := persistLatestPosition(c, newPos, &msg.Payload)
 			if err != nil {
 				log.Println("Encountered an error saving a position:", err)
+			} else {
+				err := pkg.PublishPosition(c, redisPubChannel, newPos)
+				if err != nil {
+					log.Println("Encountered an error publishing a position:", err)
+				} else {
+					publishCounter.Incr(1)
+				}
 			}
 
 			//_, err = persistLatestTrackPosition(c, msg.Payload)
@@ -176,8 +186,8 @@ func Persist(c *redis.Client, redisSubChannel string, redisPubChannel string) {
 				dropCounter.Incr(1)
 			}
 		case <-ticker.C:
-			log.Printf("%d positions saved, %d positions dropped in the past 5 seconds",
-				persistCounter.Rate(), dropCounter.Rate())
+			log.Printf("%d positions persisted, %d positions published, %d positions dropped in the past 5 seconds",
+				persistCounter.Rate(), publishCounter.Rate(), dropCounter.Rate())
 		}
 	}
 }
