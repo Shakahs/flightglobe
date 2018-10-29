@@ -20,3 +20,8 @@ func UnmarshalPosition(rawPos string) (*Position, error) {
 	}
 	return &unmarshaledPos, nil
 }
+
+func MarshalPosition(pos *Position) ([]byte, error) {
+	marshaled, err := json.Marshal(pos)
+	return marshaled, err
+}
