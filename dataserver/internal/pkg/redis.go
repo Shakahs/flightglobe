@@ -3,9 +3,9 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/KromDaniel/rejonson"
 	"github.com/go-redis/redis"
 	_ "github.com/jackc/pgx/stdlib"
+	"github.com/patrickmn/go-cache"
 	"github.com/paulbellamy/ratecounter"
 	"log"
 	"time"
@@ -16,51 +16,6 @@ func ProvideRedisClient(redisAddress string) *redis.Client {
 		Addr: redisAddress,
 	})
 	return goRedisClient
-}
-
-func RedisReJSONExtender(c *redis.Client) *rejonson.Client {
-	rJsonClient := rejonson.ExtendClient(c)
-	return rJsonClient
-}
-
-func ProvideReJSONClient(redisAddress string) *rejonson.Client {
-	originalClient := ProvideRedisClient(redisAddress)
-	extendedClient := RedisReJSONExtender(originalClient)
-	return extendedClient
-}
-
-//var DB = sqlx.MustConnect("pgx",
-//	"postgres://flightglobe:flightglobe@localhost/flightglobe")
-
-func GetPositionMapRaw(c *rejonson.Client, dataKey string) []byte {
-	rawData, err := c.JsonGet(dataKey).Bytes()
-	if err != nil {
-		panic(err)
-	}
-	return rawData
-}
-
-func GetPositionMap(c *rejonson.Client, dataKey string) SinglePositionDataset {
-	rawData := GetPositionMapRaw(c, dataKey)
-
-	var pMap SinglePositionDataset
-	err := json.Unmarshal(rawData, &pMap)
-	if err != nil {
-		panic(err)
-	}
-
-	return pMap
-}
-
-func EnsureJSONKeyExists(c *rejonson.Client, redisDataKey string, data string) (bool, error) {
-	if c.Exists(redisDataKey).Val() == 0 {
-		_, err := c.JsonSet(redisDataKey, ".", data).Result()
-		if err != nil {
-			return false, err
-		}
-	}
-
-	return true, nil
 }
 
 func publishPosition(c *redis.Client, pubChannel string, newPos Position) error {
@@ -109,4 +64,30 @@ func PublishPositionsFromChan(inChan chan Positions, c *redis.Client, pubChannel
 			fmt.Printf("published %d positions in the past 5 seconds\n", counter.Rate())
 		}
 	}
+}
+
+func SavePositionToCache(c *cache.Cache, rawPos string) error {
+	var newPos Position
+	err := json.Unmarshal([]byte(rawPos), &newPos)
+	if err != nil {
+		return err
+	}
+
+	c.Set(newPos.Icao, rawPos, 0)
+
+	return nil
+}
+
+func RetrievePositionsFromCache(c *cache.Cache) (SinglePositionDataset, error) {
+	data := make(SinglePositionDataset)
+	items := c.Items()
+	for k, v := range items {
+		var pos Position
+		err := json.Unmarshal([]byte(v.Object.(string)), &pos)
+		if err != nil {
+			return data, err
+		}
+		data[k] = pos
+	}
+	return data, nil
 }
