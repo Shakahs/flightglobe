@@ -2,12 +2,28 @@ package pkg
 
 import (
 	"encoding/json"
+	"github.com/go-redis/redis"
 	"github.com/patrickmn/go-cache"
 	"time"
 )
 
-func ProvideCache() *cache.Cache {
+func CreatePositionCache() *cache.Cache {
 	return cache.New(5*time.Minute, 6*time.Minute)
+}
+
+func CachePositions(r *redis.Client, channel string, c *cache.Cache) {
+	pubsub := r.Subscribe(channel)
+	ch := pubsub.Channel()
+
+	for {
+		select {
+		case msg, ok := <-ch:
+			if !ok {
+				break
+			}
+			SavePositionToCache(c, msg.Payload)
+		}
+	}
 }
 
 func SavePositionToCache(c *cache.Cache, rawPos string) error {

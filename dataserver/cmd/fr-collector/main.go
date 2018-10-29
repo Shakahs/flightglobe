@@ -26,15 +26,14 @@ func init() {
 
 	pkg.CheckEnvVars(redisPubChannel, redisSubChannel, redisAddress, redisPort)
 
-	positionCache = pkg.ProvideCache()
+	positionCache = pkg.CreatePositionCache()
 }
 
 func main() {
 	var redisdb = pkg.ProvideRedisClient(fmt.Sprintf("%s:%s",
 		redisAddress, redisPort))
 
-	pubsub := redisdb.Subscribe(redisSubChannel)
-	ch := pubsub.Channel()
+	go pkg.CachePositions(redisdb,redisSubChannel,positionCache)
 
 	rawData := make(chan []byte)
 	doScrape := func() {
@@ -63,13 +62,6 @@ func main() {
 
 	for {
 		select {
-		case msg, ok := <-ch:
-			if !ok {
-				break
-			}
-
-			pkg.SavePositionToCache(positionCache, msg.Payload)
-
 		case <-sigc:
 			fmt.Println("Received signal, quitting")
 			scheduler.Stop()
