@@ -14,7 +14,7 @@ type Position struct {
 
 type Positions = []Position
 
-type SinglePositionDataset map[string]Position
+type SinglePositionDataset map[string]*Position
 
 type MultiplePositionDataset map[string]Positions
 

@@ -8,7 +8,7 @@ import (
 )
 
 func CreatePositionCache() *cache.Cache {
-	return cache.New(5*time.Minute, 6*time.Minute)
+	return cache.New(5*time.Minute, 1*time.Minute)
 }
 
 func CachePositions(r *redis.Client, channel string, c *cache.Cache) {
@@ -21,19 +21,20 @@ func CachePositions(r *redis.Client, channel string, c *cache.Cache) {
 			if !ok {
 				break
 			}
-			SavePositionToCache(c, msg.Payload)
+			payload := msg.Payload
+			SavePositionToCache(c, &payload)
 		}
 	}
 }
 
-func SavePositionToCache(c *cache.Cache, rawPos string) error {
+func SavePositionToCache(c *cache.Cache, rawPos *string) error {
 	var newPos Position
-	err := json.Unmarshal([]byte(rawPos), &newPos)
+	err := json.Unmarshal([]byte(*rawPos), &newPos)
 	if err != nil {
 		return err
 	}
 
-	c.Set(newPos.Icao, rawPos, 0)
+	c.SetDefault(newPos.Icao, rawPos)
 
 	return nil
 }
@@ -43,11 +44,11 @@ func RetrievePositionsFromCache(c *cache.Cache) (SinglePositionDataset, error) {
 	items := c.Items()
 	for k, v := range items {
 		var pos Position
-		err := json.Unmarshal([]byte(v.Object.(string)), &pos)
+		err := json.Unmarshal([]byte(*v.Object.(*string)), &pos)
 		if err != nil {
 			return data, err
 		}
-		data[k] = pos
+		data[k] = &pos
 	}
 	return data, nil
 }
