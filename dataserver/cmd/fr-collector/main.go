@@ -15,21 +15,13 @@ var redisSubChannel string
 var redisAddress string
 var redisPort string
 
-func checkEnvVars(vars ...string)  {
-	for _,v := range vars {
-		if v == "" {
-			panic("Required env variable not provided")
-		}
-	}
-}
-
 func init() {
 	redisPubChannel = os.Getenv("REDIS_PUB_CHANNEL")
 	redisSubChannel = os.Getenv("REDIS_SUB_CHANNEL")
 	redisAddress = os.Getenv("REDIS_ADDRESS")
 	redisPort = os.Getenv("REDIS_PORT")
 
-	checkEnvVars(redisPubChannel, redisSubChannel, redisAddress, redisPort)
+	pkg.CheckEnvVars(redisPubChannel, redisSubChannel, redisAddress, redisPort)
 }
 
 func main() {
