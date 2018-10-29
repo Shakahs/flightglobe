@@ -6,5 +6,5 @@ import {FlightPosition} from "./types";
 const loc = window.location;
 
 const socket$ =  webSocket<FlightPosition>(`ws://${ loc.host }/sub`);
-// const buffered$ = socket$.pipe(bufferTime(1000))
-export default socket$;
+const buffered$ = socket$.pipe(bufferTime(1000))
+export default buffered$;

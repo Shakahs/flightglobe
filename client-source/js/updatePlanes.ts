@@ -1,4 +1,4 @@
-import { forOwn, has } from 'lodash-es';
+import { forEach, has } from 'lodash-es';
 
 import * as Cesium from 'cesium';
 
@@ -17,11 +17,11 @@ const scratchC3 = new Cesium.Cartesian3()
 const knownPlanes:PlaneMap = {};
 
 
-const updatePlanes = (planeData: Cesium.CustomDataSource, data: FlightPosition):void => {
+const updatePlanes = (planeData: Cesium.CustomDataSource, data: FlightPosition[]):void => {
   // const now = Cesium.JulianDate.now();
   // const future = Cesium.JulianDate.addSeconds(now, 30, Cesium.JulianDate.now());
 
-  // forOwn(data, (v, icao) => {
+    forEach(data, (v) => {
     // const diff = DateTime
     //   .utc()
     //   .diff(DateTime.fromMillis(v.time * 1000, { zone: 'utc' }), 'seconds')
@@ -29,9 +29,9 @@ const updatePlanes = (planeData: Cesium.CustomDataSource, data: FlightPosition):
     // console.log(`position age is ${ diff.seconds } seconds`);
 
     const newPosition = Cesium.Cartesian3.fromDegrees(
-      data.longitude,
-      data.latitude,
-      data.altitude,
+      v.longitude,
+      v.latitude,
+      v.altitude,
       undefined,
       scratchC3
     );
@@ -40,12 +40,12 @@ const updatePlanes = (planeData: Cesium.CustomDataSource, data: FlightPosition):
     //   scratchJulian
     // );
 
-    if (!has(knownPlanes, data.icao)) {
-      knownPlanes[data.icao] = planeMaker(planeData, data.icao, newPosition);
+    if (!has(knownPlanes, v.icao)) {
+      knownPlanes[v.icao] = planeMaker(planeData, v.icao, newPosition);
     } else {
-      knownPlanes[data.icao].updatePosition(newPosition);
+      knownPlanes[v.icao].updatePosition(newPosition);
     }
-  // });
+  });
 };
 
 export default updatePlanes;
