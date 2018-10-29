@@ -6,7 +6,9 @@ import (
 	"github.com/KromDaniel/rejonson"
 	"github.com/go-redis/redis"
 	_ "github.com/jackc/pgx/stdlib"
+	"github.com/paulbellamy/ratecounter"
 	"log"
+	"time"
 )
 
 func ProvideRedisClient(redisAddress string) *redis.Client {
@@ -75,25 +77,32 @@ func publishPosition(c *redis.Client, pubChannel string, newPos Position) error 
 	return nil
 }
 
-func publishPositions(c *redis.Client, pubChannel string, newData Positions) error {
+func publishPositions(c *redis.Client, pubChannel string, newData Positions) (int64, error) {
+	publishCount := int64(0)
 	for _, newPos := range newData {
 		err := publishPosition(c, pubChannel, newPos)
 		if err != nil {
-			return err
+			return publishCount, err
 		}
+		publishCount++
 	}
-	return nil
+	return publishCount, nil
 }
 
 func PublishPositionsFromChan(inChan chan Positions, c *redis.Client, pubChannel string) {
+	counter := ratecounter.NewRateCounter(5 * time.Second)
+
 	for {
 		select {
 		case newData := <-inChan:
-			err := publishPositions(c, pubChannel, newData)
+			publishCount, err := publishPositions(c, pubChannel, newData)
 			if err != nil {
 				log.Fatal(err)
 			}
-			fmt.Println("finished publishing")
+
+			counter.Incr(publishCount)
+
+			fmt.Printf("publishing %d 5 seconds\n", counter.Rate())
 		}
 	}
 }
