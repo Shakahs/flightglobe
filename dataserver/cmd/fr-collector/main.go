@@ -11,36 +11,36 @@ import (
 )
 
 var redisPubChannel string
-var redisDataKey string
+var redisSubChannel string
 var redisAddress string
 var redisPort string
 
-func init() {
-	redisPubChannel = os.Getenv("REDIS_PUB_CHANNEL")
-	redisDataKey = os.Getenv("REDIS_DATA_KEY")
-	redisAddress = os.Getenv("REDIS_ADDRESS")
-	redisPort = os.Getenv("REDIS_PORT")
-
-	for _, v := range []string{redisPubChannel, redisDataKey, redisAddress, redisPort} {
+func checkEnvVars(vars ...string)  {
+	for _,v := range vars {
 		if v == "" {
-			panic(fmt.Sprintf("%s env variable not provided", v))
+			panic("Required env variable not provided")
 		}
 	}
 }
 
-func main() {
-	var redisdb = pkg.ProvideReJSONClient(fmt.Sprintf("%s:%s",
-		redisAddress, redisPort))
+func init() {
+	redisPubChannel = os.Getenv("REDIS_PUB_CHANNEL")
+	redisSubChannel = os.Getenv("REDIS_SUB_CHANNEL")
+	redisAddress = os.Getenv("REDIS_ADDRESS")
+	redisPort = os.Getenv("REDIS_PORT")
 
-	_, err := pkg.EnsureJSONKeyExists(redisdb, redisDataKey, "{}")
-	if err != nil {
-		panic("Unable to ensure critical JSON key exists")
-	}
+	checkEnvVars(redisPubChannel, redisSubChannel, redisAddress, redisPort)
+}
+
+func main() {
+	//var redisdb = pkg.ProvideRedisClient(fmt.Sprintf("%s:%s",
+	//	redisAddress, redisPort))
 
 	rawData := make(chan []byte)
 
 	doScrape := func() {
-		pMap := pkg.GetPositionMap(redisdb, redisDataKey)
+		//pMap := pkg.GetPositionMap(redisdb, redisDataKey)
+		var pMap pkg.SinglePositionDataset
 		flightradar24.Scrape(pMap, rawData)
 	}
 
@@ -49,7 +49,7 @@ func main() {
 	cleanData := make(chan pkg.Positions)
 	go flightradar24.Clean(rawData, cleanData)
 
-	go pkg.PublishPositions(cleanData, redisdb, redisPubChannel)
+	//go pkg.PublishPositions(cleanData, redisdb, redisPubChannel)
 
 	scheduler := cron.New()
 	scheduler.AddFunc("@every 30s", doScrape)
