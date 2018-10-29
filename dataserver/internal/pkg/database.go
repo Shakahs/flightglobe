@@ -6,9 +6,8 @@ import (
 	"github.com/KromDaniel/rejonson"
 	"github.com/go-redis/redis"
 	_ "github.com/jackc/pgx/stdlib"
+	"log"
 )
-
-
 
 func ProvideRedisClient(redisAddress string) *redis.Client {
 	goRedisClient := redis.NewClient(&redis.Options{
@@ -27,7 +26,6 @@ func ProvideReJSONClient(redisAddress string) *rejonson.Client {
 	extendedClient := RedisReJSONExtender(originalClient)
 	return extendedClient
 }
-
 
 //var DB = sqlx.MustConnect("pgx",
 //	"postgres://flightglobe:flightglobe@localhost/flightglobe")
@@ -63,26 +61,39 @@ func EnsureJSONKeyExists(c *rejonson.Client, redisDataKey string, data string) (
 	return true, nil
 }
 
-func publishPosition(allpos Positions, c *rejonson.Client, redisPubChannel string){
-	published := 0
-	for _, pos := range(allpos){
-		marshaled, err := json.Marshal(pos)
-		if err == nil {
-			err = c.Publish(redisPubChannel,  string(marshaled[:])).Err()
-			if err != nil {
-				panic(err)
-			}
-		}
-		published++
+func publishPosition(c *redis.Client, pubChannel string, newPos Position) error {
+	marshaled, err := json.Marshal(newPos)
+	if err != nil {
+		return err
 	}
-	fmt.Println("published", published, "positions downstream")
+
+	err = c.Publish(pubChannel, string(marshaled[:])).Err()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func PublishPositions(inChan chan Positions, c *rejonson.Client, pubChannel string) {
+func publishPositions(c *redis.Client, pubChannel string, newData Positions) error {
+	for _, newPos := range newData {
+		err := publishPosition(c, pubChannel, newPos)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func PublishPositionsFromChan(inChan chan Positions, c *redis.Client, pubChannel string) {
 	for {
 		select {
-		case r := <-inChan:
-			publishPosition(r, c, pubChannel)
+		case newData := <-inChan:
+			err := publishPositions(c, pubChannel, newData)
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println("finished publishing")
 		}
 	}
 }

@@ -25,8 +25,8 @@ func init() {
 }
 
 func main() {
-	//var redisdb = pkg.ProvideRedisClient(fmt.Sprintf("%s:%s",
-	//	redisAddress, redisPort))
+	var redisdb = pkg.ProvideRedisClient(fmt.Sprintf("%s:%s",
+		redisAddress, redisPort))
 
 	rawData := make(chan []byte)
 
@@ -41,7 +41,7 @@ func main() {
 	cleanData := make(chan pkg.Positions)
 	go flightradar24.Clean(rawData, cleanData)
 
-	//go pkg.PublishPositions(cleanData, redisdb, redisPubChannel)
+	go pkg.PublishPositionsFromChan(cleanData, redisdb, redisPubChannel)
 
 	scheduler := cron.New()
 	scheduler.AddFunc("@every 30s", doScrape)
