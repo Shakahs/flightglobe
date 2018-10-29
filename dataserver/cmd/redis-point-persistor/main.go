@@ -2,44 +2,34 @@ package main
 
 import (
 	"fmt"
-	"github.com/KromDaniel/rejonson"
 	"github.com/Shakahs/flightglobe/dataserver/internal/app/redis-point-persistor"
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
-	"log"
+	"github.com/go-redis/redis"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
 var redisSubChannel string
-var redisDataKey string
+var redisPubChannel string
 var redisAddress string
 var redisPort string
-var reJsonClient *rejonson.Client
+var redisClient *redis.Client
 
 func init() {
 	redisSubChannel = os.Getenv("REDIS_SUB_CHANNEL")
-	redisDataKey = os.Getenv("REDIS_DATA_KEY")
+	redisPubChannel = os.Getenv("REDIS_PUB_CHANNEL")
 	redisAddress = os.Getenv("REDIS_ADDRESS")
 	redisPort = os.Getenv("REDIS_PORT")
 
-	for _, v := range []string{redisSubChannel, redisDataKey, redisAddress, redisPort} {
-		if v == "" {
-			log.Fatal("Required env variable missing")
-		}
-	}
+	pkg.CheckEnvVars(redisSubChannel, redisPubChannel, redisAddress, redisPort)
 
-	reJsonClient = pkg.ProvideReJSONClient(fmt.Sprintf("%s:%s",
+	redisClient = pkg.ProvideRedisClient(fmt.Sprintf("%s:%s",
 		redisAddress, redisPort))
-
-	_, err := pkg.EnsureJSONKeyExists(reJsonClient, redisDataKey, "{}")
-	if err != nil {
-		log.Fatal("Unable to ensure required key exists")
-	}
 }
 
 func main() {
-	go redis_point_persistor.Persist(reJsonClient, redisSubChannel, redisDataKey)
+	go redis_point_persistor.Persist(redisClient, redisSubChannel, redisPubChannel)
 
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc,

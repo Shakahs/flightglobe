@@ -64,4 +64,3 @@ func PublishPositionsFromChan(inChan chan Positions, c *redis.Client, pubChannel
 		}
 	}
 }
-

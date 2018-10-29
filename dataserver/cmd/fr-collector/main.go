@@ -33,7 +33,7 @@ func main() {
 	var redisdb = pkg.ProvideRedisClient(fmt.Sprintf("%s:%s",
 		redisAddress, redisPort))
 
-	go pkg.CachePositions(redisdb,redisSubChannel,positionCache)
+	go pkg.CachePositions(redisdb, redisSubChannel, positionCache)
 
 	rawData := make(chan []byte)
 	doScrape := func() {
