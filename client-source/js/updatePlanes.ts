@@ -11,16 +11,17 @@ import * as Cesium from 'cesium';
 
 import {planeMaker} from './plane';
 import {FlightPosition, FlightPositionMap, PlaneMap} from "./types";
+const isAfter = require('date-fns/is_after')
 
 const scratchC3 = new Cesium.Cartesian3()
 // const scratchJulian = JulianDate.now();
 const knownPlanes:PlaneMap = {};
 
 
-const updatePlanes = (planeData: Cesium.CustomDataSource, data: FlightPosition[]):void => {
+const updatePlanes = (planeData: Cesium.CustomDataSource, data: FlightPosition[]):Date => {
   // const now = Cesium.JulianDate.now();
   // const future = Cesium.JulianDate.addSeconds(now, 30, Cesium.JulianDate.now());
-
+    let newest:Date=new Date(2000,1,1)
     forEach(data, (v) => {
     // const diff = DateTime
     //   .utc()
@@ -45,7 +46,14 @@ const updatePlanes = (planeData: Cesium.CustomDataSource, data: FlightPosition[]
     } else {
       knownPlanes[v.icao].updatePosition(newPosition);
     }
+
+    if (isAfter(v.time, newest)){
+        newest=v.time
+    }
+
   });
+
+    return newest
 };
 
 export default updatePlanes;
