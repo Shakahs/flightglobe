@@ -20,7 +20,7 @@ import (
 //	},
 //}
 
-func sendFull(c *websocket.Conn, r pkg.PositionRequest) error {
+func sendIncremental(c *websocket.Conn, r pkg.PositionRequest) error {
 	data := positionCache.GetPositions()
 
 	fmt.Printf("Received request for all data after %s", r.LastReceived.String())
@@ -30,12 +30,12 @@ func sendFull(c *websocket.Conn, r pkg.PositionRequest) error {
 		if v.Time.After(r.LastReceived) {
 			marshaled, err := pkg.MarshalPosition(v)
 			if err != nil {
-				return errors.New("sendFull failed")
+				return errors.New("sendIncremental failed")
 			}
 
 			err = c.WriteMessage(1, marshaled)
 			if err != nil {
-				return errors.New("sendFull failed")
+				return errors.New("sendIncremental failed")
 			}
 
 			sentCount++
@@ -82,7 +82,7 @@ func maintainConnection(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		sendFull(wsConn, request)
+		sendIncremental(wsConn, request)
 	}
 	fmt.Println("connection closing")
 }

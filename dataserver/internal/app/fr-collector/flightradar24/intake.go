@@ -6,7 +6,9 @@ import (
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg/quadtree"
 	"github.com/paulmach/go.geo"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"time"
 )
 
 func generateURL(qt *quadtree.Quadtree) string {
@@ -54,8 +56,11 @@ func retrieve(url string) []byte {
 func Scrape(pList []*pkg.Position, outputChan chan []byte) {
 	qt := buildQuadTree(pList)
 	urlList := buildUrlList(qt)
+	delay := 29 / len(urlList)
+	log.Printf("Retrieving %d URLs with a delay of %d", len(urlList), delay)
 	for _, v := range urlList {
 		data := retrieve(v)
 		outputChan <- data
+		time.Sleep(time.Duration(delay) * time.Second)
 	}
 }
