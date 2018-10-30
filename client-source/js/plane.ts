@@ -16,14 +16,12 @@ export const planeMaker = (planeData: Cesium.CustomDataSource, icao: Icao, posit
             // position: this.sampledPosition,
             position,
             id: icao,
+            polyline: new Cesium.PolylineGraphics()
         })),
 
-        updatePosition: function(position){
-            this.entity.position = position
-        }
-    };
+        track: []
 
-    newPlane.updatePosition.bind(newPlane);
+    };
 
     return newPlane
 };

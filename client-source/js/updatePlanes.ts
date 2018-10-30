@@ -43,7 +43,7 @@ const updatePlanes = (planeData: Cesium.CustomDataSource, data: FlightPosition[]
     if (!has(knownPlanes, v.icao)) {
       knownPlanes[v.icao] = planeMaker(planeData, v.icao, newPosition);
     } else {
-      knownPlanes[v.icao].updatePosition(newPosition);
+      knownPlanes[v.icao].entity.position = newPosition;
     }
 
     if (isAfter(v.time, newest)){

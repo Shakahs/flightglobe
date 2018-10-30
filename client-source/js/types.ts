@@ -13,8 +13,8 @@ import * as Cesium from 'cesium';
 // }
 
 export interface Plane {
-    entity: Cesium.Entity;
-    updatePosition: (position: Cesium.Cartesian3) => void;
+    entity: Cesium.Entity
+    track: Cesium.Cartesian3[]
 }
 
 export declare function updatePlanes(planeData: Cesium.CustomDataSource): any;
