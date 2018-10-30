@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"github.com/go-redis/redis"
@@ -10,7 +11,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 )
 
 //use this upgrader if frontend app and backend server will be on different domains,
@@ -21,36 +21,43 @@ import (
 //	},
 //}
 
-func sendFull(c *websocket.Conn) error {
+func sendFull(c *websocket.Conn, r pkg.PositionRequest) error {
 	data, err := pkg.RetrievePositionsFromCache(positionCache)
 	if err != nil {
 		return err
 	}
 
-	for _, v := range data {
-		marshaled, err := pkg.MarshalPosition(v)
-		if err != nil {
-			return errors.New("sendFull failed")
-		}
+	fmt.Printf("Received request for all data after %s", r.LastReceived.String())
+	sentCount := 0
 
-		err = c.WriteMessage(1, marshaled)
-		if err != nil {
-			return errors.New("sendFull failed")
+	for _, v := range data {
+		if v.Time.After(r.LastReceived) {
+			marshaled, err := pkg.MarshalPosition(v)
+			if err != nil {
+				return errors.New("sendFull failed")
+			}
+
+			err = c.WriteMessage(1, marshaled)
+			if err != nil {
+				return errors.New("sendFull failed")
+			}
+
+			sentCount++
 		}
 	}
 
-	fmt.Println("sendFull completed")
+	fmt.Printf("sent %d Positions", sentCount)
 	return nil
 }
 
-func readLoop(c *websocket.Conn) {
-	for {
-		if _, _, err := c.NextReader(); err != nil {
-			c.Close()
-			break
-		}
-	}
-}
+//func readLoop(c *websocket.Conn) {
+//	for {
+//		if _, _, err := c.NextReader(); err != nil {
+//			c.Close()
+//			break
+//		}
+//	}
+//}
 
 func maintainConnection(w http.ResponseWriter, r *http.Request) {
 	wsConn, err := upgrader.Upgrade(w, r, nil)
@@ -60,21 +67,26 @@ func maintainConnection(w http.ResponseWriter, r *http.Request) {
 	}
 
 	defer wsConn.Close()
-	go readLoop(wsConn)
+	//go readLoop(wsConn)
 
 	fmt.Println("connection opened")
 
-	ticker := time.NewTicker(time.Second * 5)
-	defer ticker.Stop()
 	for {
-		select {
-		case <-ticker.C:
-			err = sendFull(wsConn)
-			if err != nil {
-				log.Println("write:", err, "closing connection")
-				return
-			}
+		_, message, err := wsConn.ReadMessage()
+		if err != nil {
+			log.Println("read:", err)
+			break
 		}
+		fmt.Println("message received")
+
+		var request pkg.PositionRequest
+		err = json.Unmarshal(message, &request)
+		if err != nil {
+			log.Println("read:", err)
+			break
+		}
+
+		sendFull(wsConn, request)
 	}
 	fmt.Println("connection closing")
 }

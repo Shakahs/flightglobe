@@ -34,3 +34,7 @@ type precisionStandards struct {
 	heading     int32
 	geohash     uint
 }
+
+type PositionRequest struct {
+	LastReceived time.Time `json:"lastReceived"`
+}

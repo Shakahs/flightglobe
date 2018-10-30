@@ -17,11 +17,10 @@ const scratchC3 = new Cesium.Cartesian3()
 // const scratchJulian = JulianDate.now();
 const knownPlanes:PlaneMap = {};
 
-
+let newest:Date=new Date(2000,1,1);
 const updatePlanes = (planeData: Cesium.CustomDataSource, data: FlightPosition[]):Date => {
   // const now = Cesium.JulianDate.now();
   // const future = Cesium.JulianDate.addSeconds(now, 30, Cesium.JulianDate.now());
-    let newest:Date=new Date(2000,1,1)
     forEach(data, (v) => {
     // const diff = DateTime
     //   .utc()
