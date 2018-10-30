@@ -9,7 +9,7 @@ const cesiumWorkers = '../Build/Cesium/Workers';
 
 module.exports = {
   mode: 'development',
-  entry: './client-source/js/app.ts',
+  entry: './client-source/js/app.tsx',
   devtool: 'cheap-module-eval-source-map',
   module: {
     unknownContextCritical: false,

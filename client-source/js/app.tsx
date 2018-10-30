@@ -4,6 +4,8 @@ import updatePlanes from './updatePlanes';
 import { viewer, planeData } from './globe';
 import {size} from 'lodash-es'
 import { interval, fromEvent } from 'rxjs';
+import React from 'react';
+import ReactDOM from 'react-dom';
 
 let newestPositionTime:Date = new Date(2000,1,1);
 const myInterval = interval(5000);
@@ -21,3 +23,9 @@ buffered$.subscribe((data) => {
   planeData.entities.resumeEvents();
   viewer.scene.requestRender();
 });
+
+const App = ()=>(
+    <div>Hello world...</div>
+);
+
+ReactDOM.render(<App />,document.getElementById('reactApp'));
