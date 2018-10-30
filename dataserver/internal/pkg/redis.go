@@ -2,7 +2,6 @@ package pkg
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/go-redis/redis"
 	_ "github.com/jackc/pgx/stdlib"
 	"github.com/paulbellamy/ratecounter"
@@ -60,7 +59,7 @@ func PublishPositionsFromChan(inChan chan Positions, c *redis.Client, pubChannel
 			counter.Incr(publishCount)
 
 		case <-ticker.C:
-			fmt.Printf("published %d positions in the past 5 seconds\n", counter.Rate())
+			log.Printf("published %d positions in the past 5 seconds\n", counter.Rate())
 		}
 	}
 }

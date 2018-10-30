@@ -3,6 +3,7 @@ package pkg
 import (
 	"github.com/go-redis/redis"
 	"log"
+	"time"
 )
 
 func CreateCache() *LockableSinglePositionDataset {
@@ -15,6 +16,9 @@ func CachePositions(r *redis.Client, channel string, c *LockableSinglePositionDa
 	pubsub := r.Subscribe(channel)
 	ch := pubsub.Channel()
 
+	discardTicker := time.NewTicker(time.Minute)
+	defer discardTicker.Stop()
+
 	for {
 		select {
 		case msg, ok := <-ch:
@@ -26,6 +30,8 @@ func CachePositions(r *redis.Client, channel string, c *LockableSinglePositionDa
 				log.Fatal("error unmarshaling position", err)
 			}
 			c.SavePosition(newPos)
+		case <-discardTicker.C:
+			c.CleanPositions()
 		}
 	}
 }
@@ -44,4 +50,18 @@ func (c *LockableSinglePositionDataset) GetPositions() []*Position {
 	}
 	c.lock.RUnlock()
 	return dataset
+}
+
+func (c *LockableSinglePositionDataset) CleanPositions() {
+	c.lock.Lock()
+	delCount := 0
+	for k, v := range c.data {
+		elapsed := time.Now().UTC().Sub(v.Time)
+		if elapsed > time.Minute*5 {
+			delete(c.data, k)
+			delCount++
+		}
+	}
+	c.lock.Unlock()
+	log.Printf("%d Positions expired from Cache", delCount)
 }
