@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"github.com/Shakahs/flightglobe/dataserver/internal/app/fr-collector/flightradar24"
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
-	"github.com/patrickmn/go-cache"
 	"github.com/robfig/cron"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -16,7 +14,7 @@ var redisPubChannel string
 var redisSubChannel string
 var redisAddress string
 var redisPort string
-var positionCache *cache.Cache
+var positionCache *pkg.LockableSinglePositionDataset
 
 func init() {
 	redisPubChannel = os.Getenv("REDIS_PUB_CHANNEL")
@@ -26,7 +24,7 @@ func init() {
 
 	pkg.CheckEnvVars(redisPubChannel, redisSubChannel, redisAddress, redisPort)
 
-	positionCache = pkg.CreatePositionCache()
+	positionCache = pkg.CreateCache()
 }
 
 func main() {
@@ -37,11 +35,8 @@ func main() {
 
 	rawData := make(chan []byte)
 	doScrape := func() {
-		pMap, err := pkg.RetrievePositionsFromCache(positionCache)
-		if err != nil {
-			log.Fatal(err)
-		}
-		flightradar24.Scrape(pMap, rawData)
+		positionList := positionCache.GetPositions()
+		flightradar24.Scrape(positionList, rawData)
 	}
 
 	go doScrape()

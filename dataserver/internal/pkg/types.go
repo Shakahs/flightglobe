@@ -1,6 +1,9 @@
 package pkg
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 type Position struct {
 	Id        int64     `json:"-"`
@@ -37,4 +40,9 @@ type precisionStandards struct {
 
 type PositionRequest struct {
 	LastReceived time.Time `json:"lastReceived"`
+}
+
+type LockableSinglePositionDataset struct {
+	data SinglePositionDataset
+	lock sync.RWMutex
 }

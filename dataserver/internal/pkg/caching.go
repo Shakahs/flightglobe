@@ -1,17 +1,17 @@
 package pkg
 
 import (
-	"encoding/json"
 	"github.com/go-redis/redis"
-	"github.com/patrickmn/go-cache"
-	"time"
+	"log"
 )
 
-func CreatePositionCache() *cache.Cache {
-	return cache.New(5*time.Minute, 1*time.Minute)
+func CreateCache() *LockableSinglePositionDataset {
+	return &LockableSinglePositionDataset{
+		data: make(SinglePositionDataset),
+	}
 }
 
-func CachePositions(r *redis.Client, channel string, c *cache.Cache) {
+func CachePositions(r *redis.Client, channel string, c *LockableSinglePositionDataset) {
 	pubsub := r.Subscribe(channel)
 	ch := pubsub.Channel()
 
@@ -21,34 +21,27 @@ func CachePositions(r *redis.Client, channel string, c *cache.Cache) {
 			if !ok {
 				break
 			}
-			payload := msg.Payload
-			SavePositionToCache(c, &payload)
+			newPos, err := UnmarshalPosition(msg.Payload)
+			if err != nil {
+				log.Fatal("error unmarshaling position", err)
+			}
+			c.SavePosition(newPos)
 		}
 	}
 }
 
-func SavePositionToCache(c *cache.Cache, rawPos *string) error {
-	var newPos Position
-	err := json.Unmarshal([]byte(*rawPos), &newPos)
-	if err != nil {
-		return err
-	}
-
-	c.SetDefault(newPos.Icao, rawPos)
-
-	return nil
+func (c *LockableSinglePositionDataset) SavePosition(newPos *Position) {
+	c.lock.Lock()
+	c.data[newPos.Icao] = newPos
+	c.lock.Unlock()
 }
 
-func RetrievePositionsFromCache(c *cache.Cache) (SinglePositionDataset, error) {
-	data := make(SinglePositionDataset)
-	items := c.Items()
-	for k, v := range items {
-		var pos Position
-		err := json.Unmarshal([]byte(*v.Object.(*string)), &pos)
-		if err != nil {
-			return data, err
-		}
-		data[k] = &pos
+func (c *LockableSinglePositionDataset) GetPositions() []*Position {
+	var dataset []*Position
+	c.lock.RLock()
+	for _, v := range c.data {
+		dataset = append(dataset, v)
 	}
-	return data, nil
+	c.lock.RUnlock()
+	return dataset
 }

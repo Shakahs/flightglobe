@@ -6,7 +6,6 @@ import (
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"github.com/go-redis/redis"
 	"github.com/gorilla/websocket"
-	"github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 	"log"
 	"net/http"
@@ -22,10 +21,7 @@ import (
 //}
 
 func sendFull(c *websocket.Conn, r pkg.PositionRequest) error {
-	data, err := pkg.RetrievePositionsFromCache(positionCache)
-	if err != nil {
-		return err
-	}
+	data := positionCache.GetPositions()
 
 	fmt.Printf("Received request for all data after %s", r.LastReceived.String())
 	sentCount := 0
@@ -109,7 +105,7 @@ var redisSubChannel string
 var redisAddress string
 var redisPort string
 var upgrader = websocket.Upgrader{}
-var positionCache *cache.Cache
+var positionCache *pkg.LockableSinglePositionDataset
 var redisClient *redis.Client
 
 func init() {
@@ -122,7 +118,7 @@ func init() {
 	redisClient = pkg.ProvideRedisClient(fmt.Sprintf("%s:%s",
 		redisAddress, redisPort))
 
-	positionCache = pkg.CreatePositionCache()
+	positionCache = pkg.CreateCache()
 }
 
 func main() {
