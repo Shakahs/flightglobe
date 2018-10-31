@@ -55,10 +55,11 @@ func convert(FrData []Fr_Record) pkg.FlightRecords {
 	for _, v := range FrData {
 		pos := pkg.FlightRecord{
 			Icao: v.Icao,
+			Time: time.Unix(v.Time, 0).UTC(),
 			Position: pkg.Position{
 				Latitude:  v.Lat,
 				Longitude: v.Lng,
-				Time:      time.Unix(v.Time, 0).UTC(),
+				Timestamp: v.Time,
 				Heading:   v.Heading,
 				Altitude:  int32(v.Altitude),
 			},

@@ -10,12 +10,12 @@ import {FlightPosition, FlightMap, PositionUpdate, DemographicsUpdate} from "./t
 
 const flightData:FlightMap = new Map();
 
-let newestPositionTime:Date = new Date(2000,1,1);
+let newestPositionTimestamp = 0;
 const pollInterval = interval(5000);
 pollInterval.subscribe(()=>{
   // console.log("asking for positions after", newestPositionTime)
   // @ts-ignore: we need to send a request here, not a FlightPosition
-  socket$.next({lastReceived: newestPositionTime})
+  socket$.next({lastReceivedTimestamp: newestPositionTimestamp})
 });
 
 buffered$.subscribe((messages) => {
@@ -24,7 +24,7 @@ buffered$.subscribe((messages) => {
     forEach(messages, (message)=>{
       switch (message.type) {
           case "positionUpdate":
-            updatePlane(flightData, cesiumPlaneDataSource, message);
+            newestPositionTimestamp = updatePlane(flightData, cesiumPlaneDataSource, message);
             break;
           case "demographicsUpdate":
             updateDemographics(flightData, message);

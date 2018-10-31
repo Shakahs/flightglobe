@@ -33,8 +33,8 @@ const retrieveFlight = (flightData: FlightMap, icao: Icao):Flight=>{
     return thisFlight
 };
 
-let newest:Date=new Date(2000,1,1);
-export const updatePlane = (flightData: FlightMap, cesiumPlaneData:Cesium.CustomDataSource, positionUpdate: PositionUpdate):Date => {
+let newest = 0;
+export const updatePlane = (flightData: FlightMap, cesiumPlaneData:Cesium.CustomDataSource, positionUpdate: PositionUpdate):number => {
 
   // const now = Cesium.JulianDate.now();
   // const future = Cesium.JulianDate.addSeconds(now, 30, Cesium.JulianDate.now());
@@ -70,8 +70,8 @@ export const updatePlane = (flightData: FlightMap, cesiumPlaneData:Cesium.Custom
         thisFlight.entity = entityMaker(cesiumPlaneData, positionUpdate, newPosition)
     }
 
-    if (isAfter(positionUpdate.body.time, newest)){
-        newest=positionUpdate.body.time
+    if(positionUpdate.body.timestamp > newest){
+        newest = positionUpdate.body.timestamp
     }
 
     return newest

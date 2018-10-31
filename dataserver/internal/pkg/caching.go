@@ -57,7 +57,7 @@ func (c *LockableRecordMap) CleanPositions() {
 	delCount := 0
 	totalCount := 0
 	for k, v := range c.data {
-		elapsed := time.Now().UTC().Sub(v.Position.Time)
+		elapsed := time.Now().UTC().Sub(v.Time)
 		if elapsed > time.Minute*5 {
 			delete(c.data, k)
 			delCount++

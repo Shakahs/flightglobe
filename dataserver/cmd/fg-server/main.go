@@ -28,7 +28,7 @@ func sendIncremental(c *websocket.Conn, t time.Time) error {
 	sentCount := 0
 
 	for _, v := range data {
-		if v.Position.Time.After(t) {
+		if v.Time.After(t) {
 			var positionUpdate = pkg.PositionUpdate{"positionUpdate", v.Icao, &v.Position}
 			marshaled, err := json.Marshal(positionUpdate)
 			if err != nil {
@@ -44,7 +44,7 @@ func sendIncremental(c *websocket.Conn, t time.Time) error {
 		}
 	}
 
-	fmt.Printf("sent %d FlightRecords", sentCount)
+	fmt.Printf("sent %d FlightRecords\n", sentCount)
 	return nil
 }
 
@@ -86,7 +86,7 @@ func maintainConnection(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		sendIncremental(wsConn, request.LastReceived)
+		sendIncremental(wsConn, time.Unix(request.LastReceivedTimestamp, 0).UTC())
 	}
 	fmt.Println("connection closing")
 }

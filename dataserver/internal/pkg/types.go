@@ -6,11 +6,11 @@ import (
 )
 
 type Position struct {
-	Latitude  float64   `json:"latitude"`
-	Longitude float64   `json:"longitude"`
-	Time      time.Time `json:"time" db:"ptime2"`
-	Heading   float64   `json:"heading"`
-	Altitude  int32     `json:"altitude"` // feet
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+	Timestamp int64   `json:"timestamp"`
+	Heading   float64 `json:"heading"`
+	Altitude  int32   `json:"altitude"` // feet
 }
 
 type Demographic struct {
@@ -19,9 +19,10 @@ type Demographic struct {
 	Destination string `json:"destination"`
 }
 type FlightRecord struct {
-	Icao        string `json:"icao"`
+	Icao        string
 	Position    Position
 	Demographic Demographic
+	Time        time.Time
 }
 
 type FlightRecords = []FlightRecord
@@ -36,7 +37,7 @@ type precisionStandards struct {
 }
 
 type PositionRequest struct {
-	LastReceived time.Time `json:"lastReceived"`
+	LastReceivedTimestamp int64 `json:"lastReceivedTimestamp"`
 }
 
 type LockableRecordMap struct {
