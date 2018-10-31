@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 //use this upgrader if frontend app and backend server will be on different domains,
@@ -20,39 +21,14 @@ import (
 //	},
 //}
 
-func sendFull(c *websocket.Conn) error {
+func sendIncremental(c *websocket.Conn, t time.Time) error {
 	data := positionCache.GetPositions()
 
-	fmt.Printf("Received request for all data\n")
+	fmt.Printf("Received request for all data after %s\n", t.String())
 	sentCount := 0
 
 	for _, v := range data {
-		var positionUpdate = pkg.PositionUpdate{"positionUpdate", v.Icao, &v.Position}
-		marshaled, err := json.Marshal(positionUpdate)
-		if err != nil {
-			return errors.New("sendIncremental JSON marshal failed")
-		}
-
-		err = c.WriteMessage(1, marshaled)
-		if err != nil {
-			return errors.New("sendIncremental failed")
-		}
-
-		sentCount++
-	}
-
-	fmt.Printf("sent %d FlightRecords", sentCount)
-	return nil
-}
-
-func sendIncremental(c *websocket.Conn, r pkg.PositionRequest) error {
-	data := positionCache.GetPositions()
-
-	fmt.Printf("Received request for all data after %s\n", r.LastReceived.String())
-	sentCount := 0
-
-	for _, v := range data {
-		if v.Position.Time.After(r.LastReceived) {
+		if v.Position.Time.After(t) {
 			var positionUpdate = pkg.PositionUpdate{"positionUpdate", v.Icao, &v.Position}
 			marshaled, err := json.Marshal(positionUpdate)
 			if err != nil {
@@ -92,7 +68,10 @@ func maintainConnection(w http.ResponseWriter, r *http.Request) {
 	//go readLoop(wsConn)
 
 	fmt.Println("connection opened")
-	//sendFull(wsConn)
+	sendIncremental(wsConn, time.Now().UTC().Add(time.Hour*time.Duration(-1)))
+
+	time.Sleep(2 * time.Second)
+
 	for {
 		_, message, err := wsConn.ReadMessage()
 		if err != nil {
@@ -107,7 +86,7 @@ func maintainConnection(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		sendIncremental(wsConn, request)
+		sendIncremental(wsConn, request.LastReceived)
 	}
 	fmt.Println("connection closing")
 }
