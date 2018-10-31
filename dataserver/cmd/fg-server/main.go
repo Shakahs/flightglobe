@@ -20,15 +20,40 @@ import (
 //	},
 //}
 
-func sendIncremental(c *websocket.Conn, r pkg.PositionRequest) error {
+func sendFull(c *websocket.Conn) error {
 	data := positionCache.GetPositions()
 
-	fmt.Printf("Received request for all data after %s", r.LastReceived.String())
+	fmt.Printf("Received request for all data\n")
 	sentCount := 0
 
 	for _, v := range data {
-		if v.Time.After(r.LastReceived) {
-			var positionUpdate = pkg.PositionUpdate{"positionUpdate", v}
+		var positionUpdate = pkg.PositionUpdate{"positionUpdate", v.Icao, &v.Position}
+		marshaled, err := json.Marshal(positionUpdate)
+		if err != nil {
+			return errors.New("sendIncremental JSON marshal failed")
+		}
+
+		err = c.WriteMessage(1, marshaled)
+		if err != nil {
+			return errors.New("sendIncremental failed")
+		}
+
+		sentCount++
+	}
+
+	fmt.Printf("sent %d FlightRecords", sentCount)
+	return nil
+}
+
+func sendIncremental(c *websocket.Conn, r pkg.PositionRequest) error {
+	data := positionCache.GetPositions()
+
+	fmt.Printf("Received request for all data after %s\n", r.LastReceived.String())
+	sentCount := 0
+
+	for _, v := range data {
+		if v.Position.Time.After(r.LastReceived) {
+			var positionUpdate = pkg.PositionUpdate{"positionUpdate", v.Icao, &v.Position}
 			marshaled, err := json.Marshal(positionUpdate)
 			if err != nil {
 				return errors.New("sendIncremental JSON marshal failed")
@@ -43,7 +68,7 @@ func sendIncremental(c *websocket.Conn, r pkg.PositionRequest) error {
 		}
 	}
 
-	fmt.Printf("sent %d Positions", sentCount)
+	fmt.Printf("sent %d FlightRecords", sentCount)
 	return nil
 }
 
@@ -67,14 +92,13 @@ func maintainConnection(w http.ResponseWriter, r *http.Request) {
 	//go readLoop(wsConn)
 
 	fmt.Println("connection opened")
-
+	//sendFull(wsConn)
 	for {
 		_, message, err := wsConn.ReadMessage()
 		if err != nil {
 			log.Println("read:", err)
 			break
 		}
-		fmt.Println("message received")
 
 		var request pkg.PositionRequest
 		err = json.Unmarshal(message, &request)
@@ -106,7 +130,7 @@ var redisSubChannel string
 var redisAddress string
 var redisPort string
 var upgrader = websocket.Upgrader{}
-var positionCache *pkg.LockableSinglePositionDataset
+var positionCache *pkg.LockableRecordMap
 var redisClient *redis.Client
 
 func init() {

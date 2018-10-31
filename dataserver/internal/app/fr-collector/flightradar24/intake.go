@@ -29,17 +29,17 @@ func buildUrlList(qt *quadtree.Quadtree) []string {
 	return urlList
 }
 
-func buildQuadTree(allPos []*pkg.Position) *quadtree.Quadtree {
+func buildQuadTree(allFlightRecords []*pkg.FlightRecord) (*quadtree.Quadtree, int) {
 	qt := quadtree.New(geo.NewBound(180, -180, -90, 90))
 	qtMembers := 0
-	for _, pos := range allPos {
-		np := geo.NewPoint(pos.Longitude, pos.Latitude)
+	for _, pos := range allFlightRecords {
+		np := geo.NewPoint(pos.Position.Longitude, pos.Position.Latitude)
 		qt.Insert(np)
 		qtMembers++
 	}
 	//quadtree.PrintLeafMap(qt)
 	//fmt.Println("Built quadtree with", qtMembers, "members")
-	return qt
+	return qt, qtMembers
 }
 
 func retrieve(url string) []byte {
@@ -53,11 +53,11 @@ func retrieve(url string) []byte {
 	return body
 }
 
-func Scrape(pList []*pkg.Position, outputChan chan []byte) {
-	qt := buildQuadTree(pList)
+func Scrape(pList []*pkg.FlightRecord, outputChan chan []byte) {
+	qt, count := buildQuadTree(pList)
 	urlList := buildUrlList(qt)
 	delay := 29 / len(urlList)
-	log.Printf("Retrieving %d URLs with a delay of %d", len(urlList), delay)
+	log.Printf("Retrieving %d URLs for %d flights with a delay of %d", len(urlList), count, delay)
 	for _, v := range urlList {
 		data := retrieve(v)
 		outputChan <- data

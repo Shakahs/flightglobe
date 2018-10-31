@@ -18,18 +18,13 @@ pollInterval.subscribe(()=>{
   socket$.next({lastReceived: newestPositionTime})
 });
 
-const handlePositionUpdate = (positionUpdate: PositionUpdate)=>{
-    // console.log(`Received ${size(data)} positions`);
-    newestPositionTime = updatePlane(flightData, cesiumPlaneDataSource, positionUpdate.body);
-    // console.log("newest updated to:", newestPositionTime)
-};
-
 buffered$.subscribe((messages) => {
+    console.log(size(messages), "messages received");
     cesiumPlaneDataSource.entities.suspendEvents();
     forEach(messages, (message)=>{
       switch (message.type) {
           case "positionUpdate":
-            handlePositionUpdate(message);
+            updatePlane(flightData, cesiumPlaneDataSource, message);
             break;
           case "demographicsUpdate":
             updateDemographics(flightData, message);
@@ -40,9 +35,10 @@ buffered$.subscribe((messages) => {
     viewer.scene.requestRender();
 });
 
-// setInterval(()=>{
-//     console.table(flightData)
-// }, 30000);
+setInterval(()=>{
+    console.log(`${flightData.size} flights in memory`)
+    // console.log(flightData)
+}, 15000);
 
 const App = ()=>(
     <div>Hello world...</div>

@@ -16,8 +16,6 @@ import (
 var persistQuery = `INSERT INTO position_stream (lat, lng, heading, altitude, icao)
          VALUES(:lat, :lng, :heading, :altitude, :icao)`
 
-
-
 //func insert(newData pkg.Position) {
 //	tx := DB.MustBegin()
 //
@@ -53,8 +51,6 @@ var persistQuery = `INSERT INTO position_stream (lat, lng, heading, altitude, ic
 //	fmt.Println("Insert took", elapsed)
 //}
 
-
-
 func subscribe(r *rejonson.Client, redisSubChannel string, db *sqlx.DB) {
 	pubsub := r.Subscribe(redisSubChannel)
 	ch := pubsub.Channel()
@@ -72,7 +68,7 @@ func subscribe(r *rejonson.Client, redisSubChannel string, db *sqlx.DB) {
 			}
 
 			//deserialize so we can get the ICAO.
-			var pos pkg.Position
+			var pos pkg.FlightRecord
 			err := json.Unmarshal([]byte(msg.Payload), &pos) //get msg string, convert to byte array for unmarshal
 			if err != nil {
 				log.Fatal("unmarshal error", err)
@@ -115,8 +111,7 @@ func main() {
 	dbHost := os.Getenv("PIPELINEDB_HOST")
 	dbName := os.Getenv("PIPELINEDB_DBNAME")
 
-
-	for _,v := range([]string{redisSubChannel, redisAddress, redisPort, dbUsername, dbPassword, dbHost, dbName}) {
+	for _, v := range []string{redisSubChannel, redisAddress, redisPort, dbUsername, dbPassword, dbHost, dbName} {
 		if v == "" {
 			panic(fmt.Sprintf("%s env variable not provided", v))
 		}
@@ -124,7 +119,6 @@ func main() {
 
 	reJsonClient := pkg.ProvideReJSONClient(fmt.Sprintf("%s:%s",
 		redisAddress, redisPort))
-
 
 	dsn := fmt.Sprintf("postgres://%s:%s@%s/%s", dbUsername, dbPassword, dbHost, dbName)
 	var dbClient = sqlx.MustConnect("pgx", dsn)

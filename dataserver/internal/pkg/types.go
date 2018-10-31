@@ -6,33 +6,27 @@ import (
 )
 
 type Position struct {
-	Id          int64     `json:"-"`
-	Icao        string    `json:"icao"`
-	Latitude    float64   `json:"latitude"`
-	Longitude   float64   `json:"longitude"`
-	Time        time.Time `json:"time" db:"ptime2"`
-	Heading     float64   `json:"heading"`
-	Altitude    int32     `json:"altitude"` // feet
-	Model       string    `json:"model"`
-	Origin      string    `json:"origin"`
-	Destination string    `json:"destination"`
+	Latitude  float64   `json:"latitude"`
+	Longitude float64   `json:"longitude"`
+	Time      time.Time `json:"time" db:"ptime2"`
+	Heading   float64   `json:"heading"`
+	Altitude  int32     `json:"altitude"` // feet
 }
 
-type Positions = []Position
-
-type SinglePositionDataset map[string]*Position
-
-type MultiplePositionDataset map[string]Positions
-
-type OutgoingSinglePositionDataset struct {
-	channel string
-	data    SinglePositionDataset
+type Demographic struct {
+	Model       string `json:"model"`
+	Origin      string `json:"origin"`
+	Destination string `json:"destination"`
+}
+type FlightRecord struct {
+	Icao        string `json:"icao"`
+	Position    Position
+	Demographic Demographic
 }
 
-type OutgoingFlightHistory struct {
-	channel string
-	data    Positions
-}
+type FlightRecords = []FlightRecord
+
+type RecordMap map[string]*FlightRecord
 
 type precisionStandards struct {
 	coordinates int32
@@ -45,12 +39,13 @@ type PositionRequest struct {
 	LastReceived time.Time `json:"lastReceived"`
 }
 
-type LockableSinglePositionDataset struct {
-	data SinglePositionDataset
+type LockableRecordMap struct {
+	data RecordMap
 	lock sync.RWMutex
 }
 
 type PositionUpdate struct {
 	Type string    `json:"type"`
+	Icao string    `json:"icao"`
 	Body *Position `json:"body"`
 }

@@ -6,13 +6,13 @@ import (
 	"time"
 )
 
-func CreateCache() *LockableSinglePositionDataset {
-	return &LockableSinglePositionDataset{
-		data: make(SinglePositionDataset),
+func CreateCache() *LockableRecordMap {
+	return &LockableRecordMap{
+		data: make(RecordMap),
 	}
 }
 
-func CachePositions(r *redis.Client, channel string, c *LockableSinglePositionDataset) {
+func CachePositions(r *redis.Client, channel string, c *LockableRecordMap) {
 	pubsub := r.Subscribe(channel)
 	ch := pubsub.Channel()
 
@@ -36,14 +36,14 @@ func CachePositions(r *redis.Client, channel string, c *LockableSinglePositionDa
 	}
 }
 
-func (c *LockableSinglePositionDataset) SavePosition(newPos *Position) {
+func (c *LockableRecordMap) SavePosition(newPos *FlightRecord) {
 	c.lock.Lock()
 	c.data[newPos.Icao] = newPos
 	c.lock.Unlock()
 }
 
-func (c *LockableSinglePositionDataset) GetPositions() []*Position {
-	var dataset []*Position
+func (c *LockableRecordMap) GetPositions() []*FlightRecord {
+	var dataset []*FlightRecord
 	c.lock.RLock()
 	for _, v := range c.data {
 		dataset = append(dataset, v)
@@ -52,16 +52,19 @@ func (c *LockableSinglePositionDataset) GetPositions() []*Position {
 	return dataset
 }
 
-func (c *LockableSinglePositionDataset) CleanPositions() {
+func (c *LockableRecordMap) CleanPositions() {
 	c.lock.Lock()
 	delCount := 0
+	totalCount := 0
 	for k, v := range c.data {
-		elapsed := time.Now().UTC().Sub(v.Time)
+		elapsed := time.Now().UTC().Sub(v.Position.Time)
 		if elapsed > time.Minute*5 {
 			delete(c.data, k)
 			delCount++
+		} else {
+			totalCount++
 		}
 	}
 	c.lock.Unlock()
-	log.Printf("%d Positions expired from Cache", delCount)
+	log.Printf("%d FlightRecords expired from Cache, there are now %d cached records", delCount, totalCount)
 }

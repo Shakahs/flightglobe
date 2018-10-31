@@ -14,7 +14,7 @@ var redisPubChannel string
 var redisSubChannel string
 var redisAddress string
 var redisPort string
-var positionCache *pkg.LockableSinglePositionDataset
+var positionCache *pkg.LockableRecordMap
 
 func init() {
 	redisPubChannel = os.Getenv("REDIS_PUB_CHANNEL")
@@ -40,7 +40,7 @@ func main() {
 	}
 
 	go doScrape()
-	cleanData := make(chan pkg.Positions)
+	cleanData := make(chan pkg.FlightRecords)
 	go flightradar24.Clean(rawData, cleanData)
 	go pkg.PublishPositionsFromChan(cleanData, redisdb, redisPubChannel)
 

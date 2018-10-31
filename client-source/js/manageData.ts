@@ -17,7 +17,7 @@ import {
     FlightMap,
     FlightDemographics,
     DemographicsUpdate,
-    Icao
+    Icao, PositionUpdate
 } from "./types";
 const isAfter = require('date-fns/is_after')
 
@@ -34,7 +34,8 @@ const retrieveFlight = (flightData: FlightMap, icao: Icao):Flight=>{
 };
 
 let newest:Date=new Date(2000,1,1);
-export const updatePlane = (flightData: FlightMap, cesiumPlaneData:Cesium.CustomDataSource, position: FlightPosition):Date => {
+export const updatePlane = (flightData: FlightMap, cesiumPlaneData:Cesium.CustomDataSource, positionUpdate: PositionUpdate):Date => {
+
   // const now = Cesium.JulianDate.now();
   // const future = Cesium.JulianDate.addSeconds(now, 30, Cesium.JulianDate.now());
     // const diff = DateTime
@@ -44,9 +45,9 @@ export const updatePlane = (flightData: FlightMap, cesiumPlaneData:Cesium.Custom
     // console.log(`position age is ${ diff.seconds } seconds`);
 
     const newPosition = Cesium.Cartesian3.fromDegrees(
-      position.longitude,
-      position.latitude,
-      position.altitude,
+      positionUpdate.body.longitude,
+      positionUpdate.body.latitude,
+      positionUpdate.body.altitude,
       undefined,
       scratchC3
     );
@@ -61,18 +62,17 @@ export const updatePlane = (flightData: FlightMap, cesiumPlaneData:Cesium.Custom
     //     flightData.set(position.icao, thisFlight)
     // }
 
-    const thisFlight = retrieveFlight(flightData, position.icao)
+    const thisFlight = retrieveFlight(flightData, positionUpdate.icao);
 
     if (thisFlight.entity) {
         thisFlight.entity.position = newPosition;
     } else {
-        thisFlight.entity = entityMaker(cesiumPlaneData, position, newPosition)
+        thisFlight.entity = entityMaker(cesiumPlaneData, positionUpdate, newPosition)
     }
 
-    if (isAfter(position.time, newest)){
-        newest=position.time
+    if (isAfter(positionUpdate.body.time, newest)){
+        newest=positionUpdate.body.time
     }
-
 
     return newest
 };

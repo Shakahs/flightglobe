@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func isPositionValid(newPos *pkg.Position) bool {
+func isPositionValid(newPos *pkg.FlightRecord) bool {
 	if newPos.Icao == "" {
 		return false
 	} //blank ICAO
@@ -19,15 +19,16 @@ func isPositionValid(newPos *pkg.Position) bool {
 	return true
 }
 
-func arePositionsIdentical(oldPos *pkg.Position, newPos *pkg.Position) bool {
-	if oldPos.Latitude == newPos.Latitude && oldPos.Longitude == newPos.Longitude {
+func arePositionsIdentical(oldRecord *pkg.FlightRecord, newRecord *pkg.FlightRecord) bool {
+	if oldRecord.Position.Latitude == newRecord.Position.Latitude &&
+		oldRecord.Position.Longitude == newRecord.Position.Longitude {
 		return true
 	} //identical coordinates
 
 	return false
 }
 
-func shouldSavePosition(oldPos *pkg.Position, newPos *pkg.Position) bool {
+func shouldSavePosition(oldPos *pkg.FlightRecord, newPos *pkg.FlightRecord) bool {
 	if !isPositionValid(newPos) {
 		return false
 	} //failed validation
@@ -38,7 +39,7 @@ func shouldSavePosition(oldPos *pkg.Position, newPos *pkg.Position) bool {
 	return true
 }
 
-//func shouldSaveTrackPosition(track pkg.Positions, newPos pkg.Position) bool {
+//func shouldSaveTrackPosition(track pkg.FlightRecords, newPos pkg.FlightRecord) bool {
 //	if !isPositionValid(newPos) {
 //		return false
 //	} //failed validation
@@ -64,8 +65,8 @@ func generatePointKeyName(icao string) string {
 	return fmt.Sprintf("position:%s", icao)
 }
 
-func getLatestPosition(c *redis.Client, icao string) (*pkg.Position, error) {
-	var oldPos pkg.Position
+func getLatestPosition(c *redis.Client, icao string) (*pkg.FlightRecord, error) {
+	var oldPos pkg.FlightRecord
 
 	oldPosRaw, err := c.Get(generatePointKeyName(icao)).Bytes()
 	if err == redis.Nil {
@@ -82,7 +83,7 @@ func getLatestPosition(c *redis.Client, icao string) (*pkg.Position, error) {
 	return &oldPos, nil
 }
 
-func persistLatestPosition(c *redis.Client, newPos *pkg.Position, rawPos *string) (bool, error) {
+func persistLatestPosition(c *redis.Client, newPos *pkg.FlightRecord, rawPos *string) (bool, error) {
 
 	oldPos, err := getLatestPosition(c, newPos.Icao)
 	if err != redis.Nil && err != nil {
@@ -100,7 +101,7 @@ func persistLatestPosition(c *redis.Client, newPos *pkg.Position, rawPos *string
 }
 
 //func persistLatestTrackPosition(c *rejonson.Client, rawPos string) (bool, error) {
-//	var newPos pkg.Position
+//	var newPos pkg.FlightRecord
 //	err := json.Unmarshal([]byte(rawPos), &newPos) //get msg string, convert to byte array for unmarshal
 //	if err != nil {
 //		log.Fatal("unmarshal error", err)
@@ -112,7 +113,7 @@ func persistLatestPosition(c *redis.Client, newPos *pkg.Position, rawPos *string
 //		return false, err
 //	}
 //
-//	var track pkg.Positions
+//	var track pkg.FlightRecords
 //	rawTrack, err := c.JsonGet(trackKey).Bytes()
 //	if err != nil {
 //		return false, err
@@ -159,7 +160,7 @@ func Persist(c *redis.Client, redisSubChannel string, redisPubChannel string) {
 
 			newPos, err := pkg.UnmarshalPosition(msg.Payload)
 			if err != nil {
-				log.Println("Unable to unmarshal Position from pubsub feed")
+				log.Println("Unable to unmarshal FlightRecord from pubsub feed")
 				break
 			}
 

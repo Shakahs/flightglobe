@@ -50,27 +50,30 @@ func process(data []byte) []Fr_Record {
 	return collector
 }
 
-func convert(FrData []Fr_Record) pkg.Positions {
-	var collector pkg.Positions
+func convert(FrData []Fr_Record) pkg.FlightRecords {
+	var collector pkg.FlightRecords
 	for _, v := range FrData {
-		pos := pkg.Position{
-			Id:          0,
-			Icao:        v.Icao,
-			Latitude:    v.Lat,
-			Longitude:   v.Lng,
-			Time:        time.Unix(v.Time, 0).UTC(),
-			Heading:     v.Heading,
-			Altitude:    int32(v.Altitude),
-			Model:       v.Model,
-			Origin:      v.Origin,
-			Destination: v.Destination,
+		pos := pkg.FlightRecord{
+			Icao: v.Icao,
+			Position: pkg.Position{
+				Latitude:  v.Lat,
+				Longitude: v.Lng,
+				Time:      time.Unix(v.Time, 0).UTC(),
+				Heading:   v.Heading,
+				Altitude:  int32(v.Altitude),
+			},
+			Demographic: pkg.Demographic{
+				Model:       v.Model,
+				Origin:      v.Origin,
+				Destination: v.Destination,
+			},
 		}
 		collector = append(collector, pos)
 	}
 	return collector
 }
 
-func Clean(inChan chan []byte, outChan chan pkg.Positions) {
+func Clean(inChan chan []byte, outChan chan pkg.FlightRecords) {
 	for {
 		select {
 		case raw := <-inChan:

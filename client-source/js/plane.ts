@@ -1,7 +1,7 @@
 import * as Cesium from 'cesium';
 
 // import {NearFarScalar} from 'cesium';
-import {FlightPosition, FlightPositionMap, Icao,} from './types'
+import {FlightPosition, FlightPositionMap, Icao, PositionUpdate,} from './types'
 // import {Cartesian3, PointGraphics, Entity} from "cesium";
 import {Flight} from './types'
 
@@ -10,19 +10,20 @@ const nfScalar = new Cesium.NearFarScalar(5000, 3.25, 1000000, 1.5);
 const labelDisplayCondition = new Cesium.DistanceDisplayCondition(0.0, 2000000);
 const labelOffset = new Cesium.Cartesian2(10,20);
 
-export const entityMaker = (planeData: Cesium.CustomDataSource, plane: FlightPosition, position: Cesium.Cartesian3):Cesium.Entity => {
+export const entityMaker = (planeData: Cesium.CustomDataSource, update: PositionUpdate, position: Cesium.Cartesian3):Cesium.Entity => {
 
+    const plane = update.body;
     const newEntity  = new Cesium.Entity({
         // point: new PointGraphics({pixelSize: 2, scaleByDistance: nfScalar}),
         point: new Cesium.PointGraphics({pixelSize: 2}),
         // position: this.sampledPosition,
         position,
-        id: plane.icao,
+        id: update.icao,
         // polyline: new Cesium.PolylineGraphics()
         //@ts-ignore
-        label: new Cesium.LabelGraphics({text: `${plane.icao}\n${plane.origin}\n${plane.destination}`, font: '12px sans-serif',
+        // label: new Cesium.LabelGraphics({text: `${plane.icao}\n${plane.origin}\n${plane.destination}`, font: '12px sans-serif',
             //@ts-ignore
-            distanceDisplayCondition: labelDisplayCondition, pixelOffset: labelOffset})
+            // distanceDisplayCondition: labelDisplayCondition, pixelOffset: labelOffset})
     });
     planeData.entities.add(newEntity);
 

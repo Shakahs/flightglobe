@@ -27,15 +27,11 @@ export declare function updatePlanes(planeData: Cesium.CustomDataSource): any;
 export type Icao = string
 
 export interface FlightPosition  {
-    icao: Icao,
     time: Date,
     altitude: number
     latitude: number
     longitude: number
     heading: number
-    model: string
-    origin: string
-    destination: string
 }
 
 export type FlightPositions = FlightPosition[]

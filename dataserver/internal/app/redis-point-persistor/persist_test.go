@@ -8,11 +8,11 @@ import (
 func TestIsPositionValid(t *testing.T) {
 
 	testTable := []struct {
-		pos            pkg.Position
+		pos            pkg.FlightRecord
 		expectedResult bool
 	}{
-		{pos: pkg.Position{Icao: "abc"}, expectedResult: true},
-		{pos: pkg.Position{}, expectedResult: false},
+		{pos: pkg.FlightRecord{Icao: "abc"}, expectedResult: true},
+		{pos: pkg.FlightRecord{}, expectedResult: false},
 	}
 
 	for _, entry := range testTable {
@@ -27,23 +27,23 @@ func TestIsPositionValid(t *testing.T) {
 func TestArePositionsIdentical(t *testing.T) {
 
 	testTable := []struct {
-		oldPos         pkg.Position
-		newPos         pkg.Position
+		oldPos         pkg.FlightRecord
+		newPos         pkg.FlightRecord
 		expectedResult bool
 	}{
 		{
-			oldPos:         pkg.Position{Latitude: 99, Longitude: 99},
-			newPos:         pkg.Position{Latitude: 99, Longitude: 99},
+			oldPos:         pkg.FlightRecord{Latitude: 99, Longitude: 99},
+			newPos:         pkg.FlightRecord{Latitude: 99, Longitude: 99},
 			expectedResult: true,
 		},
 		{
-			oldPos:         pkg.Position{Latitude: 99, Longitude: 99},
-			newPos:         pkg.Position{Latitude: 98, Longitude: 99},
+			oldPos:         pkg.FlightRecord{Latitude: 99, Longitude: 99},
+			newPos:         pkg.FlightRecord{Latitude: 98, Longitude: 99},
 			expectedResult: false,
 		},
 		{
-			oldPos:         pkg.Position{Latitude: 99, Longitude: 99},
-			newPos:         pkg.Position{Latitude: 99, Longitude: 98},
+			oldPos:         pkg.FlightRecord{Latitude: 99, Longitude: 99},
+			newPos:         pkg.FlightRecord{Latitude: 99, Longitude: 98},
 			expectedResult: false,
 		},
 	}

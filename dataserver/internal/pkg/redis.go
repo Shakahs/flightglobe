@@ -16,7 +16,7 @@ func ProvideRedisClient(redisAddress string) *redis.Client {
 	return goRedisClient
 }
 
-func PublishPosition(c *redis.Client, pubChannel string, newPos *Position) error {
+func PublishPosition(c *redis.Client, pubChannel string, newPos *FlightRecord) error {
 	marshaled, err := json.Marshal(newPos)
 	if err != nil {
 		return err
@@ -30,7 +30,7 @@ func PublishPosition(c *redis.Client, pubChannel string, newPos *Position) error
 	return nil
 }
 
-func publishPositions(c *redis.Client, pubChannel string, newData Positions) (int64, error) {
+func publishPositions(c *redis.Client, pubChannel string, newData FlightRecords) (int64, error) {
 	publishCount := int64(0)
 	for _, newPos := range newData {
 		err := PublishPosition(c, pubChannel, &newPos)
@@ -42,7 +42,7 @@ func publishPositions(c *redis.Client, pubChannel string, newData Positions) (in
 	return publishCount, nil
 }
 
-func PublishPositionsFromChan(inChan chan Positions, c *redis.Client, pubChannel string) {
+func PublishPositionsFromChan(inChan chan FlightRecords, c *redis.Client, pubChannel string) {
 	counter := ratecounter.NewRateCounter(5 * time.Second)
 
 	ticker := time.NewTicker(time.Second * 5)

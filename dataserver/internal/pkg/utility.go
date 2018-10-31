@@ -12,8 +12,8 @@ func CheckEnvVars(vars ...string) {
 	}
 }
 
-func UnmarshalPosition(rawPos string) (*Position, error) {
-	var unmarshaledPos Position
+func UnmarshalPosition(rawPos string) (*FlightRecord, error) {
+	var unmarshaledPos FlightRecord
 	err := json.Unmarshal([]byte(rawPos), &unmarshaledPos) //get msg string, convert to byte array for unmarshal
 	if err != nil {
 		return &unmarshaledPos, err
@@ -21,7 +21,7 @@ func UnmarshalPosition(rawPos string) (*Position, error) {
 	return &unmarshaledPos, nil
 }
 
-func MarshalPosition(pos *Position) ([]byte, error) {
+func MarshalPosition(pos *FlightRecord) ([]byte, error) {
 	marshaled, err := json.Marshal(pos)
 	return marshaled, err
 }
