@@ -18,10 +18,9 @@ const scratchC3 = new Cesium.Cartesian3()
 
 
 let newest:Date=new Date(2000,1,1);
-const updatePlanes = (planeData: PlaneMap, cesiumPlaneData:Cesium.CustomDataSource, positions: FlightPosition[]):Date => {
+const updatePlanes = (planeData: PlaneMap, cesiumPlaneData:Cesium.CustomDataSource, position: FlightPosition):Date => {
   // const now = Cesium.JulianDate.now();
   // const future = Cesium.JulianDate.addSeconds(now, 30, Cesium.JulianDate.now());
-    forEach(positions, (position) => {
     // const diff = DateTime
     //   .utc()
     //   .diff(DateTime.fromMillis(v.time * 1000, { zone: 'utc' }), 'seconds')
@@ -51,7 +50,6 @@ const updatePlanes = (planeData: PlaneMap, cesiumPlaneData:Cesium.CustomDataSour
         newest=position.time
     }
 
-  });
 
     return newest
 };

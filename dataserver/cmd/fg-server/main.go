@@ -28,9 +28,10 @@ func sendIncremental(c *websocket.Conn, r pkg.PositionRequest) error {
 
 	for _, v := range data {
 		if v.Time.After(r.LastReceived) {
-			marshaled, err := pkg.MarshalPosition(v)
+			var positionUpdate = pkg.PositionUpdate{"positionUpdate", v}
+			marshaled, err := json.Marshal(positionUpdate)
 			if err != nil {
-				return errors.New("sendIncremental failed")
+				return errors.New("sendIncremental JSON marshal failed")
 			}
 
 			err = c.WriteMessage(1, marshaled)

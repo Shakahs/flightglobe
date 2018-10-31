@@ -37,3 +37,12 @@ export type FlightPositions = FlightPosition[]
 export type FlightPositionMap = { [icao:string]: FlightPosition }
 
 export type PlaneMap = Map<string,Plane>
+
+export interface Message {
+    type: string
+    body: any
+}
+
+export interface PositionUpdate extends Message {
+    body: FlightPosition
+}

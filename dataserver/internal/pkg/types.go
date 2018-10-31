@@ -49,3 +49,8 @@ type LockableSinglePositionDataset struct {
 	data SinglePositionDataset
 	lock sync.RWMutex
 }
+
+type PositionUpdate struct {
+	Type string    `json:"type"`
+	Body *Position `json:"body"`
+}
