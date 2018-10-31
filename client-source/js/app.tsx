@@ -1,12 +1,12 @@
 import 'cesiumSource/Widgets/widgets.css';
 import {socket$, buffered$} from './dataStreams';
-import updatePlane from './updatePlanes';
+import {updatePlane, updateDemographics} from './manageData';
 import { viewer, cesiumPlaneDataSource } from './globe';
 import {size,forEach} from 'lodash-es'
 import { interval } from 'rxjs';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {FlightPosition, FlightMap, PositionUpdate} from "./types";
+import {FlightPosition, FlightMap, PositionUpdate, DemographicsUpdate} from "./types";
 
 const flightData:FlightMap = new Map();
 
@@ -18,9 +18,9 @@ pollInterval.subscribe(()=>{
   socket$.next({lastReceived: newestPositionTime})
 });
 
-const handlePositionUpdate = (position: FlightPosition)=>{
+const handlePositionUpdate = (positionUpdate: PositionUpdate)=>{
     // console.log(`Received ${size(data)} positions`);
-    newestPositionTime = updatePlane(flightData, cesiumPlaneDataSource, position);
+    newestPositionTime = updatePlane(flightData, cesiumPlaneDataSource, positionUpdate.body);
     // console.log("newest updated to:", newestPositionTime)
 };
 
@@ -29,12 +29,20 @@ buffered$.subscribe((messages) => {
     forEach(messages, (message)=>{
       switch (message.type) {
           case "positionUpdate":
-            handlePositionUpdate(message.body)
+            handlePositionUpdate(message);
+            break;
+          case "demographicsUpdate":
+            updateDemographics(flightData, message);
+            break;
       }
     });
     cesiumPlaneDataSource.entities.resumeEvents();
     viewer.scene.requestRender();
 });
+
+// setInterval(()=>{
+//     console.table(flightData)
+// }, 30000);
 
 const App = ()=>(
     <div>Hello world...</div>

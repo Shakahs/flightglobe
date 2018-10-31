@@ -9,16 +9,32 @@ import * as Cesium from 'cesium';
 // import { Cartesian3, CustomDataSource} from 'cesium';
 // import {JulianDate} from 'cesium';
 
-import {flightMaker} from './plane';
-import {FlightPosition, FlightPositionMap, Flight, FlightMap} from "./types";
+import {entityMaker} from './plane';
+import {
+    FlightPosition,
+    FlightPositionMap,
+    Flight,
+    FlightMap,
+    FlightDemographics,
+    DemographicsUpdate,
+    Icao
+} from "./types";
 const isAfter = require('date-fns/is_after')
 
 const scratchC3 = new Cesium.Cartesian3()
 // const scratchJulian = JulianDate.now();
 
+const retrieveFlight = (flightData: FlightMap, icao: Icao):Flight=>{
+    let thisFlight = flightData.get(icao);
+    if(!thisFlight){
+        thisFlight = {entity: undefined, demographics: undefined};
+        flightData.set(icao, thisFlight)
+    }
+    return thisFlight
+};
 
 let newest:Date=new Date(2000,1,1);
-const updatePlanes = (flightData: FlightMap, cesiumPlaneData:Cesium.CustomDataSource, position: FlightPosition):Date => {
+export const updatePlane = (flightData: FlightMap, cesiumPlaneData:Cesium.CustomDataSource, position: FlightPosition):Date => {
   // const now = Cesium.JulianDate.now();
   // const future = Cesium.JulianDate.addSeconds(now, 30, Cesium.JulianDate.now());
     // const diff = DateTime
@@ -39,11 +55,18 @@ const updatePlanes = (flightData: FlightMap, cesiumPlaneData:Cesium.CustomDataSo
     //   scratchJulian
     // );
 
-    const thisPlane = flightData.get(position.icao);
-    if (thisPlane) {
-        thisPlane.entity.position = newPosition;
+    // let thisFlight = flightData.get(position.icao);
+    // if(!thisFlight){
+    //     thisFlight = {entity: undefined, demographics: undefined};
+    //     flightData.set(position.icao, thisFlight)
+    // }
+
+    const thisFlight = retrieveFlight(flightData, position.icao)
+
+    if (thisFlight.entity) {
+        thisFlight.entity.position = newPosition;
     } else {
-        flightData.set(position.icao, flightMaker(cesiumPlaneData, position, newPosition))
+        thisFlight.entity = entityMaker(cesiumPlaneData, position, newPosition)
     }
 
     if (isAfter(position.time, newest)){
@@ -54,4 +77,7 @@ const updatePlanes = (flightData: FlightMap, cesiumPlaneData:Cesium.CustomDataSo
     return newest
 };
 
-export default updatePlanes;
+export const updateDemographics = (flightData: FlightMap, demographicsUpdate: DemographicsUpdate) => {
+    const thisFlight = retrieveFlight(flightData, demographicsUpdate.icao);
+    thisFlight.demographics = demographicsUpdate.body;
+};

@@ -19,7 +19,7 @@ export interface FlightDemographics {
 }
 
 export interface Flight {
-    entity: Cesium.Entity
+    entity: Cesium.Entity | undefined
     demographics: FlightDemographics | undefined
 }
 
@@ -47,8 +47,13 @@ export type FlightMap = Map<string,Flight>
 export interface Message {
     type: string
     body: any
+    icao: Icao
 }
 
 export interface PositionUpdate extends Message {
     body: FlightPosition
+}
+
+export interface DemographicsUpdate extends Message {
+    body: FlightDemographics
 }
