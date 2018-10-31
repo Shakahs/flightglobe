@@ -1,7 +1,7 @@
 import * as Cesium from 'cesium';
 // import {Cartesian3, CustomDataSource, Entity, JulianDate} from "cesium";
 
-// export declare class Plane {
+// export declare class Flight {
 //     constructor(cesiumPlaneDataSource: Cesium.CustomDataSource, icao: Icao, position: Cesium.Cartesian3);
 //
 //     cesiumPlaneDataSource:Cesium.CustomDataSource;
@@ -12,9 +12,15 @@ import * as Cesium from 'cesium';
 //     // myMethod(opts: MyClass.MyClassMethodOptions): number;
 // }
 
-export interface Plane {
+export interface FlightDemographics {
+    origin: string
+    destination: string
+    model: string
+}
+
+export interface Flight {
     entity: Cesium.Entity
-    track: Cesium.Cartesian3[]
+    demographics: FlightDemographics | undefined
 }
 
 export declare function updatePlanes(planeData: Cesium.CustomDataSource): any;
@@ -36,7 +42,7 @@ export type FlightPositions = FlightPosition[]
 
 export type FlightPositionMap = { [icao:string]: FlightPosition }
 
-export type PlaneMap = Map<string,Plane>
+export type FlightMap = Map<string,Flight>
 
 export interface Message {
     type: string

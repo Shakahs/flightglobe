@@ -3,16 +3,16 @@ import * as Cesium from 'cesium';
 // import {NearFarScalar} from 'cesium';
 import {FlightPosition, FlightPositionMap, Icao,} from './types'
 // import {Cartesian3, PointGraphics, Entity} from "cesium";
-import {Plane} from './types'
+import {Flight} from './types'
 
 
 const nfScalar = new Cesium.NearFarScalar(5000, 3.25, 1000000, 1.5);
 const labelDisplayCondition = new Cesium.DistanceDisplayCondition(0.0, 2000000);
 const labelOffset = new Cesium.Cartesian2(10,20);
 
-export const planeMaker = (planeData: Cesium.CustomDataSource, plane: FlightPosition, position: Cesium.Cartesian3):Plane => {
+export const flightMaker = (planeData: Cesium.CustomDataSource, plane: FlightPosition, position: Cesium.Cartesian3):Flight => {
 
-    const newPlane = {
+    const newFlight = {
         entity: planeData.entities.add(new Cesium.Entity({
             // point: new PointGraphics({pixelSize: 2, scaleByDistance: nfScalar}),
             point: new Cesium.PointGraphics({pixelSize: 2}),
@@ -25,15 +25,13 @@ export const planeMaker = (planeData: Cesium.CustomDataSource, plane: FlightPosi
                 //@ts-ignore
                 distanceDisplayCondition: labelDisplayCondition, pixelOffset: labelOffset})
         })),
-
-        track: []
-
+        demographics: undefined
     };
 
-    return newPlane
+    return newFlight
 };
 
-// export class Plane implements PlaneObj {
+// export class Flight implements PlaneObj {
 //   constructor(cesiumPlaneDataSource: FlightPositionMap, icao: Icao, position: FlightPosition) {
 //     // super(cesiumPlaneDataSource, icao, position);
 //

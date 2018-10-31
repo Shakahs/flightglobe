@@ -6,9 +6,9 @@ import {size,forEach} from 'lodash-es'
 import { interval } from 'rxjs';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {FlightPosition, PlaneMap, PositionUpdate} from "./types";
+import {FlightPosition, FlightMap, PositionUpdate} from "./types";
 
-const planeData:PlaneMap = new Map();
+const flightData:FlightMap = new Map();
 
 let newestPositionTime:Date = new Date(2000,1,1);
 const pollInterval = interval(5000);
@@ -20,7 +20,7 @@ pollInterval.subscribe(()=>{
 
 const handlePositionUpdate = (position: FlightPosition)=>{
     // console.log(`Received ${size(data)} positions`);
-    newestPositionTime = updatePlane(planeData, cesiumPlaneDataSource, position);
+    newestPositionTime = updatePlane(flightData, cesiumPlaneDataSource, position);
     // console.log("newest updated to:", newestPositionTime)
 };
 
