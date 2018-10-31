@@ -53,8 +53,18 @@ func process(data []byte) []Fr_Record {
 func convert(FrData []Fr_Record) pkg.Positions {
 	var collector pkg.Positions
 	for _, v := range FrData {
-		pos := pkg.Position{0, v.Icao, v.Lat, v.Lng,
-			time.Unix(v.Time,0).UTC(), v.Heading, int32(v.Altitude)}
+		pos := pkg.Position{
+			Id:          0,
+			Icao:        v.Icao,
+			Latitude:    v.Lat,
+			Longitude:   v.Lng,
+			Time:        time.Unix(v.Time, 0).UTC(),
+			Heading:     v.Heading,
+			Altitude:    int32(v.Altitude),
+			Model:       v.Model,
+			Origin:      v.Origin,
+			Destination: v.Destination,
+		}
 		collector = append(collector, pos)
 	}
 	return collector

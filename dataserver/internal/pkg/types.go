@@ -6,13 +6,16 @@ import (
 )
 
 type Position struct {
-	Id        int64     `json:"-"`
-	Icao      string    `json:"icao"`
-	Latitude  float64   `json:"latitude"`
-	Longitude float64   `json:"longitude"`
-	Time      time.Time `json:"time" db:"ptime2"`
-	Heading   float64   `json:"heading"`
-	Altitude  int32     `json:"altitude"` // feet
+	Id          int64     `json:"-"`
+	Icao        string    `json:"icao"`
+	Latitude    float64   `json:"latitude"`
+	Longitude   float64   `json:"longitude"`
+	Time        time.Time `json:"time" db:"ptime2"`
+	Heading     float64   `json:"heading"`
+	Altitude    int32     `json:"altitude"` // feet
+	Model       string    `json:"model"`
+	Origin      string    `json:"origin"`
+	Destination string    `json:"destination"`
 }
 
 type Positions = []Position

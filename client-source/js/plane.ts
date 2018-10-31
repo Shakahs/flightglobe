@@ -8,19 +8,20 @@ import {Plane} from './types'
 
 const nfScalar = new Cesium.NearFarScalar(5000, 3.25, 1000000, 1.5);
 const labelDisplayCondition = new Cesium.DistanceDisplayCondition(0.0, 2000000);
-const labelOffset = new Cesium.Cartesian2(10,10);
+const labelOffset = new Cesium.Cartesian2(10,20);
 
-export const planeMaker = (planeData: Cesium.CustomDataSource, icao: Icao, position: Cesium.Cartesian3):Plane => {
+export const planeMaker = (planeData: Cesium.CustomDataSource, plane: FlightPosition, position: Cesium.Cartesian3):Plane => {
+
     const newPlane = {
         entity: planeData.entities.add(new Cesium.Entity({
             // point: new PointGraphics({pixelSize: 2, scaleByDistance: nfScalar}),
             point: new Cesium.PointGraphics({pixelSize: 2}),
             // position: this.sampledPosition,
             position,
-            id: icao,
+            id: plane.icao,
             // polyline: new Cesium.PolylineGraphics()
             //@ts-ignore
-            label: new Cesium.LabelGraphics({text: icao, font: '12px sans-serif',
+            label: new Cesium.LabelGraphics({text: `${plane.icao}\n${plane.origin}\n${plane.destination}`, font: '12px sans-serif',
                 //@ts-ignore
                 distanceDisplayCondition: labelDisplayCondition, pixelOffset: labelOffset})
         })),

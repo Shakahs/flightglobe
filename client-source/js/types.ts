@@ -27,6 +27,9 @@ export interface FlightPosition  {
     latitude: number
     longitude: number
     heading: number
+    model: string
+    origin: string
+    destination: string
 }
 
 export type FlightPositions = FlightPosition[]
