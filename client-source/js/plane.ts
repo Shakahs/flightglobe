@@ -34,10 +34,10 @@ export const planeMaker = (planeData: Cesium.CustomDataSource, plane: FlightPosi
 };
 
 // export class Plane implements PlaneObj {
-//   constructor(planeData: FlightPositionMap, icao: Icao, position: FlightPosition) {
-//     // super(planeData, icao, position);
+//   constructor(cesiumPlaneDataSource: FlightPositionMap, icao: Icao, position: FlightPosition) {
+//     // super(cesiumPlaneDataSource, icao, position);
 //
-//     this.planeData = planeData;
+//     this.cesiumPlaneDataSource = cesiumPlaneDataSource;
 //     this.icao = icao;
 //
 //     // this.sampledPosition = new SampledPositionProperty();
@@ -49,7 +49,7 @@ export const planeMaker = (planeData: Cesium.CustomDataSource, plane: FlightPosi
 //
 //     // this.sampledPosition.addSample(date, position);
 //
-//     this.entity = this.planeData.entities.add(new Cesium.Entity({
+//     this.entity = this.cesiumPlaneDataSource.entities.add(new Cesium.Entity({
 //         // point: new PointGraphics({pixelSize: 2, scaleByDistance: nfScalar}),
 //         point: new Cesium.PointGraphics({pixelSize: 2}),
 //         // position: this.sampledPosition,

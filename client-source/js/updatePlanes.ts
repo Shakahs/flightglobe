@@ -15,13 +15,13 @@ const isAfter = require('date-fns/is_after')
 
 const scratchC3 = new Cesium.Cartesian3()
 // const scratchJulian = JulianDate.now();
-const knownPlanes = new Map<string,Plane>();
+
 
 let newest:Date=new Date(2000,1,1);
-const updatePlanes = (planeData: Cesium.CustomDataSource, data: FlightPosition[]):Date => {
+const updatePlanes = (planeData: PlaneMap, cesiumPlaneData:Cesium.CustomDataSource, positions: FlightPosition[]):Date => {
   // const now = Cesium.JulianDate.now();
   // const future = Cesium.JulianDate.addSeconds(now, 30, Cesium.JulianDate.now());
-    forEach(data, (v) => {
+    forEach(positions, (position) => {
     // const diff = DateTime
     //   .utc()
     //   .diff(DateTime.fromMillis(v.time * 1000, { zone: 'utc' }), 'seconds')
@@ -29,9 +29,9 @@ const updatePlanes = (planeData: Cesium.CustomDataSource, data: FlightPosition[]
     // console.log(`position age is ${ diff.seconds } seconds`);
 
     const newPosition = Cesium.Cartesian3.fromDegrees(
-      v.longitude,
-      v.latitude,
-      v.altitude,
+      position.longitude,
+      position.latitude,
+      position.altitude,
       undefined,
       scratchC3
     );
@@ -40,15 +40,15 @@ const updatePlanes = (planeData: Cesium.CustomDataSource, data: FlightPosition[]
     //   scratchJulian
     // );
 
-    const thisPlane = knownPlanes.get(v.icao);
+    const thisPlane = planeData.get(position.icao);
     if (thisPlane) {
         thisPlane.entity.position = newPosition;
     } else {
-        knownPlanes.set(v.icao, planeMaker(planeData, v, newPosition))
+        planeData.set(position.icao, planeMaker(cesiumPlaneData, position, newPosition))
     }
 
-    if (isAfter(v.time, newest)){
-        newest=v.time
+    if (isAfter(position.time, newest)){
+        newest=position.time
     }
 
   });

@@ -2,9 +2,9 @@ import * as Cesium from 'cesium';
 // import {Cartesian3, CustomDataSource, Entity, JulianDate} from "cesium";
 
 // export declare class Plane {
-//     constructor(planeData: Cesium.CustomDataSource, icao: Icao, position: Cesium.Cartesian3);
+//     constructor(cesiumPlaneDataSource: Cesium.CustomDataSource, icao: Icao, position: Cesium.Cartesian3);
 //
-//     planeData:Cesium.CustomDataSource;
+//     cesiumPlaneDataSource:Cesium.CustomDataSource;
 //     entity: Cesium.Entity;
 //     icao: Icao;
 //
@@ -36,4 +36,4 @@ export type FlightPositions = FlightPosition[]
 
 export type FlightPositionMap = { [icao:string]: FlightPosition }
 
-export type PlaneMap = { [icao:string]: Plane }
+export type PlaneMap = Map<string,Plane>

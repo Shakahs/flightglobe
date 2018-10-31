@@ -1,15 +1,18 @@
 import 'cesiumSource/Widgets/widgets.css';
 import {socket$, buffered$} from './dataStreams';
 import updatePlanes from './updatePlanes';
-import { viewer, planeData } from './globe';
+import { viewer, cesiumPlaneDataSource } from './globe';
 import {size} from 'lodash-es'
-import { interval, fromEvent } from 'rxjs';
+import { interval } from 'rxjs';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {PlaneMap} from "./types";
+
+const planeData:PlaneMap = new Map();
 
 let newestPositionTime:Date = new Date(2000,1,1);
-const myInterval = interval(5000);
-myInterval.subscribe(()=>{
+const pollInterval = interval(5000);
+pollInterval.subscribe(()=>{
   // console.log("asking for positions after", newestPositionTime)
   // @ts-ignore: we need to send a request here, not a FlightPosition
   socket$.next({lastReceived: newestPositionTime})
@@ -17,10 +20,10 @@ myInterval.subscribe(()=>{
 
 buffered$.subscribe((data) => {
   console.log(`Received ${size(data)} positions`);
-  planeData.entities.suspendEvents();
-  newestPositionTime = updatePlanes(planeData, data);
+  cesiumPlaneDataSource.entities.suspendEvents();
+  newestPositionTime = updatePlanes(planeData, cesiumPlaneDataSource, data);
   // console.log("newest updated to:", newestPositionTime)
-  planeData.entities.resumeEvents();
+  cesiumPlaneDataSource.entities.resumeEvents();
   viewer.scene.requestRender();
 });
 
