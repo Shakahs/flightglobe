@@ -40,8 +40,8 @@ setInterval(()=>{
     // console.log(flightData)
 }, 15000);
 
-const App = ()=>(
-    <div>Hello world...</div>
-);
-
-ReactDOM.render(<App />,document.getElementById('reactApp'));
+// const App = ()=>(
+//     <div>Hello world...</div>
+// );
+//
+// ReactDOM.render(<App />,document.getElementById('reactApp'));
