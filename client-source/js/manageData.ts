@@ -36,6 +36,15 @@ const retrieveFlight = (flightData: FlightMap, icao: Icao):Flight=>{
 let newest = 0;
 const labelDisplayCondition = new Cesium.DistanceDisplayCondition(0.0, 2000000);
 const labelOffset = new Cesium.Cartesian2(10,20);
+
+const createLabel = (thisFlight: Flight):Cesium.LabelGraphics=>{
+    return new Cesium.LabelGraphics(
+        //@ts-ignore
+        {text: `${thisFlight.icao}\n${thisFlight.demographics.origin}\n${thisFlight.demographics.destination}`, font: '12px sans-serif',
+            //@ts-ignore
+            distanceDisplayCondition: labelDisplayCondition, pixelOffset: labelOffset})
+};
+
 export const updatePlane = (flightData: FlightMap, cesiumPlaneData:Cesium.CustomDataSource, positionUpdate: PositionUpdate):number => {
 
   // const now = Cesium.JulianDate.now();
@@ -74,11 +83,7 @@ export const updatePlane = (flightData: FlightMap, cesiumPlaneData:Cesium.Custom
 
     //apply demographics data if we have it
     if(!thisFlight.entity.label && thisFlight.demographics){
-        thisFlight.entity.label = new Cesium.LabelGraphics(
-            //@ts-ignore
-            {text: `${thisFlight.icao}\n${thisFlight.demographics.origin}\n${thisFlight.demographics.destination}`, font: '12px sans-serif',
-        //@ts-ignore
-        distanceDisplayCondition: labelDisplayCondition, pixelOffset: labelOffset})
+        thisFlight.entity.label = createLabel(thisFlight)
     }
 
     if(positionUpdate.body.timestamp > newest){
@@ -91,4 +96,7 @@ export const updatePlane = (flightData: FlightMap, cesiumPlaneData:Cesium.Custom
 export const updateDemographics = (flightData: FlightMap, demographicsUpdate: DemographicsUpdate) => {
     const thisFlight = retrieveFlight(flightData, demographicsUpdate.icao);
     thisFlight.demographics = demographicsUpdate.body;
+    if(thisFlight.entity && !thisFlight.entity.label){
+        thisFlight.entity.label = createLabel(thisFlight)
+    }
 };
