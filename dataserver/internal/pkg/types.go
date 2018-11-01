@@ -50,3 +50,9 @@ type PositionUpdate struct {
 	Icao string    `json:"icao"`
 	Body *Position `json:"body"`
 }
+
+type DemographicUpdate struct {
+	Type string       `json:"type"`
+	Icao string       `json:"icao"`
+	Body *Demographic `json:"body"`
+}

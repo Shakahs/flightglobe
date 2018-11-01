@@ -9,7 +9,7 @@ import * as Cesium from 'cesium';
 // import { Cartesian3, CustomDataSource} from 'cesium';
 // import {JulianDate} from 'cesium';
 
-import {entityMaker} from './plane';
+import {entityMaker} from './flight';
 import {
     FlightPosition,
     FlightPositionMap,
@@ -27,13 +27,15 @@ const scratchC3 = new Cesium.Cartesian3()
 const retrieveFlight = (flightData: FlightMap, icao: Icao):Flight=>{
     let thisFlight = flightData.get(icao);
     if(!thisFlight){
-        thisFlight = {entity: undefined, demographics: undefined};
+        thisFlight = {icao, entity: undefined, demographics: undefined};
         flightData.set(icao, thisFlight)
     }
     return thisFlight
 };
 
 let newest = 0;
+const labelDisplayCondition = new Cesium.DistanceDisplayCondition(0.0, 2000000);
+const labelOffset = new Cesium.Cartesian2(10,20);
 export const updatePlane = (flightData: FlightMap, cesiumPlaneData:Cesium.CustomDataSource, positionUpdate: PositionUpdate):number => {
 
   // const now = Cesium.JulianDate.now();
@@ -68,6 +70,15 @@ export const updatePlane = (flightData: FlightMap, cesiumPlaneData:Cesium.Custom
         thisFlight.entity.position = newPosition;
     } else {
         thisFlight.entity = entityMaker(cesiumPlaneData, positionUpdate, newPosition)
+    }
+
+    //apply demographics data if we have it
+    if(!thisFlight.entity.label && thisFlight.demographics){
+        thisFlight.entity.label = new Cesium.LabelGraphics(
+            //@ts-ignore
+            {text: `${thisFlight.icao}\n${thisFlight.demographics.origin}\n${thisFlight.demographics.destination}`, font: '12px sans-serif',
+        //@ts-ignore
+        distanceDisplayCondition: labelDisplayCondition, pixelOffset: labelOffset})
     }
 
     if(positionUpdate.body.timestamp > newest){

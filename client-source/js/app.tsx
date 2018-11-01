@@ -26,7 +26,7 @@ buffered$.subscribe((messages) => {
           case "positionUpdate":
             newestPositionTimestamp = updatePlane(flightData, cesiumPlaneDataSource, message);
             break;
-          case "demographicsUpdate":
+          case "demographicUpdate":
             updateDemographics(flightData, message);
             break;
       }

@@ -19,6 +19,7 @@ export interface FlightDemographics {
 }
 
 export interface Flight {
+    icao: Icao
     entity: Cesium.Entity | undefined
     demographics: FlightDemographics | undefined
 }

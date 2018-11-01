@@ -21,7 +21,7 @@ import (
 //	},
 //}
 
-func sendIncremental(c *websocket.Conn, t time.Time) error {
+func sendIncrementalPositions(c *websocket.Conn, t time.Time) error {
 	data := positionCache.GetPositions()
 
 	fmt.Printf("Received request for all data after %s\n", t.String())
@@ -32,12 +32,23 @@ func sendIncremental(c *websocket.Conn, t time.Time) error {
 			var positionUpdate = pkg.PositionUpdate{"positionUpdate", v.Icao, &v.Position}
 			marshaled, err := json.Marshal(positionUpdate)
 			if err != nil {
-				return errors.New("sendIncremental JSON marshal failed")
+				return errors.New("sendIncrementalPositions JSON marshal position failed")
 			}
 
 			err = c.WriteMessage(1, marshaled)
 			if err != nil {
-				return errors.New("sendIncremental failed")
+				return errors.New("sendIncrementalPositions position failed")
+			}
+
+			var demographicUpdate = pkg.DemographicUpdate{"demographicUpdate", v.Icao, &v.Demographic}
+			marshaled, err = json.Marshal(demographicUpdate)
+			if err != nil {
+				return errors.New("sendIncrementalPositions JSON marshal demographic failed")
+			}
+
+			err = c.WriteMessage(1, marshaled)
+			if err != nil {
+				return errors.New("sendIncrementalPositions demographic failed")
 			}
 
 			sentCount++
@@ -68,7 +79,7 @@ func maintainConnection(w http.ResponseWriter, r *http.Request) {
 	//go readLoop(wsConn)
 
 	fmt.Println("connection opened")
-	sendIncremental(wsConn, time.Now().UTC().Add(time.Hour*time.Duration(-1)))
+	sendIncrementalPositions(wsConn, time.Now().UTC().Add(time.Hour*time.Duration(-1)))
 
 	time.Sleep(2 * time.Second)
 
@@ -86,7 +97,7 @@ func maintainConnection(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		sendIncremental(wsConn, time.Unix(request.LastReceivedTimestamp, 0).UTC())
+		sendIncrementalPositions(wsConn, time.Unix(request.LastReceivedTimestamp, 0).UTC())
 	}
 	fmt.Println("connection closing")
 }
