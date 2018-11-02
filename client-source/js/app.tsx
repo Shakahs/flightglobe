@@ -1,7 +1,7 @@
 import 'cesiumSource/Widgets/widgets.css';
 import {socket$, buffered$} from './dataStreams';
 import {updatePlane, updateDemographics} from './manageData';
-import { viewer, cesiumPlaneDataSource } from './globe';
+import {viewer, cesiumPlaneDataSource, airportData} from './globe';
 import {size,forEach} from 'lodash-es'
 import { interval } from 'rxjs';
 import React from 'react';
@@ -27,7 +27,7 @@ buffered$.subscribe((messages) => {
             newestPositionTimestamp = updatePlane(flightData, cesiumPlaneDataSource, message);
             break;
           case "demographicUpdate":
-            updateDemographics(flightData, message);
+            updateDemographics(flightData, message, airportData);
             break;
       }
     });

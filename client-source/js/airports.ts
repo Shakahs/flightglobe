@@ -3,11 +3,13 @@ import { forOwn } from 'lodash-es';
 import {Cartesian3} from 'cesium';
 import {LabelStyle} from 'cesium';
 import {DistanceDisplayCondition} from 'cesium';
+import {AirportData} from "./types";
+import * as Cesium from 'cesium';
 
 const ddCondition = new DistanceDisplayCondition(0.0, 100000);
 const scratchC3 = new Cartesian3();
 
-const loadAirports = (airportData, airportDataRaw) => {
+const loadAirports = (airportData, airportDataRaw:AirportData) => {
   airportData.entities.suspendEvents();
   forOwn(airportDataRaw, (v) => {
     const newPosition = Cartesian3.fromDegrees(
@@ -30,7 +32,6 @@ const loadAirports = (airportData, airportDataRaw) => {
         style: LabelStyle.FILL_AND_OUTLINE,
       },
       position: newPosition,
-      id: v.icao,
     });
   });
   airportData.entities.resumeEvents();

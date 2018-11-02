@@ -54,3 +54,14 @@ export interface PositionUpdate extends Message {
 export interface DemographicsUpdate extends Message {
     body: FlightDemographics
 }
+
+export type AirportData = { [id:string]: {
+        lng: number
+        lat: number
+        altitude: number
+        city: string
+        country: string
+        name: string
+        iata: string
+    }
+}
