@@ -41,5 +41,5 @@ spec:
           value: redis-service
         - name: REDIS_PORT
           value: "6379"
-        - name: REDIS_DATA_KEY
-          value: flight_positions
+        - name: REDIS_SUB_CHANNEL
+          value: positions_clean
