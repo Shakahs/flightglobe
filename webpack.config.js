@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require('path');
 
-const cesiumSource = 'node_modules/cesium/Source';
+const cesiumSource = 'cesium/Source';
 const cesiumWorkers = '../Build/Cesium/Workers';
 
 module.exports = {

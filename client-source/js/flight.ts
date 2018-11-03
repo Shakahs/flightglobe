@@ -26,6 +26,10 @@ export const entityMaker = (planeData: Cesium.CustomDataSource, update: Position
             // distanceDisplayCondition: labelDisplayCondition, pixelOffset: labelOffset})
     });
     planeData.entities.add(newEntity);
+    //@ts-ignore
+    newEntity.manualUpdate = true;
+    //@ts-ignore
+    // newEntity.forceUpdate = true;
 
     return newEntity
 };

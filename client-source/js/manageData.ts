@@ -38,11 +38,14 @@ const labelDisplayCondition = new Cesium.DistanceDisplayCondition(0.0, 2000000);
 const labelOffset = new Cesium.Cartesian2(10,20);
 
 const createLabel = (thisFlight: Flight):Cesium.LabelGraphics=>{
-    return new Cesium.LabelGraphics(
+    const newLabel = new Cesium.LabelGraphics(
         //@ts-ignore
         {text: `${thisFlight.icao}\n${thisFlight.demographics.origin}\n${thisFlight.demographics.destination}`, font: '12px sans-serif',
             //@ts-ignore
             distanceDisplayCondition: labelDisplayCondition, pixelOffset: labelOffset})
+
+    newLabel.forceUpdate = true;
+    return newLabel
 };
 
 export const updatePlane = (flightData: FlightMap, cesiumPlaneData:Cesium.CustomDataSource, positionUpdate: PositionUpdate):number => {
@@ -84,6 +87,7 @@ export const updatePlane = (flightData: FlightMap, cesiumPlaneData:Cesium.Custom
     //apply demographics data if we have it
     if(!thisFlight.entity.label && thisFlight.demographics){
         thisFlight.entity.label = createLabel(thisFlight)
+
     }
 
     if(positionUpdate.body.timestamp > newest){
