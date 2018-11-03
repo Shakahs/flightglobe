@@ -1,11 +1,13 @@
 .idea/
 *.ipynb
+*telepresence.log
 .node_modules/
 /yarn-error.log
 /node_modules/
 /webpack-stats.json
 /.env
 /client-build/
+/cesium/
 dataserver/cmd/fr-collector/fr-collector
 dataserver/cmd/redis-point-persistor/redis-point-persistor
 dataserver/cmd/fg-server/fg-server
