@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/NYTimes/gziphandler"
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"github.com/go-redis/redis"
 	"github.com/gorilla/websocket"
@@ -119,6 +120,8 @@ func maintainConnection(w http.ResponseWriter, r *http.Request) {
 var redisSubChannel string
 var redisAddress string
 var redisPort string
+var deploymentEnvironment string
+var isDeployedProduction bool
 var upgrader = websocket.Upgrader{}
 var positionCache *pkg.LockableRecordMap
 var redisClient *redis.Client
@@ -127,8 +130,16 @@ func init() {
 	redisAddress = os.Getenv("REDIS_ADDRESS")
 	redisPort = os.Getenv("REDIS_PORT")
 	redisSubChannel = os.Getenv("REDIS_SUB_CHANNEL")
+	deploymentEnvironment = os.Getenv("DEPLOYMENT_ENVIRONMENT")
 
 	pkg.CheckEnvVars(redisAddress, redisPort, redisSubChannel)
+
+	if deploymentEnvironment == "" || deploymentEnvironment == "production" {
+		isDeployedProduction = true
+	} else {
+		isDeployedProduction = false
+	}
+	fmt.Printf("Production environment: %t\n", isDeployedProduction)
 
 	redisClient = pkg.ProvideRedisClient(fmt.Sprintf("%s:%s",
 		redisAddress, redisPort))
@@ -138,8 +149,13 @@ func init() {
 
 func main() {
 	go pkg.CachePositions(redisClient, redisSubChannel, positionCache)
-	fs := http.FileServer(http.Dir("/var/flightglobe/static"))
-	http.Handle("/", fs)
+	var fs http.Handler
+	if isDeployedProduction {
+		fs = http.FileServer(http.Dir("/var/flightglobe/static"))
+	} else {
+		fs = http.FileServer(http.Dir("static"))
+	}
+	http.Handle("/", gziphandler.GzipHandler(fs))
 	http.HandleFunc("/sub", maintainConnection)
 	//http.HandleFunc("/track", provideTrack)
 	log.Fatal(http.ListenAndServe(":8080", nil))
