@@ -28,11 +28,13 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
   // imageryProvider,
   // terrainProvider,
   requestRenderMode: true,
-  // shouldAnimate: true,
+  maximumRenderTimeChange : Infinity,
+  // targetFrameRate: 30
+    // shouldAnimate: true,
   // automaticallyTrackDataSourceClocks: false,
 });
 
-viewer.scene.debugShowFramesPerSecond = true;
+// viewer.scene.debugShowFramesPerSecond = true;
 viewer.dataSources.add(cesiumPlaneDataSource);
 viewer.dataSources.add(airportData);
 
