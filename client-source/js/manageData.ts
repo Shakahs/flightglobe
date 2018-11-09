@@ -82,9 +82,9 @@ export const updatePlane = (flightData: FlightMap, cesiumPlaneData:Cesium.Custom
     }
 
     //apply demographics data if we have it
-    if(!thisFlight.entity.label && thisFlight.demographics){
-        thisFlight.entity.label = createLabel(thisFlight)
-    }
+    // if(!thisFlight.entity.label && thisFlight.demographics){
+    //     thisFlight.entity.label = createLabel(thisFlight)
+    // }
 
     if(positionUpdate.body.timestamp > newest){
         newest = positionUpdate.body.timestamp
@@ -96,7 +96,7 @@ export const updatePlane = (flightData: FlightMap, cesiumPlaneData:Cesium.Custom
 export const updateDemographics = (flightData: FlightMap, demographicsUpdate: DemographicsUpdate) => {
     const thisFlight = retrieveFlight(flightData, demographicsUpdate.icao);
     thisFlight.demographics = demographicsUpdate.body;
-    if(thisFlight.entity && !thisFlight.entity.label){
-        thisFlight.entity.label = createLabel(thisFlight)
-    }
+    // if(thisFlight.entity && !thisFlight.entity.label){
+    //     thisFlight.entity.label = createLabel(thisFlight)
+    // }
 };

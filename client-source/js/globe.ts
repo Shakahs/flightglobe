@@ -6,12 +6,12 @@ import axios from 'axios';
 
 // import {ScreenSpaceEventHandler} from 'cesium';
 // import {ScreenSpaceEventType} from 'cesium';
-import loadAirports from './airports';
+// import loadAirports from './airports';
 
 const cesiumPlaneDataSource:Cesium.CustomDataSource = new Cesium.CustomDataSource('planes');
-const airportDataRaw = require('../resources/airports.json');
-const airportData = new Cesium.CustomDataSource('airports');
-loadAirports(airportData, airportDataRaw);
+// const airportDataRaw = require('../resources/airports.json');
+// const airportData = new Cesium.CustomDataSource('airports');
+// loadAirports(airportData, airportDataRaw);
 
 const viewer = new Cesium.Viewer('cesiumContainer', {
   animation: false,
@@ -36,7 +36,16 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
 
 // viewer.scene.debugShowFramesPerSecond = true;
 viewer.dataSources.add(cesiumPlaneDataSource);
-viewer.dataSources.add(airportData);
+// viewer.dataSources.add(airportData);
+// viewer.clock.shouldAnimate = false;
+// viewer.useDefaultRenderLoop = false;
+//
+// function myOwnRenderLoop() {
+//     viewer.resize();
+//     viewer.render();
+// }
+//
+// window.setInterval(myOwnRenderLoop, 500);
 
 
 const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
@@ -52,4 +61,4 @@ handler.setInputAction(async (click) => {
   }
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
-export { viewer, cesiumPlaneDataSource, airportData };
+export { viewer, cesiumPlaneDataSource };
