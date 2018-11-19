@@ -9,7 +9,7 @@ import * as Cesium from 'cesium';
 // import { Cartesian3, CustomDataSource} from 'cesium';
 // import {JulianDate} from 'cesium';
 
-import {entityMaker} from './flight';
+import {createEntity} from './flight';
 import {
     FlightPosition,
     FlightPositionMap,
@@ -17,17 +17,18 @@ import {
     FlightMap,
     FlightDemographics,
     DemographicsUpdate,
-    Icao, PositionUpdate
+    Icao, PositionUpdate, GeoMap
 } from "./types";
+import getOrCreateGeo from "./planeGeo";
 const isAfter = require('date-fns/is_after')
 
 const scratchC3 = new Cesium.Cartesian3()
 // const scratchJulian = JulianDate.now();
 
-const retrieveFlight = (flightData: FlightMap, icao: Icao):Flight=>{
+const getOrCreateFlight = (flightData: FlightMap, icao: Icao):Flight=>{
     let thisFlight = flightData.get(icao);
     if(!thisFlight){
-        thisFlight = {icao, entity: undefined, demographics: undefined};
+        thisFlight = {icao, entity: undefined, demographics: undefined, geohash: undefined};
         flightData.set(icao, thisFlight)
     }
     return thisFlight
@@ -45,15 +46,11 @@ const createLabel = (thisFlight: Flight):Cesium.LabelGraphics=>{
             distanceDisplayCondition: labelDisplayCondition, pixelOffset: labelOffset})
 };
 
-export const updatePlane = (flightData: FlightMap, cesiumPlaneData:Cesium.CustomDataSource, positionUpdate: PositionUpdate):number => {
+export const updateFlight = (flightData: FlightMap, geoData:GeoMap, viewer:Cesium.Viewer,
+                             positionUpdate: PositionUpdate):number => {
 
-  // const now = Cesium.JulianDate.now();
-  // const future = Cesium.JulianDate.addSeconds(now, 30, Cesium.JulianDate.now());
-    // const diff = DateTime
-    //   .utc()
-    //   .diff(DateTime.fromMillis(v.time * 1000, { zone: 'utc' }), 'seconds')
-    //   .toObject();
-    // console.log(`position age is ${ diff.seconds } seconds`);
+
+    const thisFlight = getOrCreateFlight(flightData, positionUpdate.icao);
 
     const newPosition = Cesium.Cartesian3.fromDegrees(
       positionUpdate.body.longitude,
@@ -62,39 +59,39 @@ export const updatePlane = (flightData: FlightMap, cesiumPlaneData:Cesium.Custom
       undefined,
       scratchC3
     );
-    // const newDate = JulianDate.fromIso8601(
-    //   DateTime.fromMillis(v.time * 1000, { zone: 'utc' }).toISO(),
-    //   scratchJulian
-    // );
-
-    // let thisFlight = flightData.get(position.icao);
-    // if(!thisFlight){
-    //     thisFlight = {entity: undefined, demographics: undefined};
-    //     flightData.set(position.icao, thisFlight)
-    // }
-
-    const thisFlight = retrieveFlight(flightData, positionUpdate.icao);
 
     if (thisFlight.entity) {
         thisFlight.entity.position = newPosition;
     } else {
-        thisFlight.entity = entityMaker(cesiumPlaneData, positionUpdate, newPosition)
+        thisFlight.entity = createEntity(positionUpdate, newPosition)
+    }
+
+    if (!thisFlight.geohash){
+        //new flight
+        thisFlight.geohash = positionUpdate.geohash;
+        const newGeo = getOrCreateGeo(thisFlight.geohash, viewer, geoData);
+        newGeo.entities.add(thisFlight.entity)
+    } else if (thisFlight.geohash !== positionUpdate.geohash){
+        //existing flight moved to a different geohash
+        const newGeo = getOrCreateGeo(positionUpdate.geohash, viewer, geoData);
+        const oldGeo = getOrCreateGeo(thisFlight.geohash, viewer, geoData);
+        oldGeo.entities.remove(thisFlight.entity);
+        newGeo.entities.add(thisFlight.entity);
+        thisFlight.geohash = positionUpdate.geohash
     }
 
     //apply demographics data if we have it
     // if(!thisFlight.entity.label && thisFlight.demographics){
     //     thisFlight.entity.label = createLabel(thisFlight)
     // }
-
     if(positionUpdate.body.timestamp > newest){
         newest = positionUpdate.body.timestamp
     }
-
     return newest
 };
 
 export const updateDemographics = (flightData: FlightMap, demographicsUpdate: DemographicsUpdate) => {
-    const thisFlight = retrieveFlight(flightData, demographicsUpdate.icao);
+    const thisFlight = getOrCreateFlight(flightData, demographicsUpdate.icao);
     thisFlight.demographics = demographicsUpdate.body;
     // if(thisFlight.entity && !thisFlight.entity.label){
     //     thisFlight.entity.label = createLabel(thisFlight)

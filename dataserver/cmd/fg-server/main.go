@@ -7,6 +7,7 @@ import (
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"github.com/go-redis/redis"
 	"github.com/gorilla/websocket"
+	"github.com/mmcloughlin/geohash"
 	"github.com/pkg/errors"
 	"log"
 	"net/http"
@@ -30,7 +31,13 @@ func sendIncrementalPositions(c *websocket.Conn, t time.Time) error {
 
 	for _, v := range data {
 		if v.Time.After(t) {
-			var positionUpdate = pkg.PositionUpdate{"positionUpdate", v.Icao, &v.Position}
+			geoGash := geohash.EncodeWithPrecision(v.Position.Latitude, v.Position.Longitude, 1)
+			var positionUpdate = pkg.PositionUpdate{
+				Type:    "positionUpdate",
+				Icao:    v.Icao,
+				Geohash: geoGash,
+				Body:    &v.Position,
+			}
 			marshaled, err := json.Marshal(positionUpdate)
 			if err != nil {
 				return errors.New("sendIncrementalPositions JSON marshal position failed")

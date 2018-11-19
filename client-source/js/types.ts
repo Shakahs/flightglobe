@@ -22,6 +22,7 @@ export interface Flight {
     icao: Icao
     entity: Cesium.Entity | undefined
     demographics: FlightDemographics | undefined
+    geohash: string | undefined
 }
 
 export declare function updatePlanes(planeData: Cesium.CustomDataSource): any;
@@ -49,8 +50,11 @@ export interface Message {
 
 export interface PositionUpdate extends Message {
     body: FlightPosition
+    geohash: string
 }
 
 export interface DemographicsUpdate extends Message {
     body: FlightDemographics
 }
+
+export type GeoMap = Map<string,Cesium.CustomDataSource>

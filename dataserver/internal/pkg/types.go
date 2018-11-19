@@ -46,9 +46,10 @@ type LockableRecordMap struct {
 }
 
 type PositionUpdate struct {
-	Type string    `json:"type"`
-	Icao string    `json:"icao"`
-	Body *Position `json:"body"`
+	Type    string    `json:"type"`
+	Icao    string    `json:"icao"`
+	Geohash string    `json:"geohash"`
+	Body    *Position `json:"body"`
 }
 
 type DemographicUpdate struct {

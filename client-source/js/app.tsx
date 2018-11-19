@@ -1,14 +1,15 @@
 import 'cesiumSource/Widgets/widgets.css';
 import {socket$, buffered$} from './dataStreams';
-import {updatePlane, updateDemographics} from './manageData';
-import { viewer, cesiumPlaneDataSource } from './globe';
+import {updateFlight, updateDemographics} from './manageData';
+import { viewer } from './globe';
 import {size,forEach} from 'lodash-es'
 import { interval } from 'rxjs';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {FlightPosition, FlightMap, PositionUpdate, DemographicsUpdate} from "./types";
+import {FlightPosition, FlightMap, PositionUpdate, DemographicsUpdate, GeoMap} from "./types";
 
 const flightData:FlightMap = new Map();
+const geoMap:GeoMap = new Map();
 
 let newestPositionTimestamp = 0;
 const pollInterval = interval(5000);
@@ -20,23 +21,27 @@ pollInterval.subscribe(()=>{
 
 buffered$.subscribe((messages) => {
     console.log(size(messages), "messages received");
-    cesiumPlaneDataSource.entities.suspendEvents();
+    geoMap.forEach((ds)=>{ds.entities.suspendEvents()});
+
     forEach(messages, (message)=>{
       switch (message.type) {
           case "positionUpdate":
-            newestPositionTimestamp = updatePlane(flightData, cesiumPlaneDataSource, message);
+            const pUpdate = message as PositionUpdate;
+            newestPositionTimestamp = updateFlight(flightData, geoMap, viewer, pUpdate);
             break;
           case "demographicUpdate":
             updateDemographics(flightData, message);
             break;
       }
     });
-    cesiumPlaneDataSource.entities.resumeEvents();
+
+    geoMap.forEach((ds)=>{ds.entities.resumeEvents()});
     viewer.scene.requestRender();
 });
 
 setInterval(()=>{
     console.log(`${flightData.size} flights in memory`)
+    console.log(`${geoMap.size} geohash datasources`)
     // console.log(flightData)
 }, 15000);
 

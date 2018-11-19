@@ -10,7 +10,7 @@ const nfScalar = new Cesium.NearFarScalar(5000, 3.25, 1000000, 1.5);
 const labelDisplayCondition = new Cesium.DistanceDisplayCondition(0.0, 2000000);
 const labelOffset = new Cesium.Cartesian2(10,20);
 
-export const entityMaker = (planeData: Cesium.CustomDataSource, update: PositionUpdate, position: Cesium.Cartesian3):Cesium.Entity => {
+export const createEntity = (update: PositionUpdate, position: Cesium.Cartesian3):Cesium.Entity => {
 
     const plane = update.body;
     const newEntity  = new Cesium.Entity({
@@ -25,7 +25,6 @@ export const entityMaker = (planeData: Cesium.CustomDataSource, update: Position
             //@ts-ignore
             // distanceDisplayCondition: labelDisplayCondition, pixelOffset: labelOffset})
     });
-    planeData.entities.add(newEntity);
 
     return newEntity
 };
