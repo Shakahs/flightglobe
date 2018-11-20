@@ -20,7 +20,7 @@ export interface FlightDemographics {
 
 export interface Flight {
     icao: Icao
-    entity: Cesium.Entity | undefined
+    point: Cesium.PointPrimitive | undefined
     demographics: FlightDemographics | undefined
     geohash: string | undefined
 }
@@ -57,4 +57,4 @@ export interface DemographicsUpdate extends Message {
     body: FlightDemographics
 }
 
-export type GeoMap = Map<string,Cesium.CustomDataSource>
+export type GeoMap = Map<string,Cesium.PointPrimitiveCollection>

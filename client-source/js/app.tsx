@@ -21,13 +21,13 @@ pollInterval.subscribe(()=>{
 
 buffered$.subscribe((messages) => {
     console.log(size(messages), "messages received");
-    geoMap.forEach((ds)=>{ds.entities.suspendEvents()});
 
+    const affectedGeos = new Set();
     forEach(messages, (message)=>{
       switch (message.type) {
           case "positionUpdate":
             const pUpdate = message as PositionUpdate;
-            newestPositionTimestamp = updateFlight(flightData, geoMap, viewer, pUpdate);
+            newestPositionTimestamp = updateFlight(flightData, geoMap, viewer, pUpdate, affectedGeos);
             break;
           case "demographicUpdate":
             updateDemographics(flightData, message);
@@ -35,8 +35,10 @@ buffered$.subscribe((messages) => {
       }
     });
 
-    geoMap.forEach((ds)=>{ds.entities.resumeEvents()});
     viewer.scene.requestRender();
+
+    console.log(`${affectedGeos.size} geohashed datasources affected`);
+    affectedGeos.clear();
 });
 
 setInterval(()=>{

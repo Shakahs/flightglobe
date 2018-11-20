@@ -28,7 +28,7 @@ const scratchC3 = new Cesium.Cartesian3()
 const getOrCreateFlight = (flightData: FlightMap, icao: Icao):Flight=>{
     let thisFlight = flightData.get(icao);
     if(!thisFlight){
-        thisFlight = {icao, entity: undefined, demographics: undefined, geohash: undefined};
+        thisFlight = {icao, point: undefined, demographics: undefined, geohash: undefined};
         flightData.set(icao, thisFlight)
     }
     return thisFlight
@@ -47,7 +47,7 @@ const createLabel = (thisFlight: Flight):Cesium.LabelGraphics=>{
 };
 
 export const updateFlight = (flightData: FlightMap, geoData:GeoMap, viewer:Cesium.Viewer,
-                             positionUpdate: PositionUpdate):number => {
+                             positionUpdate: PositionUpdate, affectedGeos):number => {
 
 
     const thisFlight = getOrCreateFlight(flightData, positionUpdate.icao);
@@ -60,23 +60,26 @@ export const updateFlight = (flightData: FlightMap, geoData:GeoMap, viewer:Cesiu
       scratchC3
     );
 
-    if (thisFlight.entity) {
-        thisFlight.entity.position = newPosition;
-    } else {
-        thisFlight.entity = createEntity(positionUpdate, newPosition)
-    }
+    // if (thisFlight.point) {
+    //     thisFlight.point.position = newPosition;
+    // } else {
+    //     thisFlight.point = createEntity(positionUpdate, newPosition)
+    // }
 
     if (!thisFlight.geohash){
         //new flight
         thisFlight.geohash = positionUpdate.geohash;
         const newGeo = getOrCreateGeo(thisFlight.geohash, viewer, geoData);
-        newGeo.entities.add(thisFlight.entity)
+        thisFlight.point = newGeo.add({position: newPosition, pixelSize: 2});
+        affectedGeos.add(thisFlight.geohash)
     } else if (thisFlight.geohash !== positionUpdate.geohash){
         //existing flight moved to a different geohash
         const newGeo = getOrCreateGeo(positionUpdate.geohash, viewer, geoData);
         const oldGeo = getOrCreateGeo(thisFlight.geohash, viewer, geoData);
-        oldGeo.entities.remove(thisFlight.entity);
-        newGeo.entities.add(thisFlight.entity);
+        if(thisFlight.point){oldGeo.remove(thisFlight.point);}
+        thisFlight.point = newGeo.add({position: newPosition, pixelSize: 2});
+        affectedGeos.add(thisFlight.geohash);
+        affectedGeos.add(positionUpdate.geohash);
         thisFlight.geohash = positionUpdate.geohash
     }
 
