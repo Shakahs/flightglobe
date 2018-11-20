@@ -46,6 +46,10 @@ const createLabel = (thisFlight: Flight):Cesium.LabelGraphics=>{
             distanceDisplayCondition: labelDisplayCondition, pixelOffset: labelOffset})
 };
 
+const createPoint = function(pos: Cesium.Cartesian3) {
+    return {position: pos, pixelSize: 2}
+};
+
 export const updateFlight = (flightData: FlightMap, geoData:GeoMap, viewer:Cesium.Viewer,
                              positionUpdate: PositionUpdate, affectedGeos):number => {
 
@@ -64,20 +68,20 @@ export const updateFlight = (flightData: FlightMap, geoData:GeoMap, viewer:Cesiu
     //     thisFlight.point.position = newPosition;
     // } else {
     //     thisFlight.point = createEntity(positionUpdate, newPosition)
-    // }
+    // }1
 
     if (!thisFlight.geohash){
         //new flight
         thisFlight.geohash = positionUpdate.geohash;
         const newGeo = getOrCreateGeo(thisFlight.geohash, viewer, geoData);
-        thisFlight.point = newGeo.add({position: newPosition, pixelSize: 2});
+        thisFlight.point = newGeo.add(createPoint(newPosition));
         affectedGeos.add(thisFlight.geohash)
     } else if (thisFlight.geohash !== positionUpdate.geohash){
         //existing flight moved to a different geohash
         const newGeo = getOrCreateGeo(positionUpdate.geohash, viewer, geoData);
         const oldGeo = getOrCreateGeo(thisFlight.geohash, viewer, geoData);
         if(thisFlight.point){oldGeo.remove(thisFlight.point);}
-        thisFlight.point = newGeo.add({position: newPosition, pixelSize: 2});
+        thisFlight.point = newGeo.add(createPoint(newPosition));
         affectedGeos.add(thisFlight.geohash);
         affectedGeos.add(positionUpdate.geohash);
         thisFlight.geohash = positionUpdate.geohash
