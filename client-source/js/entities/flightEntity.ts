@@ -1,9 +1,9 @@
 import * as Cesium from 'cesium';
 
 // import {NearFarScalar} from 'cesium';
-import {FlightPosition, FlightPositionMap, Icao, PositionUpdate,} from './types'
+import {FlightPosition, FlightPositionMap, Icao, PositionUpdate,} from '../types'
 // import {Cartesian3, PointGraphics, Entity} from "cesium";
-import {Flight} from './types'
+import {Flight} from '../types'
 
 
 const nfScalar = new Cesium.NearFarScalar(5000, 3.25, 1000000, 1.5);

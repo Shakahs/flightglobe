@@ -1,0 +1,21 @@
+import * as Cesium from 'cesium';
+import axios from 'axios';
+import {viewer} from './initializeGlobe'
+
+// import {Viewer} from 'cesium';
+// import {CustomDataSource} from 'cesium';
+
+const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+// @ts-ignore: the installed Cesium type definition is incorrect (@types/cesium 1.47.3),
+// setInputAction will pass an argument (click in this case)
+handler.setInputAction(async (click) => {
+  const pickedObject = viewer.scene.pick(click.position);
+  if (pickedObject) {
+    const trackURL = `/track?icao=${ pickedObject.id._id }`;
+    console.log(trackURL);
+    const {data} = await axios.get(trackURL);
+    console.log(data);
+  }
+}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+export { viewer };

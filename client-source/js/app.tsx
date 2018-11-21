@@ -1,7 +1,7 @@
 import 'cesiumSource/Widgets/widgets.css';
-import {socket$, buffered$} from './dataStreams';
-import {updateFlight, updateDemographics} from './manageData';
-import { viewer } from './globe';
+import {socket$, buffered$} from './api/webSocket';
+import {updateFlight, updateDemographics} from './entities/update';
+import { viewer } from './setup';
 import {size,forEach} from 'lodash-es'
 import { interval } from 'rxjs';
 import React from 'react';
@@ -10,8 +10,8 @@ import {FlightPosition, FlightMap, PositionUpdate, DemographicsUpdate, GeoMap} f
 
 const flightData:FlightMap = new Map();
 const geoMap:GeoMap = new Map();
-
 let newestPositionTimestamp = 0;
+
 const pollInterval = interval(5000);
 pollInterval.subscribe(()=>{
   // console.log("asking for positions after", newestPositionTime)
@@ -27,7 +27,7 @@ buffered$.subscribe((messages) => {
       switch (message.type) {
           case "positionUpdate":
             const pUpdate = message as PositionUpdate;
-            newestPositionTimestamp = updateFlight(flightData, geoMap, viewer, pUpdate, affectedGeos);
+            newestPositionTimestamp = updateFlight(flightData, geoMap, viewer, pUpdate, affectedGeos, newestPositionTimestamp);
             break;
           case "demographicUpdate":
             updateDemographics(flightData, message);

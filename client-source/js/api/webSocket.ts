@@ -1,7 +1,7 @@
 import { webSocket} from "rxjs/webSocket";
 import { bufferTime } from 'rxjs/operators';
-import { globe } from './api';
-import {FlightPosition, Message} from "./types";
+import { globe } from './index';
+import {FlightPosition, Message} from "../types";
 
 const loc = window.location;
 
