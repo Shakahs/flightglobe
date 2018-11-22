@@ -9,7 +9,7 @@ import ReactDOM from 'react-dom';
 import {FlightPosition, FlightMap, PositionUpdate, DemographicsUpdate, GeoMap} from "./types";
 import {FlightStore} from './state'
 
-const flightStore = new FlightStore();
+const flightStore = new FlightStore(viewer);
 
 let newestPositionTimestamp = 0;
 

@@ -2,7 +2,6 @@ import {computed, observable, observe, get, autorun, IObjectDidChange} from 'mob
 import {DemographicsUpdate, Flight, FlightDemographics, FlightPosition, GeoMap, Icao, PositionUpdate} from "../types";
 import * as Cesium from "cesium";
 import {convertPositionToCartesian, createPoint} from "../entities/utility";
-import {viewer} from "../setup";
 
 // export const flightStore = observable.map<Icao, Flight>([], {name: "flights"});
 
@@ -24,7 +23,7 @@ import {viewer} from "../setup";
 //
 //
 //
-//             change.newValue.point = geoArea.add(createPoint(newPosition))
+//             change.newValue.point = geoArea.add(createPrimitives(newPosition))
 //         }
 //     }
 // });
@@ -32,15 +31,19 @@ import {viewer} from "../setup";
 export class FlightStore {
     @observable flightPositions = new Map<Icao, FlightPosition>();
     @observable flightDemographics = new Map<Icao, FlightDemographics>();
-    @observable geoAreas = new Map<Icao, Cesium.PointPrimitiveCollection>();
+    @observable geoAreas = new Map<Icao, GeoResource>();
     flights = new Map<Icao, any>();
     newestPositionTimestamp = 0;
+    viewer:Cesium.Viewer;
 
-    getOrCreateGeo(id: string):Cesium.PointPrimitiveCollection{
+    constructor(viewer: Cesium.Viewer){
+        this.viewer = viewer;
+    }
+
+    getOrCreateGeo(id: string):GeoResource{
         let geo = this.geoAreas.get(id);
         if(!geo){
-            geo = new Cesium.PointPrimitiveCollection();
-            viewer.scene.primitives.add(geo);
+            geo = new GeoResource(id, this.viewer);
             this.geoAreas.set(id, geo)
         }
         return geo
@@ -51,9 +54,9 @@ export class FlightStore {
         const geo = this.getOrCreateGeo(pos.geohash[0]);
         const thisFlight = this.flights.get(pos.icao);
         if(thisFlight && (thisFlight.geo !== geo)){
-            thisFlight.destroyPoint();
+            thisFlight.destroyPrimitives();
             thisFlight.geo = geo;
-            thisFlight.createPoint();
+            thisFlight.createPrimitives();
         } else {
             this.flights.set(pos.icao, new FlightObj(this, pos.icao, geo));
         }
@@ -81,30 +84,45 @@ export class FlightStore {
 export class FlightObj {
     flightStore;
     icao;
-    point;
     geo;
+    point;
 
     constructor(flightStore, icao: Icao, geo){
         this.flightStore = flightStore;
         this.icao = icao;
         this.geo = geo;
-        this.createPoint();
+        this.createPrimitives();
         const disposer = autorun(()=>{
             this.point.position = convertPositionToCartesian(this.flightStore.flightPositions.get(this.icao))
         })
     }
 
-    createPoint(){
+    createPrimitives(){
         const pos = this.flightStore.flightPositions.get(this.icao);
-        this.point = this.geo.add({position: convertPositionToCartesian(pos), pixelSize: 2});
+        this.point = this.geo.points.add({position: convertPositionToCartesian(pos), pixelSize: 2});
     }
 
-    destroyPoint(){
-        this.geo.remove(this.point)
+    destroyPrimitives(){
+        this.geo.points.remove(this.point)
     }
 
+    // createLabelText(dem: FlightDemographics){
+    //
+    // }
 }
 
-// export class GeoResource {
-//     points:Cesium.PointPrimitiveCollection();
-// }
+export class GeoResource {
+    id;
+    points;
+    labels;
+    viewer;
+
+    constructor(id: string, viewer: Cesium.Viewer){
+        this.id = id;
+        this.viewer = viewer;
+        this.points = new Cesium.PointPrimitiveCollection();
+        this.labels = new Cesium.LabelCollection();
+        viewer.scene.primitives.add(this.points);
+        viewer.scene.primitives.add(this.labels);
+    }
+}
