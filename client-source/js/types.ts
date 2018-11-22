@@ -34,6 +34,7 @@ export interface FlightPosition  {
     latitude: number
     longitude: number
     heading: number
+    geohash: string
 }
 
 export type FlightPositions = FlightPosition[]
@@ -50,7 +51,6 @@ export interface Message {
 
 export interface PositionUpdate extends Message {
     body: FlightPosition
-    geohash: string
 }
 
 export interface DemographicsUpdate extends Message {

@@ -1,6 +1,5 @@
 import 'cesiumSource/Widgets/widgets.css';
 import {socket$, buffered$} from './api/webSocket';
-import {updateFlight, updateDemographics} from './entities/update';
 import { viewer } from './setup';
 import {size,forEach} from 'lodash-es'
 import { interval } from 'rxjs';

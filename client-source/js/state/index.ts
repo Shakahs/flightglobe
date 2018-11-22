@@ -51,7 +51,7 @@ export class FlightStore {
 
     addOrUpdateFlight(pos: PositionUpdate){
         this.flightPositions.set(pos.icao, pos.body);
-        const geoColl = this.getOrCreateGeoCollection(pos.geohash[0]);
+        const geoColl = this.getOrCreateGeoCollection(pos.body.geohash[0]);
         const thisFlight = this.flights.get(pos.icao);
         if(thisFlight && (thisFlight.geoCollection !== geoColl)){
             thisFlight.destroyPrimitives();

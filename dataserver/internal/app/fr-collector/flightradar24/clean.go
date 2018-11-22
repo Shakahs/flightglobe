@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"github.com/bitly/go-simplejson"
+	"github.com/mmcloughlin/geohash"
 	"log"
 	"time"
 )
@@ -62,6 +63,7 @@ func convert(FrData []Fr_Record) pkg.FlightRecords {
 				Timestamp: v.Time,
 				Heading:   v.Heading,
 				Altitude:  int32(v.Altitude),
+				Geohash:   geohash.EncodeWithPrecision(v.Lat, v.Lng, 3),
 			},
 			Demographic: pkg.Demographic{
 				Model:       v.Model,
