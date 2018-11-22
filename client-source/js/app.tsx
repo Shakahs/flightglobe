@@ -7,16 +7,17 @@ import { interval } from 'rxjs';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {FlightPosition, FlightMap, PositionUpdate, DemographicsUpdate, GeoMap} from "./types";
+import {FlightStore} from './state'
 
-const flightData:FlightMap = new Map();
-const geoMap:GeoMap = new Map();
+const flightStore = new FlightStore();
+
 let newestPositionTimestamp = 0;
 
 const pollInterval = interval(5000);
 pollInterval.subscribe(()=>{
   // console.log("asking for positions after", newestPositionTime)
   // @ts-ignore: we need to send a request here, not a FlightPosition
-  socket$.next({lastReceivedTimestamp: newestPositionTimestamp})
+  socket$.next({lastReceivedTimestamp: flightStore.newestPositionTimestamp})
 });
 
 buffered$.subscribe((messages) => {
@@ -27,11 +28,12 @@ buffered$.subscribe((messages) => {
       switch (message.type) {
           case "positionUpdate":
             const pUpdate = message as PositionUpdate;
-            newestPositionTimestamp = updateFlight(flightData, geoMap, viewer, pUpdate, affectedGeos, newestPositionTimestamp);
+            flightStore.addFlight(pUpdate);
+            // newestPositionTimestamp = updateFlight(flightStore, geoAreas, viewer, pUpdate, affectedGeos, newestPositionTimestamp);
             break;
-          case "demographicUpdate":
-            updateDemographics(flightData, message);
-            break;
+          // case "demographicUpdate":
+          //   updateDemographics(flightStore, message);
+          //   break;
       }
     });
 
@@ -42,8 +44,8 @@ buffered$.subscribe((messages) => {
 });
 
 setInterval(()=>{
-    console.log(`${flightData.size} flights in memory`)
-    console.log(`${geoMap.size} geohash datasources`)
+    console.log(`${flightStore.numberFlights} flights in memory`)
+    // console.log(`${geoAreas.get().size} geohash datasources`)
     // console.log(flightData)
 }, 15000);
 

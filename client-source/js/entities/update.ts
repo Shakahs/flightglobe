@@ -2,6 +2,7 @@ import * as Cesium from 'cesium';
 import {DemographicsUpdate, FlightMap, GeoMap, PositionUpdate} from "../types";
 import getOrCreateGeo from "./geoArea";
 import {createPoint, getOrCreateFlight} from "./utility";
+import {IComputedValue} from "mobx";
 
 // import Cartesian3  from 'cesium/Source/Core/Cartesian3'
 // const JulianDate = require('cesium/Source/Core/JulianDate')
@@ -10,7 +11,7 @@ import {createPoint, getOrCreateFlight} from "./utility";
 // import { Cartesian3, CustomDataSource} from 'cesium';
 // import {JulianDate} from 'cesium';
 
-const scratchC3 = new Cesium.Cartesian3()
+const scratchC3 = new Cesium.Cartesian3();
 // const scratchJulian = JulianDate.now();
 
 export const updateFlight = (flightData: FlightMap, geoData:GeoMap, viewer:Cesium.Viewer,
