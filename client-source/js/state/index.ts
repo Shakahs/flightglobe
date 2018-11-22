@@ -47,6 +47,7 @@ export class FlightStore {
           const focusGeo = Geohash.encode(cameraPosition.latitude*180/Math.PI,
               cameraPosition.longitude*180/Math.PI, 3);
             this.geoLevelOfDetail.clear();
+            this.geoLevelOfDetail.set(focusGeo, 1)
             forEach(Geohash.neighbours(focusGeo), (neighbor)=>{
                 this.geoLevelOfDetail.set(neighbor, 1)
             })
@@ -141,7 +142,11 @@ export class FlightObj {
     }
 
     @computed get labelText(){
-        return `${this.icao}\n${this.demographics.origin}\n${this.demographics.destination}`
+        if(this.demographics){
+            return `${this.icao}\n${this.demographics.origin}\n${this.demographics.destination}`
+        } else {
+            return ''
+        }
     }
 
     createPoint(){
