@@ -1,5 +1,5 @@
 import {computed, observable, observe, get, autorun, IObjectDidChange} from 'mobx';
-import {Flight, FlightPosition, GeoMap, Icao, PositionUpdate} from "../types";
+import {DemographicsUpdate, Flight, FlightDemographics, FlightPosition, GeoMap, Icao, PositionUpdate} from "../types";
 import * as Cesium from "cesium";
 import {convertPositionToCartesian, createPoint} from "../entities/utility";
 import {viewer} from "../setup";
@@ -31,9 +31,10 @@ import {viewer} from "../setup";
 
 export class FlightStore {
     @observable flightPositions = new Map<Icao, FlightPosition>();
-    newestPositionTimestamp = 0;
-    flights = new Map<Icao, any>();
+    @observable flightDemographics = new Map<Icao, FlightDemographics>();
     @observable geoAreas = new Map<Icao, Cesium.PointPrimitiveCollection>();
+    flights = new Map<Icao, any>();
+    newestPositionTimestamp = 0;
 
     getOrCreateGeo(id: string):Cesium.PointPrimitiveCollection{
         let geo = this.geoAreas.get(id);
@@ -47,17 +48,20 @@ export class FlightStore {
 
     addOrUpdateFlight(pos: PositionUpdate){
         this.flightPositions.set(pos.icao, pos.body);
-        const geo = this.getOrCreateGeo(pos.icao[0]);
+        const geo = this.getOrCreateGeo(pos.geohash[0]);
         const thisFlight = this.flights.get(pos.icao);
         if(thisFlight && (thisFlight.geo !== geo)){
             thisFlight.destroyPoint();
             thisFlight.geo = geo;
             thisFlight.createPoint();
-            console.log('point migrated to new geo')
         } else {
             this.flights.set(pos.icao, new FlightObj(this, pos.icao, geo));
         }
         this.updateLatestTimestamp(pos)
+    }
+
+    addDemographics(dem: DemographicsUpdate){
+        this.flightDemographics.set(dem.icao, dem.body)
     }
 
     updateLatestTimestamp(pos:PositionUpdate){
@@ -100,3 +104,7 @@ export class FlightObj {
     }
 
 }
+
+// export class GeoResource {
+//     points:Cesium.PointPrimitiveCollection();
+// }

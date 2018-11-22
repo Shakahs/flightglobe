@@ -29,11 +29,11 @@ buffered$.subscribe((messages) => {
           case "positionUpdate":
             const pUpdate = message as PositionUpdate;
             flightStore.addOrUpdateFlight(pUpdate);
-            // newestPositionTimestamp = updateFlight(flightStore, geoAreas, viewer, pUpdate, affectedGeos, newestPositionTimestamp);
             break;
-          // case "demographicUpdate":
-          //   updateDemographics(flightStore, message);
-          //   break;
+          case "demographicUpdate":
+            const dUpdate = message as DemographicsUpdate;
+            flightStore.addDemographics(dUpdate);
+            break;
       }
     });
 
