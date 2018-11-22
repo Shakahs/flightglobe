@@ -31,7 +31,7 @@ import {convertPositionToCartesian, createPoint} from "../entities/utility";
 export class FlightStore {
     @observable flightPositions = new Map<Icao, FlightPosition>();
     @observable flightDemographics = new Map<Icao, FlightDemographics>();
-    @observable geoAreas = new Map<Icao, GeoResource>();
+    geoAreas = new Map<Icao, GeoCollection>();
     flights = new Map<Icao, any>();
     newestPositionTimestamp = 0;
     viewer:Cesium.Viewer;
@@ -40,10 +40,10 @@ export class FlightStore {
         this.viewer = viewer;
     }
 
-    getOrCreateGeo(id: string):GeoResource{
+    getOrCreateGeoCollection(id: string):GeoCollection{
         let geo = this.geoAreas.get(id);
         if(!geo){
-            geo = new GeoResource(id, this.viewer);
+            geo = new GeoCollection(id, this.viewer);
             this.geoAreas.set(id, geo)
         }
         return geo
@@ -51,14 +51,14 @@ export class FlightStore {
 
     addOrUpdateFlight(pos: PositionUpdate){
         this.flightPositions.set(pos.icao, pos.body);
-        const geo = this.getOrCreateGeo(pos.geohash[0]);
+        const geoColl = this.getOrCreateGeoCollection(pos.geohash[0]);
         const thisFlight = this.flights.get(pos.icao);
-        if(thisFlight && (thisFlight.geo !== geo)){
+        if(thisFlight && (thisFlight.geoCollection !== geoColl)){
             thisFlight.destroyPrimitives();
-            thisFlight.geo = geo;
+            thisFlight.geoCollection = geoColl;
             thisFlight.createPrimitives();
         } else {
-            this.flights.set(pos.icao, new FlightObj(this, pos.icao, geo));
+            this.flights.set(pos.icao, new FlightObj(this, pos.icao, geoColl));
         }
         this.updateLatestTimestamp(pos)
     }
@@ -72,11 +72,11 @@ export class FlightStore {
             this.newestPositionTimestamp : pos.body.timestamp;
     }
 
-    @computed get numberFlights(){
+    numberFlights(){
         return this.flightPositions.size
     }
 
-    @computed get numberGeos(){
+    numberGeos(){
         return this.geoAreas.size
     }
 }
@@ -84,13 +84,13 @@ export class FlightStore {
 export class FlightObj {
     flightStore;
     icao;
-    geo;
+    geoCollection;
     point;
 
     constructor(flightStore, icao: Icao, geo){
         this.flightStore = flightStore;
         this.icao = icao;
-        this.geo = geo;
+        this.geoCollection = geo;
         this.createPrimitives();
         const disposer = autorun(()=>{
             this.point.position = convertPositionToCartesian(this.flightStore.flightPositions.get(this.icao))
@@ -99,11 +99,11 @@ export class FlightObj {
 
     createPrimitives(){
         const pos = this.flightStore.flightPositions.get(this.icao);
-        this.point = this.geo.points.add({position: convertPositionToCartesian(pos), pixelSize: 2});
+        this.point = this.geoCollection.points.add({position: convertPositionToCartesian(pos), pixelSize: 2});
     }
 
     destroyPrimitives(){
-        this.geo.points.remove(this.point)
+        this.geoCollection.points.remove(this.point)
     }
 
     // createLabelText(dem: FlightDemographics){
@@ -111,7 +111,7 @@ export class FlightObj {
     // }
 }
 
-export class GeoResource {
+export class GeoCollection {
     id;
     points;
     labels;

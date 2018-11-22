@@ -44,8 +44,8 @@ buffered$.subscribe((messages) => {
 });
 
 setInterval(()=>{
-    console.log(`${flightStore.numberFlights} flights in memory`)
-    console.log(`${flightStore.numberGeos} geohash datasources`)
+    console.log(`${flightStore.numberFlights()} flights in memory`)
+    console.log(`${flightStore.numberGeos()} geohash datasources`)
     // console.log(flightData)
 }, 15000);
 
