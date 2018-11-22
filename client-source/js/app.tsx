@@ -28,7 +28,7 @@ buffered$.subscribe((messages) => {
       switch (message.type) {
           case "positionUpdate":
             const pUpdate = message as PositionUpdate;
-            flightStore.addFlight(pUpdate);
+            flightStore.addOrUpdateFlight(pUpdate);
             // newestPositionTimestamp = updateFlight(flightStore, geoAreas, viewer, pUpdate, affectedGeos, newestPositionTimestamp);
             break;
           // case "demographicUpdate":
@@ -45,7 +45,7 @@ buffered$.subscribe((messages) => {
 
 setInterval(()=>{
     console.log(`${flightStore.numberFlights} flights in memory`)
-    // console.log(`${geoAreas.get().size} geohash datasources`)
+    console.log(`${flightStore.numberGeos} geohash datasources`)
     // console.log(flightData)
 }, 15000);
 

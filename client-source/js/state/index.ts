@@ -1,7 +1,7 @@
 import {computed, observable, observe, get, autorun, IObjectDidChange} from 'mobx';
 import {Flight, FlightPosition, GeoMap, Icao, PositionUpdate} from "../types";
 import * as Cesium from "cesium";
-import {createPoint} from "../entities/utility";
+import {convertPositionToCartesian, createPoint} from "../entities/utility";
 import {viewer} from "../setup";
 
 // export const flightStore = observable.map<Icao, Flight>([], {name: "flights"});
@@ -31,10 +31,9 @@ import {viewer} from "../setup";
 
 export class FlightStore {
     @observable flightPositions = new Map<Icao, FlightPosition>();
-    @observable flightCartesians = new Map<Icao, Cesium.Cartesian3>();
     newestPositionTimestamp = 0;
     flights = new Map<Icao, any>();
-    geoAreas = new Map<Icao, Cesium.PointPrimitiveCollection>();
+    @observable geoAreas = new Map<Icao, Cesium.PointPrimitiveCollection>();
 
     constructor(){
         // const disposer = observe(this.flightPositions, this.handlePositionChange)
@@ -56,10 +55,12 @@ export class FlightStore {
         return geo
     }
 
-    addFlight(pos: PositionUpdate){
+    addOrUpdateFlight(pos: PositionUpdate){
         this.flightPositions.set(pos.icao, pos.body);
         const geo = this.getOrCreateGeo(pos.icao[0]);
-        this.flights.set(pos.icao, new FlightObj(this, pos.icao, geo))
+        if(!this.flights.has(pos.icao)){
+            this.flights.set(pos.icao, new FlightObj(this, pos.icao, geo));
+        }
         this.updateLatestTimestamp(pos)
     }
 
@@ -70,6 +71,10 @@ export class FlightStore {
 
     @computed get numberFlights(){
         return this.flightPositions.size
+    }
+
+    @computed get numberGeos(){
+        return this.geoAreas.size
     }
 }
 
@@ -82,17 +87,10 @@ export class FlightObj {
         this.flightStore = flightStore;
         this.icao = icao;
         const pos = this.flightStore.flightPositions.get(this.icao);
-        this.point = geo.add({position: this.convertPositionToCartesian(pos), pixelSize: 2});
+        this.point = geo.add({position: convertPositionToCartesian(pos), pixelSize: 2});
         const disposer = autorun(()=>{
-            this.point.position = this.convertPositionToCartesian(this.flightStore.flightPositions.get(this.icao))
+            this.point.position = convertPositionToCartesian(this.flightStore.flightPositions.get(this.icao))
         })
     }
 
-    convertPositionToCartesian(pos){
-        return Cesium.Cartesian3.fromDegrees(
-            pos.longitude,
-            pos.latitude,
-            pos.altitude
-        );
-    }
 }

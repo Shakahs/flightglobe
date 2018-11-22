@@ -1,4 +1,4 @@
-import {Flight, FlightMap, Icao} from "../types";
+import {Flight, FlightMap, FlightPosition, Icao} from "../types";
 import * as Cesium from "cesium";
 
 const labelDisplayCondition = new Cesium.DistanceDisplayCondition(0.0, 2000000);
@@ -27,3 +27,11 @@ const createLabel = (thisFlight: Flight): Cesium.LabelGraphics => {
 export const createPoint = function (pos: Cesium.Cartesian3) {
     return {position: pos, pixelSize: 2}
 };
+
+export const convertPositionToCartesian = function(pos:FlightPosition):Cesium.Cartesian3 {
+    return Cesium.Cartesian3.fromDegrees(
+        pos.longitude,
+        pos.latitude,
+        pos.altitude
+    );
+}
