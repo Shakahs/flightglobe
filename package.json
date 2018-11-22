@@ -12,6 +12,7 @@
   "devDependencies": {
     "@types/cesium": "^1.47.3",
     "@types/geojson": "^7946.0.0",
+    "@types/latlon-geohash": "^1.1.0",
     "@types/lodash-es": "^4.17.1",
     "@types/node": "^10.11.7",
     "@types/redux-saga": "^0.10.5",
@@ -44,6 +45,7 @@
     "dotenv": "^4.0.0",
     "es6-promise": "^4.1.0",
     "immutable": "^3.8.2",
+    "latlon-geohash": "^1.1.0",
     "lodash-es": "^4.17.4",
     "mobx": "^4.6.0",
     "prop-types": "^15.5.6",

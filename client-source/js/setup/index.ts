@@ -18,4 +18,7 @@ handler.setInputAction(async (click) => {
   }
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
+//percentage of change to trigger camera changed event. lowered to make camera events more responsive
+viewer.camera.percentageChanged = 0.1;
+
 export { viewer };

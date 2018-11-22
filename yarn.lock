@@ -10,6 +10,11 @@
   version "7946.0.3"
   resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.3.tgz#e5791534ab0acfb2b3a39b713966cfcee85d469f"
 
+"@types/latlon-geohash@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@types/latlon-geohash/-/latlon-geohash-1.1.0.tgz#204dac465269f302bf21c877c84473c4d71305d7"
+  integrity sha512-GqP7AQvUkbcEj8LgVlJ8SA8iVqlvHQmMf46H3S+I/RbLQwFjJGC+TPOQhHPIQsj+Et44MihSLDouR66O52pnYA==
+
 "@types/lodash-es@^4.17.1":
   version "4.17.1"
   resolved "https://registry.yarnpkg.com/@types/lodash-es/-/lodash-es-4.17.1.tgz#56745e5411558362aeca31def918f88f725dd29d"
@@ -2597,6 +2602,11 @@ kind-of@^5.0.0:
 kind-of@^6.0.0, kind-of@^6.0.2:
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.2.tgz#01146b36a6218e64e58f3a8d66de5d7fc6f6d051"
+
+latlon-geohash@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/latlon-geohash/-/latlon-geohash-1.1.0.tgz#7abe15224c4800e3eaecac71c753a20bfb6cbf65"
+  integrity sha1-er4VIkxIAOPq7Kxxx1OiC/tsv2U=
 
 lcid@^2.0.0:
   version "2.0.0"
