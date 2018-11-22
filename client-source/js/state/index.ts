@@ -35,16 +35,6 @@ export class FlightStore {
     flights = new Map<Icao, any>();
     @observable geoAreas = new Map<Icao, Cesium.PointPrimitiveCollection>();
 
-    constructor(){
-        // const disposer = observe(this.flightPositions, this.handlePositionChange)
-    }
-
-    // handlePositionChange(change: IObjectDidChange){
-    //     if(change.type === "add"){
-    //         this.flightCartesians.set(change.name, this.convertPositionToCartesian(change.newValue))
-    //     }
-    // }
-
     getOrCreateGeo(id: string):Cesium.PointPrimitiveCollection{
         let geo = this.geoAreas.get(id);
         if(!geo){
@@ -58,7 +48,13 @@ export class FlightStore {
     addOrUpdateFlight(pos: PositionUpdate){
         this.flightPositions.set(pos.icao, pos.body);
         const geo = this.getOrCreateGeo(pos.icao[0]);
-        if(!this.flights.has(pos.icao)){
+        const thisFlight = this.flights.get(pos.icao);
+        if(thisFlight && (thisFlight.geo !== geo)){
+            thisFlight.destroyPoint();
+            thisFlight.geo = geo;
+            thisFlight.createPoint();
+            console.log('point migrated to new geo')
+        } else {
             this.flights.set(pos.icao, new FlightObj(this, pos.icao, geo));
         }
         this.updateLatestTimestamp(pos)
@@ -82,15 +78,25 @@ export class FlightObj {
     flightStore;
     icao;
     point;
+    geo;
 
     constructor(flightStore, icao: Icao, geo){
         this.flightStore = flightStore;
         this.icao = icao;
-        const pos = this.flightStore.flightPositions.get(this.icao);
-        this.point = geo.add({position: convertPositionToCartesian(pos), pixelSize: 2});
+        this.geo = geo;
+        this.createPoint();
         const disposer = autorun(()=>{
             this.point.position = convertPositionToCartesian(this.flightStore.flightPositions.get(this.icao))
         })
+    }
+
+    createPoint(){
+        const pos = this.flightStore.flightPositions.get(this.icao);
+        this.point = this.geo.add({position: convertPositionToCartesian(pos), pixelSize: 2});
+    }
+
+    destroyPoint(){
+        this.geo.remove(this.point)
     }
 
 }

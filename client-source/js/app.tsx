@@ -23,7 +23,7 @@ pollInterval.subscribe(()=>{
 buffered$.subscribe((messages) => {
     console.log(size(messages), "messages received");
 
-    const affectedGeos = new Set();
+    // const affectedGeos = new Set();
     forEach(messages, (message)=>{
       switch (message.type) {
           case "positionUpdate":
@@ -39,8 +39,8 @@ buffered$.subscribe((messages) => {
 
     viewer.scene.requestRender();
 
-    console.log(`${affectedGeos.size} geohashed datasources affected`);
-    affectedGeos.clear();
+    // console.log(`${affectedGeos.size} geohashed datasources affected`);
+    // affectedGeos.clear();
 });
 
 setInterval(()=>{
