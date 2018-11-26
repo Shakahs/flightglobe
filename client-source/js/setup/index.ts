@@ -11,10 +11,11 @@ const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
 handler.setInputAction(async (click) => {
   const pickedObject = viewer.scene.pick(click.position);
   if (pickedObject) {
-    const trackURL = `/track?icao=${ pickedObject.id._id }`;
-    console.log(trackURL);
-    const {data} = await axios.get(trackURL);
-    console.log(data);
+    console.log(pickedObject)
+    // const trackURL = `/track?icao=${ pickedObject.id._id }`;
+    // console.log(trackURL);
+    // const {data} = await axios.get(trackURL);
+    // console.log(data);
   }
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
