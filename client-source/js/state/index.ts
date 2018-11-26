@@ -101,8 +101,9 @@ export class FlightObj {
     flightStore;
     icao;
     geoCollection;
-    point;
-    label;
+    point = null;
+    label = null;
+    primitives;
     // levelOfDetail;
 
 
@@ -110,17 +111,25 @@ export class FlightObj {
         this.flightStore = flightStore;
         this.icao = icao;
         this.geoCollection = geo;
-        this.createPoint();
+        this.primitives = [this.point, this.label];
         const disposer = autorun(()=>{
-            this.point.position = this.cartesionPosition
+            this.primitives.forEach((p)=>{
+                if(p){p.position = this.cartesionPosition}
+            })
         });
         const disposer2 = autorun(()=>{
-            if(this.levelOfDetail===0){
+            if(this.shouldPointDisplay){
+                this.createPoint()
+            } else {
+                this.destroyPoint()
+            }
+
+            if(this.shouldLabelDisplay){
+                this.createLabel()
+            } else {
                 this.destroyLabel()
             }
-           if(this.levelOfDetail>0){
-               this.createLabel()
-           }
+            
         })
     }
 
@@ -140,6 +149,27 @@ export class FlightObj {
     @computed get demographics(){
         return this.flightStore.flightDemographics.get(this.icao)
     }
+    
+    @computed get shouldPointDisplay(){
+        return true
+    }
+
+    createPoint(){
+        if(!this.point){
+            this.point = this.geoCollection.points.add({position: this.cartesionPosition, pixelSize: 2});
+        }
+    }
+
+    destroyPoint(){
+        if(this.point){
+            this.geoCollection.points.remove(this.point);
+            this.point = null;
+        }
+    }
+
+    @computed get shouldLabelDisplay(){
+        return this.levelOfDetail >= 1;
+    }
 
     @computed get labelText(){
         if(this.demographics){
@@ -149,19 +179,15 @@ export class FlightObj {
         }
     }
 
-    createPoint(){
-        this.point = this.geoCollection.points.add({position: this.cartesionPosition, pixelSize: 2});
-    }
-
-    destroyPoint(){
-        this.geoCollection.points.remove(this.point)
-    }
-
     createLabel(){
-        this.label = this.geoCollection.labels.add({text: this.labelText,
-            font: '12px sans-serif',
-            pixelOffset: labelOffset});
-        this.label.position = this.cartesionPosition;
+        if(!this.label){
+            this.label = this.geoCollection.labels.add({
+                text: this.labelText,
+                font: '12px sans-serif',
+                pixelOffset: labelOffset,
+                position: this.cartesionPosition
+            });
+        }
     }
 
     destroyLabel(){

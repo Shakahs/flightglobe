@@ -1,5 +1,6 @@
 import {Flight, FlightMap, FlightPosition, Icao} from "../types";
 import * as Cesium from "cesium";
+import {Cartesian3} from "cesium";
 
 const labelDisplayCondition = new Cesium.DistanceDisplayCondition(0.0, 2000000);
 const labelOffset = new Cesium.Cartesian2(10,20);
@@ -28,10 +29,13 @@ export const createPoint = function (pos: Cesium.Cartesian3) {
     return {position: pos, pixelSize: 2}
 };
 
+const scratchC3 = new Cartesian3();
 export const convertPositionToCartesian = function(pos:FlightPosition):Cesium.Cartesian3 {
     return Cesium.Cartesian3.fromDegrees(
         pos.longitude,
         pos.latitude,
-        pos.altitude
+        pos.altitude,
+        undefined,
+        scratchC3
     );
-}
+};
