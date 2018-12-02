@@ -10,7 +10,8 @@
     "moduleResolution": "node",
     "strict":true,
     "noImplicitAny": false,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "noEmit": true
   },
   "include": [ "client-source/**/*" ],
   "exclude": ["./node_modules/"]

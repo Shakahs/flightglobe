@@ -1,3 +1,4 @@
+import "@babel/polyfill";
 import 'cesiumSource/Widgets/widgets.css';
 import {socket$, buffered$} from './api/webSocket';
 import { viewer } from './setup';
