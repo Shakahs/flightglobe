@@ -1,5 +1,5 @@
 import * as Cesium from 'cesium';
-import {DemographicsUpdate, FlightMap, GeoMap, PositionUpdate} from "../types";
+import {DemographicsUpdate, FlightMap, GeoMap, PositionUpdate} from '../../js/types';
 import getOrCreateGeo from "./geoArea";
 import {createPoint, getOrCreateFlight} from "./utility";
 import {IComputedValue} from "mobx";

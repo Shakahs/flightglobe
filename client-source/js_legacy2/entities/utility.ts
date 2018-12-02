@@ -1,4 +1,4 @@
-import {Flight, FlightMap, FlightPosition, Icao} from "../types";
+import {Flight, FlightMap, FlightPosition, Icao} from '../../js/types';
 import * as Cesium from "cesium";
 import {Cartesian3} from "cesium";
 
@@ -29,13 +29,3 @@ export const createPoint = function (pos: Cesium.Cartesian3) {
     return {position: pos, pixelSize: 2}
 };
 
-const scratchC3 = new Cartesian3();
-export const convertPositionToCartesian = function(pos:FlightPosition):Cesium.Cartesian3 {
-    return Cesium.Cartesian3.fromDegrees(
-        pos.longitude,
-        pos.latitude,
-        pos.altitude,
-        undefined,
-        scratchC3
-    );
-};

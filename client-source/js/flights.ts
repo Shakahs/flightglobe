@@ -1,7 +1,7 @@
 import {computed, observable, observe, get, autorun, IObjectDidChange, IReactionDisposer} from 'mobx';
-import {DemographicsUpdate, Flight, FlightDemographics, FlightPosition, GeoMap, Icao, PositionUpdate} from "../types";
+import {DemographicsUpdate, Flight, FlightDemographics, FlightPosition, GeoMap, Icao, PositionUpdate} from "./types";
 import * as Cesium from "cesium";
-import {convertPositionToCartesian, createPoint} from "../entities/utility";
+import {convertPositionToCartesian} from "./utility";
 const Geohash = require('latlon-geohash');
 import {forEach} from "lodash-es";
 import {Cartesian3, Label, LabelGraphics, PointPrimitive} from "cesium";
