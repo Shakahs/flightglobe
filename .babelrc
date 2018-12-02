@@ -1,20 +1,28 @@
 {
-  "presets": [
-    [
-      "@babel/preset-env",
-      {
-        "useBuiltIns": "entry"
-      }
-    ],
-    "@babel/preset-typescript"
-  ],
-  "plugins": [
-    ["@babel/plugin-proposal-decorators", {
-       "legacy": true
-    }],
-    ["@babel/plugin-proposal-class-properties", {
-      "loose": true
-    }],
-    "@babel/plugin-transform-regenerator"
-  ]
+  "env": {
+    "test": {
+      "presets":[
+        ["@babel/preset-env", { "modules": false }],
+        "@babel/preset-typescript"
+      ],
+      "plugins": [
+        "transform-es2015-modules-commonjs"
+      ]
+    },
+    "development": {
+      "presets":[
+        ["@babel/preset-env", { "modules": false }],
+        "@babel/preset-typescript"
+      ],
+      "plugins": [
+        "transform-es2015-modules-commonjs",
+        ["@babel/plugin-proposal-decorators", {
+           "legacy": true
+        }],
+        ["@babel/plugin-proposal-class-properties", {
+          "loose": true
+        }]
+      ]
+    }
+  }
 }

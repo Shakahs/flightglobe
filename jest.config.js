@@ -1,10 +1,19 @@
 module.exports = {
-  preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['client-source'],
-  collectCoverage: true,
+  moduleFileExtensions: ['js', 'jsx', 'json', 'ts', 'tsx'],
+  testMatch: [
+    '**/?(*.)+(spec|test).ts?(x)',
+  ],
+  collectCoverage: false,
   'collectCoverageFrom': [
     '**/*.{ts,tsx}',
     '!**/js_legacy*/**',
   ],
+  'globals': {
+    'NODE_ENV': 'test',
+  },
+  'transform': {
+    '^.+\\.ts$': 'babel-jest',
+  },
 };
