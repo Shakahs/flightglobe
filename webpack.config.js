@@ -35,7 +35,7 @@ module.exports = {
     ],
   },
   output: {
-    filename: 'bundle.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'dataserver/cmd/fg-server/static'),
     // Needed by Cesium for multiline strings
     sourcePrefix: '',

@@ -4,9 +4,6 @@
       "presets":[
         ["@babel/preset-env", { "modules": false }],
         "@babel/preset-typescript"
-      ],
-      "plugins": [
-        "transform-es2015-modules-commonjs"
       ]
     },
     "development": {
@@ -15,7 +12,6 @@
         "@babel/preset-typescript"
       ],
       "plugins": [
-        "transform-es2015-modules-commonjs",
         ["@babel/plugin-proposal-decorators", {
            "legacy": true
         }],
