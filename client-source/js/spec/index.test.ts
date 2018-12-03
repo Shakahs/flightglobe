@@ -3,6 +3,7 @@ import * as Cesium from "cesium";
 import {FlightPosition, PositionUpdate} from "../types";
 import {toJS} from "mobx";
 import {convertPositionToCartesian} from "../utility";
+import {Cartesian3} from "cesium";
 
 describe("FlightGlobe tests", function() {
     let viewer:Cesium.Viewer;
@@ -140,7 +141,7 @@ describe("FlightGlobe tests", function() {
                 flightA2.body.latitude,
                 flightA2.body.altitude,
             ));
-        })
+        });
 
         it("computes the correct Level of Detail", function () {
             expect<number>(flightObj.levelOfDetail).toEqual(0);
@@ -150,12 +151,55 @@ describe("FlightGlobe tests", function() {
 
         it("computes the correct Point display condition", function () {
             expect<boolean>(flightObj.shouldPointDisplay).toBeTruthy()
-        })
+        });
 
         it("computes the correct Label display condition", function () {
             expect<boolean>(flightObj.shouldLabelDisplay).toBeFalsy();
             flightStore.geoLevelOfDetail.set(flightA1.body.geohash,1);
             expect<boolean>(flightObj.shouldLabelDisplay).toBeTruthy();
+        });
+
+        it("creates and places the Point Primitive", function () {
+            expect(flightObj.point).not.toBeNull();
+            const point = flightObj.point as Cesium.PointPrimitive;
+            expect(point.position).toEqual(Cesium.Cartesian3.fromDegrees(
+                flightA1.body.longitude,
+                flightA1.body.latitude,
+                flightA1.body.altitude,
+            ));
+        });
+
+        it("updates the Point Primitive reactively", function () {
+            expect(flightObj.point).not.toBeNull();
+            const point = flightObj.point as Cesium.PointPrimitive;
+            spyOn(flightObj,'createOrUpdatePoint');
+            flightStore.addOrUpdateFlight(flightA2);
+            expect(flightObj.createOrUpdatePoint).toHaveBeenCalledTimes(1);
+            expect<Cesium.Cartesian3>(point.position).toEqual(Cesium.Cartesian3.fromDegrees(
+                flightA2.body.longitude,
+                flightA2.body.latitude,
+                flightA2.body.altitude,
+            ));
+        });
+
+        it("updates the Point Primitive manually", function () {
+            expect(flightObj.point).not.toBeNull();
+            const point = flightObj.point as Cesium.PointPrimitive;
+            expect(point.position).toEqual(Cesium.Cartesian3.fromDegrees(
+                flightA1.body.longitude,
+                flightA1.body.latitude,
+                flightA1.body.altitude,
+            ));
+            flightObj.createOrUpdatePoint(Cesium.Cartesian3.fromDegrees(
+                flightA2.body.longitude,
+                flightA2.body.latitude,
+                flightA2.body.altitude,
+            ));
+            expect(point.position).toEqual(Cesium.Cartesian3.fromDegrees(
+                flightA2.body.longitude,
+                flightA2.body.latitude,
+                flightA2.body.altitude,
+            ))
         })
 
     })

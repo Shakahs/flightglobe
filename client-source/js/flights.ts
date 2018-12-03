@@ -1,4 +1,14 @@
-import {computed, observable, observe, get, autorun, IObjectDidChange, IReactionDisposer, ObservableMap} from 'mobx';
+import {
+    computed,
+    observable,
+    observe,
+    get,
+    autorun,
+    IObjectDidChange,
+    IReactionDisposer,
+    ObservableMap,
+    trace
+} from 'mobx';
 import {DemographicsUpdate, Flight, FlightDemographics, FlightPosition, GeoMap, Icao, PositionUpdate} from "./types";
 import * as Cesium from "cesium";
 import {convertPositionToCartesian} from "./utility";
@@ -33,8 +43,8 @@ import {Cartesian3, Label, LabelGraphics, PointPrimitive} from "cesium";
 
 export class FlightStore {
     @observable flightPositions = new ObservableMap<Icao, FlightPosition>();
-    @observable flightDemographics = new Map<Icao, FlightDemographics>();
-    @observable geoLevelOfDetail = new Map<string, number>();
+    @observable flightDemographics = new ObservableMap<Icao, FlightDemographics>();
+    @observable geoLevelOfDetail = new ObservableMap<string, number>();
     geoAreas = new Map<Icao, GeoCollection>();
     flights = new Map<Icao, FlightObj>();
     newestPositionTimestamp = 0;
@@ -116,15 +126,15 @@ export class FlightObj {
         this.geoCollection = geo;
         this.primitives = [this.point, this.label];
 
-        const positionUpdater = autorun(()=>{
-            this.primitives.forEach((p)=>{
-                if(p && this.cartesianPosition){p.position = this.cartesianPosition}
-            })
-        });
+        // const positionUpdater = autorun(()=>{
+        //     this.primitives.forEach((p)=>{
+        //         if(p && this.cartesianPosition){p.position = this.cartesianPosition}
+        //     })
+        // });
 
         const visiblePrimitiveUpdater = autorun(()=>{
-            if(this.shouldPointDisplay){
-                this.createPoint()
+            if(this.shouldPointDisplay && this.cartesianPosition){
+                this.createOrUpdatePoint(this.cartesianPosition)
             } else {
                 this.destroyPoint()
             }
@@ -134,7 +144,7 @@ export class FlightObj {
             } else {
                 this.destroyLabel()
             }
-            
+
         });
 
         this.disposers = [visiblePrimitiveUpdater];
@@ -167,10 +177,12 @@ export class FlightObj {
         return true
     }
 
-    createPoint(){
-        if(!this.point){
+    createOrUpdatePoint(pos: Cesium.Cartesian3){
+        if(this.point){
+            this.point.position = pos
+        } else {
             this.point = this.geoCollection.points.add({
-                position: this.cartesianPosition,
+                position: pos,
                 pixelSize: 2,
                 id: this.icao
             });
