@@ -118,7 +118,7 @@ export class FlightObj {
 
         const positionUpdater = autorun(()=>{
             this.primitives.forEach((p)=>{
-                if(p && this.cartesionPosition){p.position = this.cartesionPosition}
+                if(p && this.cartesianPosition){p.position = this.cartesianPosition}
             })
         });
 
@@ -137,7 +137,7 @@ export class FlightObj {
             
         });
 
-        this.disposers = [positionUpdater, visiblePrimitiveUpdater];
+        this.disposers = [visiblePrimitiveUpdater];
     }
 
     @computed get levelOfDetail():number {
@@ -152,7 +152,7 @@ export class FlightObj {
         return this.flightStore.flightPositions.get(this.icao)
     }
 
-    @computed get cartesionPosition():Cartesian3|null {
+    @computed get cartesianPosition():Cartesian3|null {
         if(this.position){
             return convertPositionToCartesian(this.position)
         }
@@ -170,7 +170,7 @@ export class FlightObj {
     createPoint(){
         if(!this.point){
             this.point = this.geoCollection.points.add({
-                position: this.cartesionPosition,
+                position: this.cartesianPosition,
                 pixelSize: 2,
                 id: this.icao
             });
@@ -202,7 +202,7 @@ export class FlightObj {
                 text: this.labelText,
                 font: '12px sans-serif',
                 pixelOffset: labelOffset,
-                position: this.cartesionPosition
+                position: this.cartesianPosition
             });
         }
     }

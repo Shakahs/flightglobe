@@ -120,18 +120,42 @@ describe("FlightGlobe tests", function() {
             flightObj = flightStore.flights.get(flightA1.icao) as FlightObj;
         });
 
-        it("computes the correct positions", function(){
-            expect(flightObj.position).toEqual(flightA1.body);
-            expect(flightObj.position).toBeDefined();
+        it("computes the correct Positions", function(){
+            expect<FlightPosition>(flightObj.position as FlightPosition).toEqual(flightA1.body);
+            expect<FlightPosition>(flightObj.position as FlightPosition).toBeDefined();
             flightStore.addOrUpdateFlight(flightA2);
-            expect(flightObj.position).toEqual(flightA2.body);
-            expect(flightObj.position).toBeDefined();
+            expect<FlightPosition>(flightObj.position as FlightPosition).toEqual(flightA2.body);
+            expect<FlightPosition>(flightObj.position as FlightPosition).toBeDefined();
         });
 
-        it("computes the correct Cartesian positions", function(){
-            expect(flightObj.cartesionPosition).toEqual(convertPositionToCartesian(flightA1.body));
+        it("computes the correct Cartesian Positions", function(){
+            expect<Cesium.Cartesian3>(flightObj.cartesianPosition as Cesium.Cartesian3).toEqual(Cesium.Cartesian3.fromDegrees(
+                flightA1.body.longitude,
+                flightA1.body.latitude,
+                flightA1.body.altitude,
+            ));
             flightStore.addOrUpdateFlight(flightA2);
-            expect(flightObj.cartesionPosition).toEqual(convertPositionToCartesian(flightA2.body));
+            expect<Cesium.Cartesian3>(flightObj.cartesianPosition as Cesium.Cartesian3).toEqual(Cesium.Cartesian3.fromDegrees(
+                flightA2.body.longitude,
+                flightA2.body.latitude,
+                flightA2.body.altitude,
+            ));
+        })
+
+        it("computes the correct Level of Detail", function () {
+            expect<number>(flightObj.levelOfDetail).toEqual(0);
+            flightStore.geoLevelOfDetail.set(flightA1.body.geohash,1);
+            expect<number>(flightObj.levelOfDetail).toEqual(1);
+        });
+
+        it("computes the correct Point display condition", function () {
+            expect<boolean>(flightObj.shouldPointDisplay).toBeTruthy()
+        })
+
+        it("computes the correct Label display condition", function () {
+            expect<boolean>(flightObj.shouldLabelDisplay).toBeFalsy();
+            flightStore.geoLevelOfDetail.set(flightA1.body.geohash,1);
+            expect<boolean>(flightObj.shouldLabelDisplay).toBeTruthy();
         })
 
     })
