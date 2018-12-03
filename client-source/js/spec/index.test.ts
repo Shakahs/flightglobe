@@ -202,6 +202,12 @@ describe("FlightGlobe tests", function() {
             ))
         })
 
+        it("mocks reactive update", function () {
+            spyOn(flightObj,'whatever');
+            flightStore.addOrUpdateFlight(flightA2);
+            expect(flightObj.whatever).toHaveBeenCalledTimes(1)
+        });
+
     })
 
 

@@ -75,7 +75,14 @@ export class FlightStore {
     }
 
     addOrUpdateFlight(pos: PositionUpdate){
-        this.flightPositions.set(pos.icao, pos.body);
+        // this.flightPositions.set(pos.icao, pos.body);
+        const currentPosition = this.flightPositions.get(pos.icao);
+        if(currentPosition){
+            Object.assign(currentPosition, pos.body)
+        } else {
+            this.flightPositions.set(pos.icao, pos.body)
+        }
+
         const geoColl = this.getOrCreateGeoCollection(pos.body.geohash[0]);
         let thisFlight = this.flights.get(pos.icao);
         if(thisFlight && (thisFlight.geoCollection !== geoColl)){
@@ -115,8 +122,8 @@ export class FlightObj {
     geoCollection:GeoCollection;
     point: null | PointPrimitive = null;
     label: null | Label = null;
-    primitives: Array<PointPrimitive | Label | null>;
     disposers: Array<IReactionDisposer>;
+    @observable rootPosition: FlightPosition;
     // levelOfDetail;
 
 
@@ -124,7 +131,7 @@ export class FlightObj {
         this.flightStore = flightStore;
         this.icao = icao;
         this.geoCollection = geo;
-        this.primitives = [this.point, this.label];
+        this.rootPosition = this.flightStore.flightPositions.get(this.icao) as FlightPosition;
 
         // const positionUpdater = autorun(()=>{
         //     this.primitives.forEach((p)=>{
@@ -147,7 +154,20 @@ export class FlightObj {
 
         });
 
+        const asdasd = autorun(()=>{
+            const newC3 = Cesium.Cartesian3.fromDegrees(
+                this.rootPosition.longitude,
+                this.rootPosition.latitude,
+                this.rootPosition.altitude,
+            );
+            this.whatever(newC3)
+        })
+
         this.disposers = [visiblePrimitiveUpdater];
+    }
+
+    whatever(input: Cartesian3){
+        console.log(input.toString())
     }
 
     @computed get levelOfDetail():number {
