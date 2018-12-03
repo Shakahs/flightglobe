@@ -1,4 +1,4 @@
-import {computed, observable, observe, get, autorun, IObjectDidChange, IReactionDisposer} from 'mobx';
+import {computed, observable, observe, get, autorun, IObjectDidChange, IReactionDisposer, ObservableMap} from 'mobx';
 import {DemographicsUpdate, Flight, FlightDemographics, FlightPosition, GeoMap, Icao, PositionUpdate} from "./types";
 import * as Cesium from "cesium";
 import {convertPositionToCartesian} from "./utility";
@@ -32,7 +32,7 @@ import {Cartesian3, Label, LabelGraphics, PointPrimitive} from "cesium";
 // });
 
 export class FlightStore {
-    @observable flightPositions = new Map<Icao, FlightPosition>();
+    @observable flightPositions = new ObservableMap<Icao, FlightPosition>();
     @observable flightDemographics = new Map<Icao, FlightDemographics>();
     @observable geoLevelOfDetail = new Map<string, number>();
     geoAreas = new Map<Icao, GeoCollection>();

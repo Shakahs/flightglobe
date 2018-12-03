@@ -8,7 +8,5 @@ export const convertPositionToCartesian = function(pos:FlightPosition):Cesium.Ca
         pos.longitude,
         pos.latitude,
         pos.altitude,
-        undefined,
-        scratchC3
     );
 };
