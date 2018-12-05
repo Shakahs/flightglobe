@@ -42,17 +42,19 @@ import {Cartesian3, Label, LabelGraphics, PointPrimitive} from "cesium";
 // });
 
 export class FlightStore {
-    @observable flightPositions = new ObservableMap<Icao, FlightPosition>();
-    @observable flightDemographics = new ObservableMap<Icao, FlightDemographics>();
-    @observable geoLevelOfDetail = new ObservableMap<string, number>();
+    flightPositions = new ObservableMap<Icao, FlightPosition>(undefined,undefined, "positionmap");
+    flightDemographics = new ObservableMap<Icao, FlightDemographics>();
+    geoLevelOfDetail = new ObservableMap<string, number>(undefined, undefined, "geoLODmap");
     geoAreas = new Map<Icao, GeoCollection>();
     flights = new Map<Icao, FlightObj>();
     newestPositionTimestamp = 0;
     viewer:Cesium.Viewer;
+    cameraEventDisposer:Cesium.Event.RemoveCallback;
+
 
     constructor(viewer: Cesium.Viewer){
         this.viewer = viewer;
-        viewer.camera.changed.addEventListener(() => {
+        this.cameraEventDisposer = viewer.camera.changed.addEventListener(() => {
           const ellipsoid = this.viewer.scene.globe.ellipsoid;
           const cameraPosition = ellipsoid.cartesianToCartographic(this.viewer.camera.position);
           const focusGeo = Geohash.encode(cameraPosition.latitude*180/Math.PI,
@@ -75,13 +77,13 @@ export class FlightStore {
     }
 
     addOrUpdateFlight(pos: PositionUpdate){
-        // this.flightPositions.set(pos.icao, pos.body);
-        const currentPosition = this.flightPositions.get(pos.icao);
-        if(currentPosition){
-            Object.assign(currentPosition, pos.body)
-        } else {
-            this.flightPositions.set(pos.icao, pos.body)
-        }
+        this.flightPositions.set(pos.icao, pos.body);
+        // const currentPosition = this.flightPositions.get(pos.icao);
+        // if(currentPosition){
+        //     currentPosition.altitude = pos.body.altitude;
+        // } else {
+        //     this.flightPositions.set(pos.icao, pos.body)
+        // }
 
         const geoColl = this.getOrCreateGeoCollection(pos.body.geohash[0]);
         let thisFlight = this.flights.get(pos.icao);
@@ -112,6 +114,12 @@ export class FlightStore {
     numberGeos():number {
         return this.geoAreas.size
     }
+
+    destroy(){
+        this.flights.forEach((f)=>f.destroy());
+        this.geoAreas.forEach((f)=>f.destroy());
+        this.cameraEventDisposer();
+    }
 }
 const labelOffset = new Cesium.Cartesian2(10, 20);
 const labelDisplayCondition = new Cesium.DistanceDisplayCondition(0.0, 2000000);
@@ -140,35 +148,47 @@ export class FlightObj {
         // });
 
         const visiblePrimitiveUpdater = autorun(()=>{
-            if(this.shouldPointDisplay && this.cartesianPosition){
-                this.createOrUpdatePoint(this.cartesianPosition)
-            } else {
-                this.destroyPoint()
+            trace()
+            console.log('updater called')
+            const newPos = this.flightStore.flightPositions.get(this.icao);
+            if(newPos){
+                const newC3 = convertPositionToCartesian(newPos)
+                if(this.point){
+                    this.point.position = newC3
+                    console.log(this.point.position)
+                } else {
+                    this.point = this.geoCollection.points.add({
+                        position: newC3,
+                        pixelSize: 2,
+                        id: this.icao
+                    });
+                }
             }
 
-            if(this.shouldLabelDisplay){
-                this.createLabel()
-            } else {
-                this.destroyLabel()
-            }
+            // if(this.shouldLabelDisplay){
+            //     this.createLabel()
+            // } else {
+            //     this.destroyLabel()
+            // }
 
-        });
+        },{name:'visibilityupdater'});
 
-        const asdasd = autorun(()=>{
-            const newC3 = Cesium.Cartesian3.fromDegrees(
-                this.rootPosition.longitude,
-                this.rootPosition.latitude,
-                this.rootPosition.altitude,
-            );
-            this.whatever(newC3)
-        })
+        // const asdasd = autorun(()=>{
+        //     trace()
+        //     const newC3 = Cesium.Cartesian3.fromDegrees(
+        //         this.rootPosition.longitude,
+        //         this.rootPosition.latitude,
+        //         this.rootPosition.altitude,
+        //     );
+        //     this.whatever(newC3)
+        // },{name:'mockupdater'})
 
         this.disposers = [visiblePrimitiveUpdater];
     }
 
-    whatever(input: Cartesian3){
-        console.log(input.toString())
-    }
+    // whatever(input: Cartesian3){
+    //     console.log(input.toString())
+    // }
 
     @computed get levelOfDetail():number {
         if(this.position){
@@ -192,14 +212,11 @@ export class FlightObj {
     @computed get demographics():FlightDemographics|undefined {
         return this.flightStore.flightDemographics.get(this.icao)
     }
-    
-    @computed get shouldPointDisplay():boolean {
-        return true
-    }
 
     createOrUpdatePoint(pos: Cesium.Cartesian3){
         if(this.point){
             this.point.position = pos
+            console.log(this.point.position)
         } else {
             this.point = this.geoCollection.points.add({
                 position: pos,
@@ -271,5 +288,10 @@ export class GeoCollection {
         this.labels = new Cesium.LabelCollection();
         viewer.scene.primitives.add(this.points);
         viewer.scene.primitives.add(this.labels);
+    }
+
+    destroy(){
+        this.points.destroy();
+        this.labels.destroy()
     }
 }

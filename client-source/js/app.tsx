@@ -7,7 +7,7 @@ import { interval } from 'rxjs';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {FlightPosition, FlightMap, PositionUpdate, DemographicsUpdate, GeoMap} from "./types";
-import {FlightStore} from './flights'
+import {FlightObj, FlightStore} from './flights'
 
 const flightStore = new FlightStore(viewer);
 
