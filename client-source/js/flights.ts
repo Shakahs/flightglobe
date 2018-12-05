@@ -19,7 +19,7 @@ import {Cartesian3, Label, LabelGraphics, PointPrimitive} from "cesium";
 const labelOffset = new Cesium.Cartesian2(10, 20);
 
 export class FlightStore {
-    flightPositions = new ObservableMap<Icao, FlightPosition>(undefined,undefined, "positionmap");
+    flightPositions = new ObservableMap<Icao, FlightPosition[]>(undefined,undefined, "positionmap");
     flightDemographics = new ObservableMap<Icao, FlightDemographics>();
     geoLevelOfDetail = new ObservableMap<string, number>(undefined, undefined, "geoLODmap");
     geoAreas = new Map<Icao, GeoCollection>();
@@ -54,13 +54,13 @@ export class FlightStore {
     }
 
     addOrUpdateFlight(pos: PositionUpdate){
-        this.flightPositions.set(pos.icao, pos.body);
-        // const currentPosition = this.flightPositions.get(pos.icao);
-        // if(currentPosition){
-        //     currentPosition.altitude = pos.body.altitude;
-        // } else {
-        //     this.flightPositions.set(pos.icao, pos.body)
-        // }
+        // this.flightPositions.set(pos.icao, pos.body);
+        const currentPositions = this.flightPositions.get(pos.icao);
+        if(currentPositions){
+            currentPositions.push(pos.body)
+        } else {
+            this.flightPositions.set(pos.icao, [pos.body])
+        }
 
         const geoColl = this.getOrCreateGeoCollection(pos.body.geohash[0]);
         let thisFlight = this.flights.get(pos.icao);
@@ -106,18 +106,16 @@ export class FlightObj {
     point: null | PointPrimitive = null;
     label: null | Label = null;
     disposers: Array<IReactionDisposer>;
-    @observable rootPosition: FlightPosition;
 
     constructor(flightStore, icao: Icao, geo){
         this.flightStore = flightStore;
         this.icao = icao;
         this.geoCollection = geo;
-        this.rootPosition = this.flightStore.flightPositions.get(this.icao) as FlightPosition;
 
         const pointUpdater = autorun(()=>{
-            const newPos = this.flightStore.flightPositions.get(this.icao);
-            if(newPos){
-                const newC3 = convertPositionToCartesian(newPos);
+            const posList = this.flightStore.flightPositions.get(this.icao);
+            if(posList){
+                const newC3 = convertPositionToCartesian(posList[posList.length-1]);
                 if(this.point){
                     this.point.position = newC3;
                 } else {
@@ -131,11 +129,11 @@ export class FlightObj {
         },{name:'visibilityupdater'});
 
         const labelUpdater = autorun(()=>{
-            const newPos = this.flightStore.flightPositions.get(this.icao);
+            const posList = this.flightStore.flightPositions.get(this.icao);
             const shouldBeVisible = this.shouldLabelDisplay;
             const labelText = this.labelText;
-            if(shouldBeVisible && newPos){
-                const newC3 = convertPositionToCartesian(newPos);
+            if(shouldBeVisible && posList){
+                const newC3 = convertPositionToCartesian(posList[posList.length-1]);
                 if(this.label){
                     this.label.position = newC3;
                 } else {
@@ -155,20 +153,24 @@ export class FlightObj {
     }
 
     @computed get levelOfDetail():number {
-        if(this.position){
-            const level = this.flightStore.geoLevelOfDetail.get(this.position.geohash);
+        if(this.latestPosition){
+            const level = this.flightStore.geoLevelOfDetail.get(this.latestPosition.geohash);
             return level ? level : 0;
         }
         return 0;
     }
 
-    @computed get position():FlightPosition|undefined {
-        return this.flightStore.flightPositions.get(this.icao)
+    @computed get latestPosition():FlightPosition|null {
+        const posList = this.flightStore.flightPositions.get(this.icao);
+        if(posList){
+            return posList[posList.length-1];
+        }
+        return null
     }
 
     @computed get cartesianPosition():Cartesian3|null {
-        if(this.position){
-            return convertPositionToCartesian(this.position)
+        if(this.latestPosition){
+            return convertPositionToCartesian(this.latestPosition)
         }
         return null
     }

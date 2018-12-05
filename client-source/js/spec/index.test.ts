@@ -81,16 +81,31 @@ describe("FlightGlobe tests", function() {
 
         describe("stores Flights correctly",function(){
 
-            it("created Flight Positions",function(){
-              expect(flightStore.numberFlights()).toEqual(2);
-              expect<FlightPosition>(flightA1.body).toEqual(flightStore.flightPositions.toJS().get(flightA1.icao) as FlightPosition);
-              expect<FlightPosition>(flightB1.body).toEqual(flightStore.flightPositions.toJS().get(flightB1.icao) as FlightPosition);
-              expect(flightStore.flightPositions.get("nonexistant")).toBeFalsy()
+            it("creates Flight Position records",function(){
+              expect(flightStore.flightPositions.size).toEqual(2);
+              expect(flightStore.flightPositions.get(flightA1.icao)).toEqual(jasmine.any(Array));
+              const flightAPositions = flightStore.flightPositions.get(flightA1.icao);
+              const flightBPositions = flightStore.flightPositions.get(flightB1.icao);
+              if(flightAPositions && flightBPositions){
+                  expect(flightAPositions.length).toEqual(1);
+                  expect<FlightPosition>(flightA1.body).toEqual(flightAPositions[0]);
+                  expect(flightBPositions.length).toEqual(1);
+                  expect<FlightPosition>(flightB1.body).toEqual(flightBPositions[0]);
+              } else {
+                  fail('positions not defined')
+              }
+              expect(flightStore.flightPositions.get("nonexistant")).not.toBeDefined()
             });
 
-            it("updated Flight Positions",function(){
+            it("updates Flight Positions",function(){
                 flightStore.addOrUpdateFlight(flightA2);
-                expect<FlightPosition>(flightA2.body).toEqual(flightStore.flightPositions.toJS().get(flightA1.icao) as FlightPosition);
+                const flightAPositions = flightStore.flightPositions.get(flightA1.icao);
+                if(flightAPositions){
+                    expect(flightAPositions.length).toEqual(2);
+                    expect<FlightPosition>(flightA2.body).toEqual(flightAPositions[1]);
+                } else {
+                    fail('positions not defined')
+                }
             });
 
             it("created correct Geo resources", function() {
@@ -107,9 +122,9 @@ describe("FlightGlobe tests", function() {
     describe("FlightObj",function(){
 
         it("computes the correct Positions", function(){
-            expect<FlightPosition>(flightObj.position as FlightPosition).toEqual(flightA1.body);
+            expect<FlightPosition>(flightObj.latestPosition as FlightPosition).toEqual(flightA1.body);
             flightStore.addOrUpdateFlight(flightA2);
-            expect<FlightPosition>(flightObj.position as FlightPosition).toEqual(flightA2.body);
+            expect<FlightPosition>(flightObj.latestPosition as FlightPosition).toEqual(flightA2.body);
         });
 
         it("computes the correct Cartesian Positions", function(){
@@ -155,9 +170,7 @@ describe("FlightGlobe tests", function() {
         it("updates the Point Primitive reactively", function () {
             expect(flightObj.point).not.toBeNull();
             const point = flightObj.point as Cesium.PointPrimitive;
-            console.log('before new data');
             flightStore.addOrUpdateFlight(flightA2);
-            console.log('after new data');
             expect<Cesium.Cartesian3>(point.position).toEqual(Cesium.Cartesian3.fromDegrees(
                 flightA2.body.longitude,
                 flightA2.body.latitude,
