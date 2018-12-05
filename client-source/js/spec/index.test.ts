@@ -155,7 +155,7 @@ describe("FlightGlobe tests", function() {
             //     expect<boolean>(flightObj.shouldPointDisplay).toBeTruthy()
             // });
 
-            it("creates and places the Point Primitive", function () {
+            it("creates the Point Primitive", function () {
                 expect(flightObj.point).not.toBeNull();
                 const point = flightObj.point;
                 if(point){
@@ -171,7 +171,7 @@ describe("FlightGlobe tests", function() {
 
             });
 
-            it("updates the Point Primitive reactively", function () {
+            it("updates the Point Primitive location reactively", function () {
                 expect(flightObj.point).not.toBeNull();
                 const point = flightObj.point;
                 if(point){
@@ -186,7 +186,7 @@ describe("FlightGlobe tests", function() {
                 }
             });
 
-            it("updates the Point Primitive manually", function () {
+            it("updates the Point Primitive location manually", function () {
                 expect(flightObj.point).not.toBeNull();
                 const point = flightObj.point;
                 if(point){
@@ -217,6 +217,41 @@ describe("FlightGlobe tests", function() {
                 flightStore.geoLevelOfDetail.set(flightA1.body.geohash,1);
                 expect<boolean>(flightObj.shouldLabelDisplay).toBeTruthy();
             });
+
+            it('creates, displays, and destroys the Label', function () {
+                flightStore.geoLevelOfDetail.set(flightA1.body.geohash,1);
+                const flight = flightStore.flights.get(flightA1.icao);
+                if(flight && flight.label){
+                    expect(flight.geoCollection.labels.contains(flight.label)).toBeTruthy();
+                    expect(flight.label.position).toEqual(Cesium.Cartesian3.fromDegrees(
+                        flightA1.body.longitude,
+                        flightA1.body.latitude,
+                        flightA1.body.altitude,
+                    ));
+                    flightStore.geoLevelOfDetail.clear()
+                    expect(flight.geoCollection.labels.contains(flight.label)).toBeFalsy();
+                } else {
+                    fail('flight or label not defined')
+                }
+            })
+
+            it('updates the Label position', function () {
+                flightStore.geoLevelOfDetail.set(flightA1.body.geohash,1);
+                flightStore.addOrUpdateFlight(flightA2);
+                flightStore.geoLevelOfDetail.clear();
+                flightStore.geoLevelOfDetail.set(flightA2.body.geohash,1);
+                const flight = flightStore.flights.get(flightA1.icao);
+                if(flight && flight.label){
+                    expect(flight.label.position).toEqual(Cesium.Cartesian3.fromDegrees(
+                        flightA2.body.longitude,
+                        flightA2.body.latitude,
+                        flightA2.body.altitude,
+                    ))
+                } else {
+                    fail('flight or label not defined')
+                }
+            })
+
         })
 
     })
