@@ -128,13 +128,27 @@ export class FlightObj {
                     });
                 }
             }
+        },{name:'visibilityupdater'});
 
-            // if(this.shouldLabelDisplay){
-            //     this.createLabel()
-            // } else {
-            //     this.destroyLabel()
-            // }
-
+        const labelUpdater = autorun(()=>{
+            const newPos = this.flightStore.flightPositions.get(this.icao);
+            const shouldBeVisible = this.shouldLabelDisplay;
+            const labelText = this.labelText;
+            if(shouldBeVisible && newPos){
+                const newC3 = convertPositionToCartesian(newPos);
+                if(this.label){
+                    this.label.position = newC3;
+                } else {
+                    this.label = this.geoCollection.labels.add({
+                        position: newC3,
+                        text: labelText,
+                        font: '12px sans-serif',
+                        pixelOffset: labelOffset,
+                    });
+                }
+            } else {
+                this.destroyLabel()
+            }
         },{name:'visibilityupdater'});
 
         this.disposers = [pointUpdater];
