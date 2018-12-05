@@ -14,7 +14,15 @@ import * as Cesium from "cesium";
 import {convertPositionToCartesian} from "./utility";
 const Geohash = require('latlon-geohash');
 import {forEach} from "lodash-es";
-import {Cartesian3, Label, LabelGraphics, PointPrimitive} from "cesium";
+import {
+    Cartesian3,
+    Label,
+    LabelCollection,
+    LabelGraphics,
+    PointPrimitive,
+    PointPrimitiveCollection, PolylineCollection,
+    Viewer
+} from "cesium";
 
 const labelOffset = new Cesium.Cartesian2(10, 20);
 
@@ -225,18 +233,21 @@ export class FlightObj {
 }
 
 export class GeoCollection {
-    id;
-    points;
-    labels;
-    viewer;
+    id: string;
+    points: PointPrimitiveCollection;
+    labels: LabelCollection;
+    lines: PolylineCollection;
+    viewer: Viewer;
 
     constructor(id: string, viewer: Cesium.Viewer){
         this.id = id;
         this.viewer = viewer;
         this.points = new Cesium.PointPrimitiveCollection();
         this.labels = new Cesium.LabelCollection();
+        this.lines = new Cesium.PolylineCollection();
         viewer.scene.primitives.add(this.points);
         viewer.scene.primitives.add(this.labels);
+        viewer.scene.primitives.add(this.lines);
     }
 
     destroy(){

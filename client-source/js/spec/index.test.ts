@@ -121,81 +121,103 @@ describe("FlightGlobe tests", function() {
 
     describe("FlightObj",function(){
 
-        it("computes the correct Positions", function(){
-            expect<FlightPosition>(flightObj.latestPosition as FlightPosition).toEqual(flightA1.body);
-            flightStore.addOrUpdateFlight(flightA2);
-            expect<FlightPosition>(flightObj.latestPosition as FlightPosition).toEqual(flightA2.body);
+        describe('computes data', function () {
+            it("computes the correct Positions", function(){
+                expect<FlightPosition>(flightObj.latestPosition as FlightPosition).toEqual(flightA1.body);
+                flightStore.addOrUpdateFlight(flightA2);
+                expect<FlightPosition>(flightObj.latestPosition as FlightPosition).toEqual(flightA2.body);
+            });
+
+            it("computes the correct Cartesian Positions", function(){
+                expect<Cesium.Cartesian3>(flightObj.cartesianPosition as Cesium.Cartesian3).toEqual(Cesium.Cartesian3.fromDegrees(
+                    flightA1.body.longitude,
+                    flightA1.body.latitude,
+                    flightA1.body.altitude,
+                ));
+                flightStore.addOrUpdateFlight(flightA2);
+                expect<Cesium.Cartesian3>(flightObj.cartesianPosition as Cesium.Cartesian3).toEqual(Cesium.Cartesian3.fromDegrees(
+                    flightA2.body.longitude,
+                    flightA2.body.latitude,
+                    flightA2.body.altitude,
+                ));
+            });
+
+            it("computes the correct Level of Detail", function () {
+                expect<number>(flightObj.levelOfDetail).toEqual(0);
+                flightStore.geoLevelOfDetail.set(flightA1.body.geohash,1);
+                expect<number>(flightObj.levelOfDetail).toEqual(1);
+            });
         });
 
-        it("computes the correct Cartesian Positions", function(){
-            expect<Cesium.Cartesian3>(flightObj.cartesianPosition as Cesium.Cartesian3).toEqual(Cesium.Cartesian3.fromDegrees(
-                flightA1.body.longitude,
-                flightA1.body.latitude,
-                flightA1.body.altitude,
-            ));
-            flightStore.addOrUpdateFlight(flightA2);
-            expect<Cesium.Cartesian3>(flightObj.cartesianPosition as Cesium.Cartesian3).toEqual(Cesium.Cartesian3.fromDegrees(
-                flightA2.body.longitude,
-                flightA2.body.latitude,
-                flightA2.body.altitude,
-            ));
+        describe('handles Points', function () {
+
+            // xit("computes the correct Point display condition", function () {
+            //     expect<boolean>(flightObj.shouldPointDisplay).toBeTruthy()
+            // });
+
+            it("creates and places the Point Primitive", function () {
+                expect(flightObj.point).not.toBeNull();
+                const point = flightObj.point;
+                if(point){
+                    expect(point.position).toEqual(Cesium.Cartesian3.fromDegrees(
+                        flightA1.body.longitude,
+                        flightA1.body.latitude,
+                        flightA1.body.altitude,
+                    ));
+                    expect(flightObj.geoCollection.points.contains(point)).toBeTruthy()
+                } else {
+                    fail('point not defined')
+                }
+
+            });
+
+            it("updates the Point Primitive reactively", function () {
+                expect(flightObj.point).not.toBeNull();
+                const point = flightObj.point;
+                if(point){
+                    flightStore.addOrUpdateFlight(flightA2);
+                    expect<Cesium.Cartesian3>(point.position).toEqual(Cesium.Cartesian3.fromDegrees(
+                        flightA2.body.longitude,
+                        flightA2.body.latitude,
+                        flightA2.body.altitude,
+                    ));
+                } else {
+                    fail('point not defined')
+                }
+            });
+
+            it("updates the Point Primitive manually", function () {
+                expect(flightObj.point).not.toBeNull();
+                const point = flightObj.point;
+                if(point){
+                    expect(point.position).toEqual(Cesium.Cartesian3.fromDegrees(
+                        flightA1.body.longitude,
+                        flightA1.body.latitude,
+                        flightA1.body.altitude,
+                    ));
+                    point.position = (Cesium.Cartesian3.fromDegrees(
+                        flightA2.body.longitude,
+                        flightA2.body.latitude,
+                        flightA2.body.altitude,
+                    ));
+                    expect(point.position).toEqual(Cesium.Cartesian3.fromDegrees(
+                        flightA2.body.longitude,
+                        flightA2.body.latitude,
+                        flightA2.body.altitude,
+                    ))
+                } else {
+                    fail('point not defined')
+                }
+            })
         });
 
-        it("computes the correct Level of Detail", function () {
-            expect<number>(flightObj.levelOfDetail).toEqual(0);
-            flightStore.geoLevelOfDetail.set(flightA1.body.geohash,1);
-            expect<number>(flightObj.levelOfDetail).toEqual(1);
-        });
-
-        // xit("computes the correct Point display condition", function () {
-        //     expect<boolean>(flightObj.shouldPointDisplay).toBeTruthy()
-        // });
-
-        it("computes the correct Label display condition", function () {
-            expect<boolean>(flightObj.shouldLabelDisplay).toBeFalsy();
-            flightStore.geoLevelOfDetail.set(flightA1.body.geohash,1);
-            expect<boolean>(flightObj.shouldLabelDisplay).toBeTruthy();
-        });
-
-        it("creates and places the Point Primitive", function () {
-            expect(flightObj.point).not.toBeNull();
-            const point = flightObj.point as Cesium.PointPrimitive;
-            expect(point.position).toEqual(Cesium.Cartesian3.fromDegrees(
-                flightA1.body.longitude,
-                flightA1.body.latitude,
-                flightA1.body.altitude,
-            ));
-        });
-
-        it("updates the Point Primitive reactively", function () {
-            expect(flightObj.point).not.toBeNull();
-            const point = flightObj.point as Cesium.PointPrimitive;
-            flightStore.addOrUpdateFlight(flightA2);
-            expect<Cesium.Cartesian3>(point.position).toEqual(Cesium.Cartesian3.fromDegrees(
-                flightA2.body.longitude,
-                flightA2.body.latitude,
-                flightA2.body.altitude,
-            ));
-        });
-
-        it("updates the Point Primitive manually", function () {
-            expect(flightObj.point).not.toBeNull();
-            const point = flightObj.point as Cesium.PointPrimitive;
-            expect(point.position).toEqual(Cesium.Cartesian3.fromDegrees(
-                flightA1.body.longitude,
-                flightA1.body.latitude,
-                flightA1.body.altitude,
-            ));
-            point.position = (Cesium.Cartesian3.fromDegrees(
-                flightA2.body.longitude,
-                flightA2.body.latitude,
-                flightA2.body.altitude,
-            ));
-            expect(point.position).toEqual(Cesium.Cartesian3.fromDegrees(
-                flightA2.body.longitude,
-                flightA2.body.latitude,
-                flightA2.body.altitude,
-            ))
+        describe('handles Labels', function () {
+            it("computes the correct Label display condition", function () {
+                expect<boolean>(flightObj.shouldLabelDisplay).toBeFalsy();
+                flightStore.geoLevelOfDetail.set(flightA1.body.geohash,1);
+                expect<boolean>(flightObj.shouldLabelDisplay).toBeTruthy();
+            });
         })
+
     })
 });
