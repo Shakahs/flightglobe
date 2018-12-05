@@ -155,7 +155,6 @@ describe("FlightGlobe tests", function() {
         it("updates the Point Primitive reactively", function () {
             expect(flightObj.point).not.toBeNull();
             const point = flightObj.point as Cesium.PointPrimitive;
-            spyOn(flightObj,'createOrUpdatePoint');
             console.log('before new data');
             flightStore.addOrUpdateFlight(flightA2);
             console.log('after new data');
@@ -174,7 +173,7 @@ describe("FlightGlobe tests", function() {
                 flightA1.body.latitude,
                 flightA1.body.altitude,
             ));
-            flightObj.createOrUpdatePoint(Cesium.Cartesian3.fromDegrees(
+            point.position = (Cesium.Cartesian3.fromDegrees(
                 flightA2.body.longitude,
                 flightA2.body.latitude,
                 flightA2.body.altitude,
@@ -185,14 +184,5 @@ describe("FlightGlobe tests", function() {
                 flightA2.body.altitude,
             ))
         })
-
-        // it("mocks reactive update", function () {
-        //     spyOn(flightObj,'whatever');
-        //     flightStore.addOrUpdateFlight(flightA2);
-        //     expect(flightObj.whatever).toHaveBeenCalled()
-        // });
-
     })
-
-
 });

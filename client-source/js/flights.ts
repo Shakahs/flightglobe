@@ -16,30 +16,7 @@ const Geohash = require('latlon-geohash');
 import {forEach} from "lodash-es";
 import {Cartesian3, Label, LabelGraphics, PointPrimitive} from "cesium";
 
-// export const flightStore = observable.map<Icao, Flight>([], {name: "flights"});
-
-// export const geoAreas = computed<GeoMap>(():GeoMap=>{
-//     const newGeoAreas:GeoMap = new Map();
-//     flightStore.forEach((f)=>{
-//         if(f.icao[0] && !newGeoAreas.has(f.icao[0])){
-//             newGeoAreas.set(f.icao[0], new Cesium.PointPrimitiveCollection());
-//         }
-//     });
-//     return newGeoAreas
-// });
-//
-// const disposer = observe(flightStore, (change)=>{
-//     if(change.type === 'add'){
-//         // const geoArea = get<string, Cesium.PointPrimitiveCollection>(geoAreas, change.newValue.icao[0]);
-//         const geoArea = geoAreas.get().get(change.newValue.icao[0]);
-//         if(geoArea){
-//
-//
-//
-//             change.newValue.point = geoArea.add(createPoint(newPosition))
-//         }
-//     }
-// });
+const labelOffset = new Cesium.Cartesian2(10, 20);
 
 export class FlightStore {
     flightPositions = new ObservableMap<Icao, FlightPosition>(undefined,undefined, "positionmap");
@@ -121,8 +98,6 @@ export class FlightStore {
         this.cameraEventDisposer();
     }
 }
-const labelOffset = new Cesium.Cartesian2(10, 20);
-const labelDisplayCondition = new Cesium.DistanceDisplayCondition(0.0, 2000000);
 
 export class FlightObj {
     flightStore:FlightStore;
@@ -132,8 +107,6 @@ export class FlightObj {
     label: null | Label = null;
     disposers: Array<IReactionDisposer>;
     @observable rootPosition: FlightPosition;
-    // levelOfDetail;
-
 
     constructor(flightStore, icao: Icao, geo){
         this.flightStore = flightStore;
@@ -141,21 +114,12 @@ export class FlightObj {
         this.geoCollection = geo;
         this.rootPosition = this.flightStore.flightPositions.get(this.icao) as FlightPosition;
 
-        // const positionUpdater = autorun(()=>{
-        //     this.primitives.forEach((p)=>{
-        //         if(p && this.cartesianPosition){p.position = this.cartesianPosition}
-        //     })
-        // });
-
-        const visiblePrimitiveUpdater = autorun(()=>{
-            trace()
-            console.log('updater called')
+        const pointUpdater = autorun(()=>{
             const newPos = this.flightStore.flightPositions.get(this.icao);
             if(newPos){
-                const newC3 = convertPositionToCartesian(newPos)
+                const newC3 = convertPositionToCartesian(newPos);
                 if(this.point){
-                    this.point.position = newC3
-                    console.log(this.point.position)
+                    this.point.position = newC3;
                 } else {
                     this.point = this.geoCollection.points.add({
                         position: newC3,
@@ -173,22 +137,8 @@ export class FlightObj {
 
         },{name:'visibilityupdater'});
 
-        // const asdasd = autorun(()=>{
-        //     trace()
-        //     const newC3 = Cesium.Cartesian3.fromDegrees(
-        //         this.rootPosition.longitude,
-        //         this.rootPosition.latitude,
-        //         this.rootPosition.altitude,
-        //     );
-        //     this.whatever(newC3)
-        // },{name:'mockupdater'})
-
-        this.disposers = [visiblePrimitiveUpdater];
+        this.disposers = [pointUpdater];
     }
-
-    // whatever(input: Cartesian3){
-    //     console.log(input.toString())
-    // }
 
     @computed get levelOfDetail():number {
         if(this.position){
@@ -211,19 +161,6 @@ export class FlightObj {
 
     @computed get demographics():FlightDemographics|undefined {
         return this.flightStore.flightDemographics.get(this.icao)
-    }
-
-    createOrUpdatePoint(pos: Cesium.Cartesian3){
-        if(this.point){
-            this.point.position = pos
-            console.log(this.point.position)
-        } else {
-            this.point = this.geoCollection.points.add({
-                position: pos,
-                pixelSize: 2,
-                id: this.icao
-            });
-        }
     }
 
     destroyPoint(){
@@ -269,10 +206,6 @@ export class FlightObj {
         //call each disposer function to destroy the MobX reaction, otherwise this is a memory leak
         this.disposers.forEach((d)=>{d()})
     }
-
-    // createLabelText(dem: FlightDemographics){
-    //
-    // }
 }
 
 export class GeoCollection {
