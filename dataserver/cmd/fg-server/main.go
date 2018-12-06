@@ -8,6 +8,7 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -46,6 +47,15 @@ func sendIncrementalPositions(c *websocket.Conn, t time.Time) error {
 			}
 
 			var demographicUpdate = pkg.DemographicUpdate{"demographicUpdate", v.Icao, &v.Demographic}
+
+			if val, ok := airportMap[demographicUpdate.Body.Origin]; ok {
+				demographicUpdate.Body.Origin = val.City
+			}
+
+			if val, ok := airportMap[demographicUpdate.Body.Destination]; ok {
+				demographicUpdate.Body.Destination = val.City
+			}
+
 			marshaled, err = json.Marshal(demographicUpdate)
 			if err != nil {
 				return errors.New("sendIncrementalPositions JSON marshal demographic failed")
@@ -129,6 +139,7 @@ var isDeployedProduction bool
 var upgrader = websocket.Upgrader{}
 var positionCache *pkg.LockableRecordMap
 var redisClient *redis.Client
+var airportMap pkg.AirportMap
 
 func init() {
 	redisAddress = os.Getenv("REDIS_ADDRESS")
@@ -149,6 +160,17 @@ func init() {
 		redisAddress, redisPort))
 
 	positionCache = pkg.CreateCache()
+
+	jsonFile, err := os.Open("airports.json")
+	if err != nil {
+		fmt.Println("Could not open airports.json")
+	}
+	defer jsonFile.Close()
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	err = json.Unmarshal([]byte(byteValue), &airportMap)
+	if err != nil {
+		fmt.Println("Could not parse airports.json:", err)
+	}
 }
 
 func main() {

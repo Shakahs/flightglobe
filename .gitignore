@@ -9,6 +9,7 @@ coverage/
 /.env
 /client-build/
 /cesium/
+dataserver/cmd/fg-server/airports.json
 dataserver/cmd/fr-collector/fr-collector
 dataserver/cmd/redis-point-persistor/redis-point-persistor
 dataserver/cmd/fg-server/fg-server

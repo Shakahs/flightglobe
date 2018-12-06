@@ -130,7 +130,7 @@ export class FlightObj {
                 } else {
                     this.point = this.geoCollection.points.add({
                         position: newC3,
-                        pixelSize: 2,
+                        pixelSize: 4,
                         id: this.icao
                     });
                 }

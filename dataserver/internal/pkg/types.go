@@ -57,3 +57,11 @@ type DemographicUpdate struct {
 	Icao string       `json:"icao"`
 	Body *Demographic `json:"body"`
 }
+
+type Airport struct {
+	IATA    string `json:"iata"`
+	City    string `json:"city"`
+	Country string `json:"country"`
+}
+
+type AirportMap map[string]Airport
