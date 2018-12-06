@@ -7,7 +7,7 @@ import {
     IObjectDidChange,
     IReactionDisposer,
     ObservableMap,
-    trace
+    trace, toJS
 } from 'mobx';
 import {DemographicsUpdate, Flight, FlightDemographics, FlightPosition, GeoMap, Icao, PositionUpdate} from "./types";
 import * as Cesium from "cesium";
@@ -20,7 +20,7 @@ import {
     LabelCollection,
     LabelGraphics,
     PointPrimitive,
-    PointPrimitiveCollection, PolylineCollection,
+    PointPrimitiveCollection, Polyline, PolylineCollection,
     Viewer
 } from "cesium";
 
@@ -112,6 +112,7 @@ export class FlightObj {
     icao:Icao;
     geoCollection:GeoCollection;
     point: null | PointPrimitive = null;
+    trail: null | Polyline = null;
     label: null | Label = null;
     disposers: Array<IReactionDisposer>;
 
@@ -134,7 +135,28 @@ export class FlightObj {
                     });
                 }
             }
-        },{name:'visibilityupdater'});
+        },{name:'pointUpdater'});
+
+        const trailUpdater = autorun(()=>{
+            const posList = this.flightStore.flightPositions.get(this.icao);
+            // const shouldBeVisible = this.shouldTrailDisplay;
+            const shouldBeVisible = true;
+            if(shouldBeVisible && posList){
+                const newC3List:Cartesian3[] = [];
+                posList.forEach((p)=>newC3List.push(convertPositionToCartesian(p)))
+                if(this.trail){
+                    this.trail.positions = newC3List;
+                } else {
+                    const polyLine = {
+                        positions: newC3List,
+                        id: this.icao
+                    };
+                    this.trail = this.geoCollection.lines.add(polyLine);
+                }
+            } else {
+                this.destroyTrail()
+            }
+        },{name:'trailUpdater'});
 
         const labelUpdater = autorun(()=>{
             const posList = this.flightStore.flightPositions.get(this.icao);
@@ -155,9 +177,9 @@ export class FlightObj {
             } else {
                 this.destroyLabel()
             }
-        },{name:'visibilityupdater'});
+        },{name:'labelUpdater'});
 
-        this.disposers = [pointUpdater];
+        this.disposers = [pointUpdater,labelUpdater];
     }
 
     @computed get levelOfDetail():number {
@@ -191,6 +213,17 @@ export class FlightObj {
         if(this.point){
             this.geoCollection.points.remove(this.point);
             this.point = null;
+        }
+    }
+
+    @computed get shouldTrailDisplay(){
+        return this.levelOfDetail >= 1;
+    }
+
+    destroyTrail(){
+        if(this.trail){
+            this.geoCollection.lines.remove(this.trail);
+            this.trail = null;
         }
     }
 

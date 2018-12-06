@@ -7,8 +7,6 @@ export const convertPositionToCartesian = function(pos:FlightPosition):Cesium.Ca
     return Cesium.Cartesian3.fromDegrees(
         pos.longitude,
         pos.latitude,
-        pos.altitude,
-        undefined,
-        scratchC3
+        pos.altitude
     );
 };
