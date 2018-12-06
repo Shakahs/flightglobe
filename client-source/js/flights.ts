@@ -138,17 +138,14 @@ export class FlightObj {
         },{name:'pointUpdater'});
 
         const trailUpdater = autorun(()=>{
-            const posList = this.flightStore.flightPositions.get(this.icao);
-            // const shouldBeVisible = this.shouldTrailDisplay;
             const shouldBeVisible = true;
-            if(shouldBeVisible && posList){
-                const newC3List:Cartesian3[] = [];
-                posList.forEach((p)=>newC3List.push(convertPositionToCartesian(p)))
+            const positions = this.trailPositions;
+            if(shouldBeVisible && positions.length>0){
                 if(this.trail){
-                    this.trail.positions = newC3List;
+                    this.trail.positions = positions;
                 } else {
                     const polyLine = {
-                        positions: newC3List,
+                        positions: positions,
                         id: this.icao
                     };
                     this.trail = this.geoCollection.lines.add(polyLine);
@@ -225,6 +222,17 @@ export class FlightObj {
             this.geoCollection.lines.remove(this.trail);
             this.trail = null;
         }
+    }
+
+    @computed get trailPositions():Cartesian3[]{
+        const posList = this.flightStore.flightPositions.get(this.icao);
+        let newC3List:Cartesian3[] = [];
+        if(posList && posList.length <= 5){
+            newC3List = posList.map((p)=>convertPositionToCartesian(p));
+        } else if(posList) {
+            newC3List = posList.slice(posList.length-5).map((p)=>convertPositionToCartesian(p));
+        }
+        return newC3List
     }
 
     @computed get shouldLabelDisplay(){
