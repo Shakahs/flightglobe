@@ -12,14 +12,14 @@ import * as Cesium from "cesium";
 const viewer = new Cesium.Viewer('cesiumContainer', {
     animation: false,
     baseLayerPicker: false,
-    fullscreenButton: false,
-    geocoder: false,
-    homeButton: false,
-    infoBox: false,
+    // fullscreenButton: false,
+    // geocoder: false,
+    // homeButton: false,
+    // infoBox: false,
     sceneModePicker: false,
     selectionIndicator: true,
     timeline: false,
-    navigationHelpButton: false,
+    // navigationHelpButton: false,
     scene3DOnly: true,
     // imageryProvider,
     // terrainProvider,
@@ -30,6 +30,11 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
     // automaticallyTrackDataSourceClocks: false,
 });
 
+viewer.camera.defaultZoomAmount = 1000000.0;
+viewer.screenSpaceEventHandler.setInputAction(
+    ()=>{viewer.camera.zoomIn()},
+    Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK
+);
 // viewer.scene.debugShowFramesPerSecond = true;
 // viewer.dataSources.add(airportData);
 // viewer.clock.shouldAnimate = false;
