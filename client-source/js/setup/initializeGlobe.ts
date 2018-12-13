@@ -30,11 +30,11 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
     // automaticallyTrackDataSourceClocks: false,
 });
 
-viewer.camera.defaultZoomAmount = 1000000.0;
-viewer.screenSpaceEventHandler.setInputAction(
-    ()=>{viewer.camera.zoomIn()},
-    Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK
-);
+// viewer.camera.defaultZoomAmount = 1000000.0;
+// viewer.screenSpaceEventHandler.setInputAction(
+//     ()=>{viewer.camera.zoomIn()},
+//     Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK
+// );
 // viewer.scene.debugShowFramesPerSecond = true;
 // viewer.dataSources.add(airportData);
 // viewer.clock.shouldAnimate = false;
