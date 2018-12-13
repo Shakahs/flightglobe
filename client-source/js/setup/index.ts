@@ -12,10 +12,16 @@ handler.setInputAction(async (click) => {
   const pickedObject:Cesium.PointPrimitive | Cesium.Polyline = viewer.scene.pick(click.position);
   if (pickedObject) {
     console.log(`picked object id: ${pickedObject.id}`)
-    // const trackURL = `/track?icao=${ pickedObject.id._id }`;
-    // console.log(trackURL);
-    // const {data} = await axios.get(trackURL);
-    // console.log(data);
+    const trackURL = `/track?icao=${ pickedObject.id }`;
+    console.log(trackURL);
+    try {
+        const {data} = await axios.get(trackURL);
+        console.log(data);
+    } catch (e) {
+        console.log('track retrieval failed with error', e)
+    }
+
+
   }
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 

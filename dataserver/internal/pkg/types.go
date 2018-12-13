@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"encoding/json"
 	"sync"
 	"time"
 )
@@ -24,6 +25,14 @@ type FlightRecord struct {
 	Position    Position
 	Demographic Demographic
 	Time        time.Time
+}
+
+func (fr FlightRecord) MarshalBinary() ([]byte, error) {
+	return json.Marshal(fr)
+}
+
+func (fr *FlightRecord) UnmarshalBinary(raw []byte) error {
+	return json.Unmarshal(raw, fr)
 }
 
 type FlightRecords = []FlightRecord

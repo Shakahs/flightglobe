@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/go-redis/redis"
 	_ "github.com/jackc/pgx/stdlib"
 	"github.com/paulbellamy/ratecounter"
@@ -62,4 +63,12 @@ func PublishPositionsFromChan(inChan chan FlightRecords, c *redis.Client, pubCha
 			log.Printf("published %d positions in the past 5 seconds\n", counter.Rate())
 		}
 	}
+}
+
+func GeneratePointKeyName(icao string) string {
+	return fmt.Sprintf("position:%s", icao)
+}
+
+func GenerateTrackKeyName(icao string) string {
+	return fmt.Sprintf("track:%s", icao)
 }

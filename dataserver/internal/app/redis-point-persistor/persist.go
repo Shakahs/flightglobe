@@ -2,7 +2,6 @@ package redis_point_persistor
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"github.com/go-redis/redis"
 	"github.com/paulbellamy/ratecounter"
@@ -52,14 +51,6 @@ func shouldSaveTrackPosition(oldPos *pkg.FlightRecord, newPos *pkg.FlightRecord)
 	return true
 }
 
-func generatePointKeyName(icao string) string {
-	return fmt.Sprintf("position:%s", icao)
-}
-
-func generateTrackKeyName(icao string) string {
-	return fmt.Sprintf("track:%s", icao)
-}
-
 func decodeRedisResponse(oldPosRaw []byte, err error) (*pkg.FlightRecord, error) {
 	var oldPos pkg.FlightRecord
 	if err == redis.Nil {
@@ -77,12 +68,12 @@ func decodeRedisResponse(oldPosRaw []byte, err error) (*pkg.FlightRecord, error)
 }
 
 func getLatestPosition(c *redis.Client, icao string) (*pkg.FlightRecord, error) {
-	oldPosRaw, err := c.Get(generatePointKeyName(icao)).Bytes()
+	oldPosRaw, err := c.Get(pkg.GeneratePointKeyName(icao)).Bytes()
 	return decodeRedisResponse(oldPosRaw, err)
 }
 
 func getLatestTrackPosition(c *redis.Client, icao string) (*pkg.FlightRecord, error) {
-	oldPosRaw, err := c.LIndex(generateTrackKeyName(icao), -1).Bytes()
+	oldPosRaw, err := c.LIndex(pkg.GenerateTrackKeyName(icao), -1).Bytes()
 	return decodeRedisResponse(oldPosRaw, err)
 }
 
@@ -94,7 +85,7 @@ func persistLatestPosition(c *redis.Client, newPos *pkg.FlightRecord, rawPos *st
 	}
 
 	if err == redis.Nil || shouldSavePosition(oldPos, newPos) { //either it does not exist, or we need to overwrite
-		_, err = c.Set(generatePointKeyName(newPos.Icao), *rawPos, time.Minute*10).Result()
+		_, err = c.Set(pkg.GeneratePointKeyName(newPos.Icao), *rawPos, time.Minute*10).Result()
 		if err != nil {
 			return false, errors.New("Could not save new position:" + err.Error())
 		}
@@ -110,11 +101,11 @@ func persistLatestTrackPosition(c *redis.Client, newPos *pkg.FlightRecord, rawPo
 	}
 
 	if err == redis.Nil || shouldSaveTrackPosition(oldPos, newPos) { //either it does not exist, or we need to overwrite
-		_, err = c.RPush(generateTrackKeyName(newPos.Icao), *rawPos).Result()
+		_, err = c.RPush(pkg.GenerateTrackKeyName(newPos.Icao), *rawPos).Result()
 		if err != nil {
 			return false, errors.New("Could not save new track position:" + err.Error())
 		}
-		boolSet, err := c.Expire(generateTrackKeyName(newPos.Icao), time.Minute*10).Result()
+		boolSet, err := c.Expire(pkg.GenerateTrackKeyName(newPos.Icao), time.Minute*10).Result()
 		if boolSet == false || err != nil {
 			return false, errors.New("Could not set expire for new track position:" + err.Error())
 		}

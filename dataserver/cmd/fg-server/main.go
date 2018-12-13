@@ -117,19 +117,27 @@ func maintainConnection(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("connection closing")
 }
 
-//func provideTrack(w http.ResponseWriter, r *http.Request) {
-//	icao := r.URL.Query().Get("icao")
-//	trackKey := fmt.Sprintf("track:%s", icao)
-//	trackRaw, err := redisClient.JsonGet(trackKey).Bytes()
-//	if err != nil {
-//		w.WriteHeader(http.StatusBadRequest)
-//		w.Write([]byte("Could not retrieve track: " + trackKey))
-//		log.Println("Failed request for track", trackKey)
-//	} else {
-//		w.Write(trackRaw)
-//		log.Println("Sent track:", trackKey)
-//	}
-//}
+func provideTrack(w http.ResponseWriter, r *http.Request) {
+	icao := r.URL.Query().Get("icao")
+	trackKey := pkg.GenerateTrackKeyName(icao)
+	var track []pkg.FlightRecord
+
+	err := redisClient.LRange(trackKey, 0, -1).ScanSlice(&track)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Could not retrieve track: " + trackKey))
+		log.Println("Failed request for track", trackKey, err)
+	} else {
+
+		trackRaw, err := json.Marshal(track)
+		if err != nil {
+			log.Println("Failed to marshal track", trackKey, err)
+		} else {
+			w.Write(trackRaw)
+			log.Println("Sent track:", trackKey)
+		}
+	}
+}
 
 var redisSubChannel string
 var redisAddress string
@@ -183,6 +191,6 @@ func main() {
 	}
 	http.Handle("/", gziphandler.GzipHandler(fs))
 	http.HandleFunc("/sub", maintainConnection)
-	//http.HandleFunc("/track", provideTrack)
+	http.HandleFunc("/track", provideTrack)
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
