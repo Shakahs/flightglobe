@@ -9,9 +9,9 @@ const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
 // @ts-ignore: the installed Cesium type definition is incorrect (@types/cesium 1.47.3),
 // setInputAction will pass an argument (click in this case)
 handler.setInputAction(async (click) => {
-  const pickedObject = viewer.scene.pick(click.position);
+  const pickedObject:Cesium.PointPrimitive | Cesium.Polyline = viewer.scene.pick(click.position);
   if (pickedObject) {
-    console.log(pickedObject)
+    console.log(`picked object id: ${pickedObject.id}`)
     // const trackURL = `/track?icao=${ pickedObject.id._id }`;
     // console.log(trackURL);
     // const {data} = await axios.get(trackURL);

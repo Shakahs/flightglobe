@@ -65,10 +65,12 @@ func generatePointKeyName(icao string) string {
 	return fmt.Sprintf("position:%s", icao)
 }
 
-func getLatestPosition(c *redis.Client, icao string) (*pkg.FlightRecord, error) {
-	var oldPos pkg.FlightRecord
+func generateTrackKeyName(icao string) string {
+	return fmt.Sprintf("track:%s", icao)
+}
 
-	oldPosRaw, err := c.Get(generatePointKeyName(icao)).Bytes()
+func decodeRedisResponse(oldPosRaw []byte, err error) (*pkg.FlightRecord, error) {
+	var oldPos pkg.FlightRecord
 	if err == redis.Nil {
 		return &oldPos, err
 	} else if err != nil {
@@ -83,6 +85,16 @@ func getLatestPosition(c *redis.Client, icao string) (*pkg.FlightRecord, error) 
 	return &oldPos, nil
 }
 
+func getLatestPosition(c *redis.Client, icao string) (*pkg.FlightRecord, error) {
+	oldPosRaw, err := c.Get(generatePointKeyName(icao)).Bytes()
+	return decodeRedisResponse(oldPosRaw, err)
+}
+
+func getLatestTrackPosition(c *redis.Client, icao string) (*pkg.FlightRecord, error) {
+	oldPosRaw, err := c.LIndex(generateTrackKeyName(icao), -1).Bytes()
+	return decodeRedisResponse(oldPosRaw, err)
+}
+
 func persistLatestPosition(c *redis.Client, newPos *pkg.FlightRecord, rawPos *string) (bool, error) {
 
 	oldPos, err := getLatestPosition(c, newPos.Icao)
@@ -90,10 +102,30 @@ func persistLatestPosition(c *redis.Client, newPos *pkg.FlightRecord, rawPos *st
 		return false, errors.New("Could not retrieve old position:" + err.Error())
 	}
 
-	if err == redis.Nil || shouldSavePosition(oldPos, newPos) {
+	if err == redis.Nil || shouldSavePosition(oldPos, newPos) { //either it does not exist, or we need to overwrite
 		_, err = c.Set(generatePointKeyName(newPos.Icao), *rawPos, time.Minute*10).Result()
 		if err != nil {
 			return false, errors.New("Could not save new position:" + err.Error())
+		}
+	}
+
+	return true, nil
+}
+
+func persistLatestTrackPosition(c *redis.Client, newPos *pkg.FlightRecord, rawPos *string) (bool, error) {
+	oldPos, err := getLatestTrackPosition(c, newPos.Icao)
+	if err != redis.Nil && err != nil {
+		return false, errors.New("Could not retrieve old track position:" + err.Error())
+	}
+
+	if err == redis.Nil || shouldSavePosition(oldPos, newPos) { //either it does not exist, or we need to overwrite
+		_, err = c.RPush(generateTrackKeyName(newPos.Icao), *rawPos).Result()
+		if err != nil {
+			return false, errors.New("Could not save new track position:" + err.Error())
+		}
+		boolSet, err := c.Expire(generateTrackKeyName(newPos.Icao), time.Minute*10).Result()
+		if boolSet == false || err != nil {
+			return false, errors.New("Could not set expire for new track position:" + err.Error())
 		}
 	}
 
@@ -147,9 +179,11 @@ func Persist(c *redis.Client, redisSubChannel string, redisPubChannel string) {
 	ticker := time.NewTicker(time.Second * 5)
 	defer ticker.Stop()
 
-	persistCounter := ratecounter.NewRateCounter(5 * time.Second)
-	publishCounter := ratecounter.NewRateCounter(5 * time.Second)
-	dropCounter := ratecounter.NewRateCounter(5 * time.Second)
+	pointPersistCounter := ratecounter.NewRateCounter(5 * time.Second)
+	trackPersistCounter := ratecounter.NewRateCounter(5 * time.Second)
+	pointPublishCounter := ratecounter.NewRateCounter(5 * time.Second)
+	pointDropCounter := ratecounter.NewRateCounter(5 * time.Second)
+	trackDropCounter := ratecounter.NewRateCounter(5 * time.Second)
 
 	for {
 		select {
@@ -164,31 +198,31 @@ func Persist(c *redis.Client, redisSubChannel string, redisPubChannel string) {
 				break
 			}
 
-			wasPointPersisted, err := persistLatestPosition(c, newPos, &msg.Payload)
+			_, err = persistLatestPosition(c, newPos, &msg.Payload)
 			if err != nil {
+				pointDropCounter.Incr(1)
 				log.Println("Encountered an error saving a position:", err)
 			} else {
+				pointPersistCounter.Incr(1)
 				err := pkg.PublishPosition(c, redisPubChannel, newPos)
 				if err != nil {
 					log.Println("Encountered an error publishing a position:", err)
 				} else {
-					publishCounter.Incr(1)
+					pointPublishCounter.Incr(1)
 				}
 			}
 
-			//_, err = persistLatestTrackPosition(c, msg.Payload)
-			//if err != nil {
-			//	log.Println("Encountered an error saving a track:", err)
-			//}
-
-			if wasPointPersisted {
-				persistCounter.Incr(1)
+			_, err = persistLatestTrackPosition(c, newPos, &msg.Payload)
+			if err != nil {
+				trackDropCounter.Incr(1)
+				log.Println("Encountered an error saving a track:", err)
 			} else {
-				dropCounter.Incr(1)
+				trackPersistCounter.Incr(1)
 			}
+
 		case <-ticker.C:
-			log.Printf("%d positions persisted, %d positions published, %d positions dropped in the past 5 seconds",
-				persistCounter.Rate(), publishCounter.Rate(), dropCounter.Rate())
+			log.Printf("in the past 5 seconds: %d positions persisted, %d positions published, %d positions dropped, %d track persisted, %d tracks dropped ",
+				pointPersistCounter.Rate(), pointPublishCounter.Rate(), pointDropCounter.Rate(), trackPersistCounter.Rate(), trackDropCounter.Rate())
 		}
 	}
 }
