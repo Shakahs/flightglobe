@@ -39,27 +39,18 @@ func shouldSavePosition(oldPos *pkg.FlightRecord, newPos *pkg.FlightRecord) bool
 	return true
 }
 
-//func shouldSaveTrackPosition(track pkg.FlightRecords, newPos pkg.FlightRecord) bool {
-//	if !isPositionValid(newPos) {
-//		return false
-//	} //failed validation
-//
-//	if len(track) == 0 {
-//		return true
-//	} //empty track
-//
-//	oldPos := track[len(track)-1] //get last recorded position
-//
-//	if arePositionsIdentical(oldPos, newPos) {
-//		return false
-//	} //identical positions
-//
-//	delta := newPos.Time.Sub(oldPos.Time)
-//	if delta.Minutes() < 1 {
-//		return false
-//	} //less than 1 minute difference
-//	return true
-//}
+func shouldSaveTrackPosition(oldPos *pkg.FlightRecord, newPos *pkg.FlightRecord) bool {
+	if !shouldSavePosition(oldPos, newPos) {
+		return false
+	}
+
+	delta := newPos.Time.Sub(oldPos.Time)
+	if delta.Minutes() < 1 {
+		return false
+	} //less than 1 minute difference
+
+	return true
+}
 
 func generatePointKeyName(icao string) string {
 	return fmt.Sprintf("position:%s", icao)
@@ -118,7 +109,7 @@ func persistLatestTrackPosition(c *redis.Client, newPos *pkg.FlightRecord, rawPo
 		return false, errors.New("Could not retrieve old track position:" + err.Error())
 	}
 
-	if err == redis.Nil || shouldSavePosition(oldPos, newPos) { //either it does not exist, or we need to overwrite
+	if err == redis.Nil || shouldSaveTrackPosition(oldPos, newPos) { //either it does not exist, or we need to overwrite
 		_, err = c.RPush(generateTrackKeyName(newPos.Icao), *rawPos).Result()
 		if err != nil {
 			return false, errors.New("Could not save new track position:" + err.Error())
@@ -131,46 +122,6 @@ func persistLatestTrackPosition(c *redis.Client, newPos *pkg.FlightRecord, rawPo
 
 	return true, nil
 }
-
-//func persistLatestTrackPosition(c *rejonson.Client, rawPos string) (bool, error) {
-//	var newPos pkg.FlightRecord
-//	err := json.Unmarshal([]byte(rawPos), &newPos) //get msg string, convert to byte array for unmarshal
-//	if err != nil {
-//		log.Fatal("unmarshal error", err)
-//	}
-//
-//	trackKey := fmt.Sprintf("track:$%s", newPos.Icao)
-//	_, err = pkg.EnsureJSONKeyExists(c, trackKey, "[]")
-//	if err != nil {
-//		return false, err
-//	}
-//
-//	var track pkg.FlightRecords
-//	rawTrack, err := c.JsonGet(trackKey).Bytes()
-//	if err != nil {
-//		return false, err
-//	}
-//
-//	err = json.Unmarshal(rawTrack, &track)
-//	if err != nil {
-//		return false, err
-//	}
-//
-//	if shouldSaveTrackPosition(track, newPos) { //compare last element of existing track to this new element
-//		_, err = c.JsonArrAppend(trackKey, ".", rawPos).Result()
-//		if err != nil {
-//			return false, err
-//		}
-//	}
-//
-//	expireAt, err := time.ParseDuration("10m")
-//	_, err = c.Expire(trackKey, expireAt).Result()
-//	if err != nil {
-//		return false, err
-//	}
-//
-//	return true, nil
-//}
 
 func Persist(c *redis.Client, redisSubChannel string, redisPubChannel string) {
 	subscription := c.Subscribe(redisSubChannel)
