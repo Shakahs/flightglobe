@@ -37,8 +37,6 @@ export interface FlightPosition  {
     geohash: string
 }
 
-export type FlightPositions = FlightPosition[]
-
 export type FlightPositionMap = { [icao:string]: FlightPosition }
 
 export type FlightMap = Map<string,Flight>
@@ -58,3 +56,17 @@ export interface DemographicsUpdate extends Message {
 }
 
 export type GeoMap = Map<string,Cesium.PointPrimitiveCollection>
+
+// type FlightRecord struct {
+//     Icao        string
+//     Position    Position
+//     Demographic Demographic
+//     Time        time.Time
+// }
+
+export interface FlightRecord {
+    Icao: string,
+    Position: FlightPosition,
+    Demographic: FlightDemographics,
+    Time: string
+}

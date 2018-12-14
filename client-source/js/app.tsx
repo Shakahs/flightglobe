@@ -8,8 +8,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {FlightPosition, FlightMap, PositionUpdate, DemographicsUpdate, GeoMap} from "./types";
 import {FlightObj, FlightStore} from './flights'
+import applyClickHandler from "./setup/clickHandler";
 
 const flightStore = new FlightStore(viewer);
+applyClickHandler(viewer, flightStore)
 
 let newestPositionTimestamp = 0;
 

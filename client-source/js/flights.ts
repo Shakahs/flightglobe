@@ -9,7 +9,16 @@ import {
     ObservableMap,
     trace, toJS
 } from 'mobx';
-import {DemographicsUpdate, Flight, FlightDemographics, FlightPosition, GeoMap, Icao, PositionUpdate} from "./types";
+import {
+    DemographicsUpdate,
+    Flight,
+    FlightDemographics,
+    FlightPosition,
+    FlightRecord,
+    GeoMap,
+    Icao,
+    PositionUpdate
+} from "./types";
 import * as Cesium from "cesium";
 import {convertPositionToCartesian} from "./utility";
 const Geohash = require('latlon-geohash');
@@ -35,6 +44,7 @@ export class FlightStore {
     newestPositionTimestamp = 0;
     viewer:Cesium.Viewer;
     cameraEventDisposer:Cesium.Event.RemoveCallback;
+    @observable selectedFlight:string = '';
 
 
     constructor(viewer: Cesium.Viewer){
@@ -81,6 +91,15 @@ export class FlightStore {
         }
 
         this.updateLatestTimestamp(pos)
+    }
+
+    importTrack(track: FlightRecord[]){
+        const icao = track[0].Icao;
+        const newPositions:FlightPosition[] = [];
+        track.forEach((t)=>{
+            newPositions.push(t.Position)
+        });
+        this.flightPositions.set(icao,newPositions)
     }
 
     addDemographics(dem: DemographicsUpdate){
@@ -138,7 +157,7 @@ export class FlightObj {
         },{name:'pointUpdater'});
 
         const trailUpdater = autorun(()=>{
-            const shouldBeVisible = true;
+            const shouldBeVisible = this.shouldTrailDisplay;
             const positions = this.trailPositions;
             if(shouldBeVisible && positions.length>0){
                 if(this.trail){
@@ -180,11 +199,16 @@ export class FlightObj {
     }
 
     @computed get levelOfDetail():number {
+        if(this.isSelected){return 1}
         if(this.latestPosition){
             const level = this.flightStore.geoLevelOfDetail.get(this.latestPosition.geohash);
             return level ? level : 0;
         }
         return 0;
+    }
+
+    @computed get isSelected():boolean {
+        return this.icao === this.flightStore.selectedFlight;
     }
 
     @computed get latestPosition():FlightPosition|null {
@@ -224,15 +248,17 @@ export class FlightObj {
         }
     }
 
+    //depending on the length of the available position history, and this points selection status
+    //return the whole position history or the last 5 positions
     @computed get trailPositions():Cartesian3[]{
-        const posList = this.flightStore.flightPositions.get(this.icao);
-        let newC3List:Cartesian3[] = [];
-        if(posList && posList.length <= 5){
-            newC3List = posList.map((p)=>convertPositionToCartesian(p));
-        } else if(posList) {
-            newC3List = posList.slice(posList.length-5).map((p)=>convertPositionToCartesian(p));
+        const fullPosList = this.flightStore.flightPositions.get(this.icao);
+        let subPosList:FlightPosition[] = [];
+        if(fullPosList && fullPosList.length <= 5){
+            subPosList = fullPosList;
+        } else if(fullPosList) {
+            subPosList = this.isSelected ? fullPosList : fullPosList.slice(fullPosList.length-5)
         }
-        return newC3List
+        return subPosList.map((p)=>convertPositionToCartesian(p))
     }
 
     @computed get shouldLabelDisplay(){
