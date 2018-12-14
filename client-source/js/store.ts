@@ -7,7 +7,7 @@ import {
     IObjectDidChange,
     IReactionDisposer,
     ObservableMap,
-    trace, toJS
+    trace, toJS, reaction
 } from 'mobx';
 import {
     DemographicsUpdate,
@@ -45,7 +45,8 @@ export class FlightStore {
     viewer:Cesium.Viewer;
     cameraEventDisposer:Cesium.Event.RemoveCallback;
     @observable selectedFlight:string = '';
-
+    @observable.ref displayedDemographics:FlightDemographics[] = [];
+    disposer:IReactionDisposer
 
     constructor(viewer: Cesium.Viewer){
         this.viewer = viewer;
@@ -60,6 +61,15 @@ export class FlightStore {
                 this.geoLevelOfDetail.set(neighbor, 1)
             })
         });
+
+        this.disposer = reaction(
+            ()=>Array.from(this.flightDemographics.values()),
+            (demoData)=>{
+                this.displayedDemographics = demoData;
+                // console.table(this.displayedDemographics)
+            },
+            {delay: 2000}
+        )
     }
 
     getOrCreateGeoCollection(id: string):GeoCollection{

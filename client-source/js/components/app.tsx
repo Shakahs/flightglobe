@@ -9,6 +9,7 @@ import ReactDOM from 'react-dom';
 import {FlightPosition, FlightMap, PositionUpdate, DemographicsUpdate, GeoMap} from "../types";
 import {FlightObj, FlightStore} from '../store'
 import applyClickHandler from "../globe/clickHandler";
+import FlightTable from './FlightTable'
 
 const flightStore = new FlightStore(viewer);
 applyClickHandler(viewer, flightStore)
@@ -52,7 +53,9 @@ setInterval(()=>{
 }, 15000);
 
 const App = ()=>(
-    <div>Hello world...</div>
+    <FlightTable
+        demoData={flightStore}
+    />
 );
 
 ReactDOM.render(<App />,document.getElementById('reactApp'));
