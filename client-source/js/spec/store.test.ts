@@ -1,4 +1,4 @@
-import {FlightObj, FlightStore} from "../flights";
+import {FlightObj, FlightStore} from "../store";
 import * as Cesium from "cesium";
 import {FlightPosition, PositionUpdate} from "../types";
 import {toJS} from "mobx";

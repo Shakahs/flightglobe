@@ -1,14 +1,14 @@
 import "@babel/polyfill";
 import 'cesiumSource/Widgets/widgets.css';
-import {socket$, buffered$} from './api/webSocket';
-import { viewer } from './setup';
+import {socket$, buffered$} from '../api/webSocket';
+import { viewer } from '../globe';
 import {size,forEach} from 'lodash-es'
 import { interval } from 'rxjs';
-import React from 'react';
+import * as React from 'react';
 import ReactDOM from 'react-dom';
-import {FlightPosition, FlightMap, PositionUpdate, DemographicsUpdate, GeoMap} from "./types";
-import {FlightObj, FlightStore} from './flights'
-import applyClickHandler from "./setup/clickHandler";
+import {FlightPosition, FlightMap, PositionUpdate, DemographicsUpdate, GeoMap} from "../types";
+import {FlightObj, FlightStore} from '../store'
+import applyClickHandler from "../globe/clickHandler";
 
 const flightStore = new FlightStore(viewer);
 applyClickHandler(viewer, flightStore)

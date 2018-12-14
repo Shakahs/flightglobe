@@ -1,6 +1,6 @@
 import * as Cesium from "cesium";
 import axios from "axios";
-import {FlightStore} from "../flights";
+import {FlightStore} from "../store";
 import {FlightRecord} from "../types";
 
 const applyClickHandler = function(viewer: Cesium.Viewer, flightStore: FlightStore){
