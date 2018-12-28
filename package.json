@@ -56,6 +56,8 @@
     "webpack-dev-server": "^3.1.9"
   },
   "dependencies": {
+    "ag-grid-community": "^19.1.4",
+    "ag-grid-react": "^19.1.2",
     "axios": "^0.17.1",
     "cesium": "^1.51.0",
     "date-fns": "^1.29.0",
@@ -73,7 +75,6 @@
     "react-redux": "^5.0.6",
     "react-router": "^4.1.2",
     "react-router-dom": "^4.1.2",
-    "react-tabulator": "^0.7.11",
     "redux": "^3.7.2",
     "redux-actions": "^2.2.1",
     "redux-immutable": "^4.0.0",

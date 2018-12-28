@@ -63,9 +63,15 @@ export class FlightStore {
         });
 
         this.disposer = reaction(
-            ()=>Array.from(this.flightDemographics.values()),
-            (demoData)=>{
-                this.displayedDemographics = demoData;
+            ()=>{
+                const newData:FlightDemographics[]=[];
+                for(let e of this.flightDemographics.entries()){
+                    newData.push({icao:e[0], ...e[1]})
+                }
+                return newData
+            },
+            (newData)=>{
+                this.displayedDemographics = newData;
                 // console.table(this.displayedDemographics)
             },
             {delay: 2000}

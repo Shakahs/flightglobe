@@ -1,27 +1,97 @@
-import 'react-tabulator/lib/styles.css'; // required styles
-import 'react-tabulator/lib/css/tabulator.min.css'; // theme
-import { ReactTabulator } from 'react-tabulator';
 import * as React from 'react';
 import {FlightDemographics, Icao} from "../types";
 import { observer } from "mobx-react"
 import {ObservableMap} from "mobx";
 import {sampleSize} from "lodash-es";
+import {AgGridReact, AgGridColumn, AgGridColumnProps} from 'ag-grid-react';
+import 'ag-grid-community/dist/styles/ag-grid.css';
+import 'ag-grid-community/dist/styles/ag-theme-balham.css';
+
+
+interface FlightTableProps {
+    demoData: any
+}
+
+interface FlightTableState {
+    columnDefs: any
+}
+
 
 const FlightTable = observer(
-    ({demoData})=>(
-        <div>
-            Length: {demoData.displayedDemographics.length}
-            <ReactTabulator
-                columns={[
-                    {title:"Origin", field:"origin"},
-                    {title:"Destination", field:"destination"}
-                ]}
-                // data={[]}
-                data={sampleSize(demoData.displayedDemographics, 10)}
-            />
-        </div>
-    )
-);
+    class FlightTableClass extends React.Component<FlightTableProps,FlightTableState> {
+
+        constructor(){
+            super();
+            this.state = {
+                columnDefs: [
+                    {headername:"ICAO", field:"icao"},
+                    {headername:"Origin", field:"origin"},
+                    {headername:"Destination", field:"destination"}
+                ]
+            }
+        }
+
+        render() {
+            return(
+                <div>
+                    Length: {this.props.demoData.displayedDemographics.length}
+                    <div
+                        className="ag-theme-balham"
+                        style={{
+                            height: '500px',
+                            width: '600px' }}
+                    >
+                        <AgGridReact
+                            //@ts-ignore
+                            //@ts-ignore
+                            enableSorting={true}
+                            enableFilter={true}
+                            //@ts-ignore
+                            columnDefs={this.state.columnDefs}
+                            deltaRowDateMode={true}
+                            rowData={this.props.demoData.displayedDemographics}>
+                            {/*rowData={sampleSize(demoData.displayedDemographics, 1000)}>*/}
+                            {/*getRowNodeId={data=>data.icao}*/}
+                            >
+                        </AgGridReact>
+                    </div>
+                </div>
+            )
+        }
+    }
+)
+
+// const FlightTable = observer(
+//     ({demoData})=>(
+//         <div>
+//             Length: {demoData.displayedDemographics.length}
+//             <div
+//                 className="ag-theme-balham"
+//                 style={{
+//                     height: '500px',
+//                     width: '600px' }}
+//             >
+//                 <AgGridReact
+//                     //@ts-ignore
+//                     //@ts-ignore
+//                     enableSorting={true}
+//                     enableFilter={true}
+//                     //@ts-ignore
+//                     columnDefs={[
+//                         {headername:"ICAO", field:"icao"},
+//                         {headername:"Origin", field:"origin"},
+//                         {headername:"Destination", field:"destination"}
+//                     ]}
+//                     deltaRowDateMode={true}
+//                     rowData={demoData.displayedDemographics}>
+//                     {/*rowData={sampleSize(demoData.displayedDemographics, 1000)}>*/}
+//                     getRowNodeId={data=>data.icao}
+//                 >
+//                 </AgGridReact>
+//             </div>
+//         </div>
+//     )
+// );
 
 // interface FlightTableProps {
 //     flightDemographics: FlightDemographics
