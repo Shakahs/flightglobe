@@ -66,7 +66,12 @@ export class FlightStore {
             ()=>{
                 const newData:FlightDemographics[]=[];
                 for(let e of this.flightDemographics.entries()){
-                    newData.push({icao:e[0], ...e[1]})
+                    newData.push({
+                        icao:e[0],
+                        origin: e[1].origin,
+                        destination: e[1].destination,
+                        model: e[1].model
+                    })
                 }
                 return newData
             },

@@ -13,53 +13,69 @@ interface FlightTableProps {
 }
 
 interface FlightTableState {
-    columnDefs: any
+    columnDefs: any,
+    mockData: any,
 }
 
+@observer
+class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
 
-const FlightTable = observer(
-    class FlightTableClass extends React.Component<FlightTableProps,FlightTableState> {
 
-        constructor(){
-            super();
-            this.state = {
-                columnDefs: [
-                    {headername:"ICAO", field:"icao"},
-                    {headername:"Origin", field:"origin"},
-                    {headername:"Destination", field:"destination"}
-                ]
-            }
-        }
+    colDefs =  [
+        {field:"icao"},
+        {field:"origin"},
+        {field:"destination"},
+        {field:"model"}
+    ];
 
-        render() {
-            return(
-                <div>
-                    Length: {this.props.demoData.displayedDemographics.length}
-                    <div
-                        className="ag-theme-balham"
-                        style={{
-                            height: '500px',
-                            width: '600px' }}
-                    >
-                        <AgGridReact
-                            //@ts-ignore
-                            //@ts-ignore
-                            enableSorting={true}
-                            enableFilter={true}
-                            //@ts-ignore
-                            columnDefs={this.state.columnDefs}
-                            deltaRowDateMode={true}
-                            rowData={this.props.demoData.displayedDemographics}>
-                            {/*rowData={sampleSize(demoData.displayedDemographics, 1000)}>*/}
-                            {/*getRowNodeId={data=>data.icao}*/}
-                            >
-                        </AgGridReact>
-                    </div>
-                </div>
-            )
-        }
+    constructor(props){
+        super(props);
+        this.state = {
+            columnDefs: [
+                {field:"icao"},
+                {field:"origin"},
+                {field:"destination"},
+                {field:"model"}
+            ],
+            mockData: []
+        };
+
+        this.getRowNodeId = this.getRowNodeId.bind(this);
     }
-)
+
+    getRowNodeId(data: FlightDemographics) {
+        return data.icao;
+    }
+
+    render() {
+        return(
+            <div>
+                Length: {this.props.demoData.displayedDemographics.length}
+                <div
+                    className="ag-theme-balham"
+                    style={{
+                        height: '500px',
+                        width: '600px' }}
+                >
+                    <AgGridReact
+                        // columnDefs={this.colDefs}
+                        // enableSorting={true}
+                        // enableFilter={true}
+                        columnDefs={this.state.columnDefs}
+                        //@ts-ignore
+                        // deltaRowDateMode={true}
+                        // rowData={this.props.demoData.displayedDemographics}>
+                        rowData={[{icao:'abc',origin:'lax',destination:'nyc',model:'747'}]}>
+                        {/*rowData={sampleSize(demoData.displayedDemographics, 1000)}>*/}
+                        getRowNodeId={(data)=>{return data.icao}}
+                        {/*getRowNodeId={this.getRowNodeId}*/}
+                        >
+                    </AgGridReact>
+                </div>
+            </div>
+        )
+    }
+}
 
 // const FlightTable = observer(
 //     ({demoData})=>(
