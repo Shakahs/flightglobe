@@ -77,7 +77,6 @@ export class FlightStore {
             },
             (newData)=>{
                 this.displayedDemographics = newData;
-                // console.table(this.displayedDemographics)
             },
             {delay: 2000}
         )
