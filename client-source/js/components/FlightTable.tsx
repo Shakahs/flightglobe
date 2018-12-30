@@ -6,7 +6,7 @@ import {sampleSize} from "lodash-es";
 import {AgGridReact, AgGridColumn, AgGridColumnProps} from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-balham-dark.css';
-
+import {GridApi,AgGridEvent,FilterChangedEvent} from 'ag-grid-community'
 
 interface FlightTableProps {
     demoData: any
@@ -27,7 +27,7 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
                 {field:"destination"},
                 {field:"model"}
             ]
-        }
+        };
     }
 
     render() {
@@ -44,6 +44,13 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
                         columnDefs={this.state.columnDefs}
                         rowData={this.props.demoData.displayedDemographics}
                         getRowNodeId={(data)=>{return data.icao}}
+                        onFilterChanged={(data:FilterChangedEvent)=>{
+                            const displayedRows:any[]=[];
+                            if(data.api){
+                                data.api.forEachNodeAfterFilter((node)=>{displayedRows.push(node.data)})
+                            }
+                            console.table(displayedRows)
+                        }}
                         deltaRowDataMode
                         enableSorting
                         enableFilter
