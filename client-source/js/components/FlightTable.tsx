@@ -46,12 +46,13 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
                         rowData={this.props.store.displayedDemographics}
                         getRowNodeId={(data)=>{return data.icao}}
                         onFilterChanged={(data:FilterChangedEvent)=>{
-                            this.props.store.filterResult.clear();
+                            const resultMap = new Map<string,boolean>();
                             if(data.api){
                                 data.api.forEachNodeAfterFilter((node)=>{
-                                    this.props.store.filterResult.set(node.data.icao,true)
+                                    resultMap.set(node.data.icao,true)
                                 })
                             }
+                            this.props.store.filterResult.replace(resultMap)
                         }}
                         deltaRowDataMode
                         enableSorting
