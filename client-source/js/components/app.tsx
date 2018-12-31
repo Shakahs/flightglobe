@@ -54,7 +54,7 @@ setInterval(()=>{
 
 const App = ()=>(
     <FlightTable
-        demoData={flightStore}
+        store={flightStore}
     />
 );
 

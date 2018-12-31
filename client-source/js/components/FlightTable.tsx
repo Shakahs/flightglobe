@@ -7,9 +7,10 @@ import {AgGridReact, AgGridColumn, AgGridColumnProps} from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-balham-dark.css';
 import {GridApi,AgGridEvent,FilterChangedEvent} from 'ag-grid-community'
+import {FlightStore} from "../store";
 
 interface FlightTableProps {
-    demoData: any
+    store: FlightStore
 }
 
 interface FlightTableState {
@@ -42,14 +43,15 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
                 >
                     <AgGridReact
                         columnDefs={this.state.columnDefs}
-                        rowData={this.props.demoData.displayedDemographics}
+                        rowData={this.props.store.displayedDemographics}
                         getRowNodeId={(data)=>{return data.icao}}
                         onFilterChanged={(data:FilterChangedEvent)=>{
-                            const displayedRows:any[]=[];
+                            this.props.store.filterResult.clear();
                             if(data.api){
-                                data.api.forEachNodeAfterFilter((node)=>{displayedRows.push(node.data)})
+                                data.api.forEachNodeAfterFilter((node)=>{
+                                    this.props.store.filterResult.set(node.data.icao,true)
+                                })
                             }
-                            console.table(displayedRows)
                         }}
                         deltaRowDataMode
                         enableSorting

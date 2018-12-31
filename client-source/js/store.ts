@@ -36,9 +36,10 @@ import {
 const labelOffset = new Cesium.Cartesian2(10, 20);
 
 export class FlightStore {
-    flightPositions = new ObservableMap<Icao, FlightPosition[]>(undefined,undefined, "positionmap");
+    flightPositions = new ObservableMap<Icao, FlightPosition[]>(undefined,undefined, "positionMap");
     flightDemographics = new ObservableMap<Icao, FlightDemographics>();
-    geoLevelOfDetail = new ObservableMap<string, number>(undefined, undefined, "geoLODmap");
+    geoLevelOfDetail = new ObservableMap<string, number>(undefined, undefined, "geoLODMap");
+    filterResult = new ObservableMap<string, boolean>(undefined, undefined, "filterResultMap");
     geoAreas = new Map<Icao, GeoCollection>();
     flights = new Map<Icao, FlightObj>();
     newestPositionTimestamp = 0;
@@ -160,6 +161,19 @@ export class FlightObj {
         this.icao = icao;
         this.geoCollection = geo;
 
+        const visibilityUpdater = autorun(()=>{
+            const shouldDisplay = this.shouldDisplay
+            if(shouldDisplay){
+                if (this.point){
+                    this.point.show = true
+                }
+            } else {
+                if (this.point){
+                    this.point.show = false
+                }
+            }
+        }, {name: 'visibilityUpdater'});
+
         const pointUpdater = autorun(()=>{
             const posList = this.flightStore.flightPositions.get(this.icao);
             if(posList){
@@ -248,6 +262,13 @@ export class FlightObj {
 
     @computed get demographics():FlightDemographics|undefined {
         return this.flightStore.flightDemographics.get(this.icao)
+    }
+
+    @computed get shouldDisplay():boolean {
+        if(this.flightStore.filterResult.size > 0){
+            return this.flightStore.filterResult.has(this.icao)
+        }
+        return true
     }
 
     destroyPoint(){
