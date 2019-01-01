@@ -7,7 +7,8 @@ import {
     IObjectDidChange,
     IReactionDisposer,
     ObservableMap,
-    trace, toJS, reaction
+    trace, toJS, reaction,
+    configure, action
 } from 'mobx';
 import {
     DemographicsUpdate,
@@ -32,6 +33,10 @@ import {
     PointPrimitiveCollection, Polyline, PolylineCollection,
     Viewer
 } from "cesium";
+
+configure({
+    enforceActions: "observed"
+});
 
 const labelOffset = new Cesium.Cartesian2(10, 20);
 
@@ -92,6 +97,7 @@ export class FlightStore {
         return geo
     }
 
+    @action('addOrUpdateFlight')
     addOrUpdateFlight(pos: PositionUpdate){
         // this.flightPositions.set(pos.icao, pos.body);
         const currentPositions = this.flightPositions.get(pos.icao);
@@ -114,6 +120,7 @@ export class FlightStore {
         this.updateLatestTimestamp(pos)
     }
 
+    @action('importTrack')
     importTrack(track: FlightRecord[]){
         const icao = track[0].Icao;
         const newPositions:FlightPosition[] = [];
@@ -123,8 +130,14 @@ export class FlightStore {
         this.flightPositions.set(icao,newPositions)
     }
 
+    @action('addDemographics')
     addDemographics(dem: DemographicsUpdate){
         this.flightDemographics.set(dem.icao, dem.body)
+    }
+
+    @action('updateFilteredFlights')
+    updateFilteredFlights(filtered: Map<string,boolean>){
+        this.filterResult.replace(filtered)
     }
 
     updateLatestTimestamp(pos:PositionUpdate){

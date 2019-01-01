@@ -52,7 +52,7 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
                                     resultMap.set(node.data.icao,true)
                                 })
                             }
-                            this.props.store.filterResult.replace(resultMap)
+                            this.props.store.updateFilteredFlights(resultMap);
                         }}
                         deltaRowDataMode
                         enableSorting
