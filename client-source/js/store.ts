@@ -12,18 +12,16 @@ import {
 } from 'mobx';
 import {
     DemographicsUpdate,
-    Flight,
     FlightDemographics,
     FlightPosition,
     FlightRecord,
-    GeoMap,
     Icao,
     PositionUpdate
 } from "./types";
 import * as Cesium from "cesium";
-import {convertPositionToCartesian} from "./utility";
+import {convertPositionToCartesian, newFlightRecord} from "./utility";
 const Geohash = require('latlon-geohash');
-import {forEach} from "lodash-es";
+import {forEach,has} from "lodash-es";
 import {
     Cartesian3,
     Label,
@@ -41,8 +39,7 @@ configure({
 const labelOffset = new Cesium.Cartesian2(10, 20);
 
 export class FlightStore {
-    flightPositions = new ObservableMap<Icao, FlightPosition[]>(undefined,undefined, "positionMap");
-    flightDemographics = new ObservableMap<Icao, FlightDemographics>();
+    flightData = new ObservableMap<Icao, FlightRecord>(undefined,undefined, "flightData");
     geoLevelOfDetail = new ObservableMap<string, number>(undefined, undefined, "geoLODMap");
     filterResult = new ObservableMap<string, boolean>(undefined, undefined, "filterResultMap");
     geoAreas = new Map<Icao, GeoCollection>();
@@ -71,13 +68,15 @@ export class FlightStore {
         this.disposer = reaction(
             ()=>{
                 const newData:FlightDemographics[]=[];
-                for(let e of this.flightDemographics.entries()){
-                    newData.push({
-                        icao:e[0],
-                        origin: e[1].origin,
-                        destination: e[1].destination,
-                        model: e[1].model
-                    })
+                for(let e of this.flightData.entries()){
+                    if(e[1].demographic){
+                        newData.push({
+                            icao:e[0],
+                            origin: e[1].demographic.origin,
+                            destination: e[1].demographic.destination,
+                            model: e[1].demographic.model
+                        })
+                    }
                 }
                 return newData
             },
@@ -100,11 +99,13 @@ export class FlightStore {
     @action('addOrUpdateFlight')
     addOrUpdateFlight(pos: PositionUpdate){
         // this.flightPositions.set(pos.icao, pos.body);
-        const currentPositions = this.flightPositions.get(pos.icao);
-        if(currentPositions){
-            currentPositions.push(pos.body)
+        const currentData = this.flightData.get(pos.icao);
+        if(currentData){
+            currentData.positions.push(pos.body)
         } else {
-            this.flightPositions.set(pos.icao, [pos.body])
+            const newData = newFlightRecord(pos.icao);
+            newData.positions.push(pos.body);
+            this.flightData.set(pos.icao, newData)
         }
 
         const geoColl = this.getOrCreateGeoCollection(pos.body.geohash[0]);
@@ -120,19 +121,26 @@ export class FlightStore {
         this.updateLatestTimestamp(pos)
     }
 
-    @action('importTrack')
-    importTrack(track: FlightRecord[]){
-        const icao = track[0].Icao;
-        const newPositions:FlightPosition[] = [];
-        track.forEach((t)=>{
-            newPositions.push(t.Position)
-        });
-        this.flightPositions.set(icao,newPositions)
-    }
+    // @action('importTrack')
+    // importTrack(track: FlightRecord[]){
+    //     const icao = track[0].Icao;
+    //     const newPositions:FlightPosition[] = [];
+    //     track.forEach((t)=>{
+    //         newPositions.push(t.Position[0])
+    //     });
+    //     this.flightPositions.set(icao,newPositions)
+    // }
 
     @action('addDemographics')
     addDemographics(dem: DemographicsUpdate){
-        this.flightDemographics.set(dem.icao, dem.body)
+        const currentData = this.flightData.get(dem.icao);
+        if(currentData){
+            currentData.demographic=dem.body;
+        } else {
+            const newData = newFlightRecord(dem.icao);
+            newData.demographic=dem.body
+            this.flightData.set(dem.icao, newData)
+        }
     }
 
     @action('updateFilteredFlights')
@@ -146,7 +154,7 @@ export class FlightStore {
     }
 
     numberFlights():number {
-        return this.flightPositions.size
+        return this.flightData.size
     }
 
     numberGeos():number {
@@ -188,9 +196,9 @@ export class FlightObj {
         }, {name: 'visibilityUpdater'});
 
         const pointUpdater = autorun(()=>{
-            const posList = this.flightStore.flightPositions.get(this.icao);
-            if(posList){
-                const newC3 = convertPositionToCartesian(posList[posList.length-1]);
+            const flightRecord = this.flightStore.flightData.get(this.icao);
+            if(flightRecord){
+                const newC3 = convertPositionToCartesian(flightRecord.positions[flightRecord.positions.length-1]);
                 if(this.point){
                     this.point.position = newC3;
                 } else {
@@ -222,11 +230,11 @@ export class FlightObj {
         },{name:'trailUpdater'});
 
         const labelUpdater = autorun(()=>{
-            const posList = this.flightStore.flightPositions.get(this.icao);
+            const flightRecord = this.flightStore.flightData.get(this.icao);
             const shouldBeVisible = this.shouldLabelDisplay;
             const labelText = this.labelText;
-            if(shouldBeVisible && posList){
-                const newC3 = convertPositionToCartesian(posList[posList.length-1]);
+            if(shouldBeVisible && flightRecord && flightRecord.positions.length>0){
+                const newC3 = convertPositionToCartesian(flightRecord.positions[flightRecord.positions.length-1]);
                 if(this.label){
                     this.label.position = newC3;
                 } else {
@@ -259,9 +267,9 @@ export class FlightObj {
     }
 
     @computed get latestPosition():FlightPosition|null {
-        const posList = this.flightStore.flightPositions.get(this.icao);
-        if(posList){
-            return posList[posList.length-1];
+        const flightRecord = this.flightStore.flightData.get(this.icao);
+        if(flightRecord){
+            return flightRecord.positions[flightRecord.positions.length-1];
         }
         return null
     }
@@ -274,7 +282,11 @@ export class FlightObj {
     }
 
     @computed get demographics():FlightDemographics|undefined {
-        return this.flightStore.flightDemographics.get(this.icao)
+        const flightRecord = this.flightStore.flightData.get(this.icao);
+        if(flightRecord){
+            return flightRecord.demographic
+        }
+        return undefined
     }
 
     @computed get shouldDisplay():boolean {
@@ -305,12 +317,12 @@ export class FlightObj {
     //depending on the length of the available position history, and this points selection status
     //return the whole position history or the last 5 positions
     @computed get trailPositions():Cartesian3[]{
-        const fullPosList = this.flightStore.flightPositions.get(this.icao);
+        const flightRecord = this.flightStore.flightData.get(this.icao);
         let subPosList:FlightPosition[] = [];
-        if(fullPosList && fullPosList.length <= 5){
-            subPosList = fullPosList;
-        } else if(fullPosList) {
-            subPosList = this.isSelected ? fullPosList : fullPosList.slice(fullPosList.length-5)
+        if(flightRecord && flightRecord.positions && flightRecord.positions.length <= 5){
+            subPosList = flightRecord.positions;
+        } else if(flightRecord) {
+            subPosList = this.isSelected ? flightRecord.positions : flightRecord.positions.slice(flightRecord.positions.length-5)
         }
         return subPosList.map((p)=>convertPositionToCartesian(p))
     }

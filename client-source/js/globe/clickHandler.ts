@@ -15,7 +15,7 @@ const applyClickHandler = function(viewer: Cesium.Viewer, flightStore: FlightSto
             console.log(trackURL);
             try {
                 const {data} = await axios.get<FlightRecord[]>(trackURL);
-                flightStore.importTrack(data)
+                // flightStore.importTrack(data)
                 flightStore.selectedFlight = pickedObject.id;
             } catch (e) {
                 console.log('track retrieval failed with error', e)

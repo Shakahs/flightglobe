@@ -80,37 +80,41 @@ describe("FlightGlobe tests", function() {
            expect(viewer.camera.changed.numberOfListeners).toBeGreaterThanOrEqual(2)
         });
 
-        describe("stores Flights correctly",function(){
+        describe("handles flight records",function(){
 
-            it("creates Flight Position records",function(){
-              expect(flightStore.flightPositions.size).toEqual(2);
-              expect(flightStore.flightPositions.get(flightA1.icao)).toEqual(jasmine.any(Array));
-              const flightAPositions = flightStore.flightPositions.get(flightA1.icao);
-              const flightBPositions = flightStore.flightPositions.get(flightB1.icao);
-              if(flightAPositions && flightBPositions){
-                  expect(flightAPositions.length).toEqual(1);
-                  expect<FlightPosition>(flightA1.body).toEqual(flightAPositions[0]);
-                  expect(flightBPositions.length).toEqual(1);
-                  expect<FlightPosition>(flightB1.body).toEqual(flightBPositions[0]);
-              } else {
-                  fail('positions not defined')
-              }
-              expect(flightStore.flightPositions.get("nonexistant")).not.toBeDefined()
+            it("by creating flight records",function(){
+              expect(flightStore.flightData.size).toEqual(2);
+              expect(flightStore.flightData.get(flightA1.icao)).toBeDefined();
+              expect(flightStore.flightData.get(flightB1.icao)).toBeDefined();
+              expect(flightStore.flightData.get("nonexistant")).not.toBeDefined()
             });
 
-            it("updates Flight Positions",function(){
+            it("by storing flight positions", function () {
+                const flightARecord = flightStore.flightData.get(flightA1.icao);
+                const flightBRecord = flightStore.flightData.get(flightB1.icao);
+                if(flightARecord && flightARecord.positions && flightBRecord && flightBRecord.positions){
+                    expect(flightARecord.positions.length).toEqual(1);
+                    expect<FlightPosition>(flightA1.body).toEqual(flightARecord.positions[0]);
+                    expect(flightBRecord.positions.length).toEqual(1);
+                    expect<FlightPosition>(flightB1.body).toEqual(flightBRecord.positions[0]);
+                } else {
+                    fail('records not defined')
+                }
+            });
+
+            it("by updating flight positions",function(){
                 flightStore.addOrUpdateFlight(flightA2);
-                const flightAPositions = flightStore.flightPositions.get(flightA1.icao);
-                if(flightAPositions){
-                    expect(flightAPositions.length).toEqual(2);
-                    expect<FlightPosition>(flightA1.body).toEqual(flightAPositions[0]);
-                    expect<FlightPosition>(flightA2.body).toEqual(flightAPositions[1]);
+                const flightARecord = flightStore.flightData.get(flightA1.icao);
+                if(flightARecord && flightARecord.positions){
+                    expect(flightARecord.positions.length).toEqual(2);
+                    expect<FlightPosition>(flightA1.body).toEqual(flightARecord.positions[0]);
+                    expect<FlightPosition>(flightA2.body).toEqual(flightARecord.positions[1]);
                 } else {
                     fail('positions not defined')
                 }
             });
 
-            it("created correct Geo resources", function() {
+            it("by creating Geo resources", function() {
                 expect(flightStore.numberGeos()).toEqual(2);
                 expect(flightStore.geoAreas.has("a")).toBeTruthy();
                 expect(flightStore.geoAreas.has("b")).toBeTruthy();

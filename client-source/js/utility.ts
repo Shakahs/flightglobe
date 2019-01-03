@@ -1,6 +1,6 @@
 import {Cartesian3} from "cesium";
 import * as Cesium from "cesium";
-import {FlightPosition} from "./types";
+import {FlightPosition, FlightRecord, Icao} from "./types";
 
 const scratchC3 = new Cartesian3();
 export const convertPositionToCartesian = function(pos:FlightPosition):Cesium.Cartesian3 {
@@ -9,4 +9,8 @@ export const convertPositionToCartesian = function(pos:FlightPosition):Cesium.Ca
         pos.latitude,
         pos.altitude
     );
+};
+
+export const newFlightRecord = function(icao: Icao):FlightRecord {
+  return {icao, positions: []}
 };
