@@ -55,6 +55,16 @@ const FlightBPosition1:PositionUpdate = {
     icao: "BCDEF"
 };
 
+const FlightCDemographic:DemographicsUpdate = {
+    type: "demographicUpdate",
+    icao: "ZZZF",
+    body: {
+        origin: "Los Angeles",
+        destination: "Tokyo",
+        model: "B747"
+    }
+};
+
 
 describe("FlightGlobe tests", function() {
     let viewer:Cesium.Viewer;
@@ -124,12 +134,20 @@ describe("FlightGlobe tests", function() {
                 }
             })
 
-            it("by storing demographic data", function(){
+            it("by storing demographic data for a flight which received position data first", function(){
                let flightRecord =  flightStore.flightData.get(FlightAPosition1.icao) as FlightRecord;
                expect(flightRecord.demographic).not.toBeDefined();
                flightStore.addDemographics(FlightADemographic);
                flightRecord =  flightStore.flightData.get(FlightAPosition1.icao) as FlightRecord;
-               expect(flightRecord.demographic).toEqual(FlightADemographic.body)
+               expect(flightRecord.demographic).toEqual(FlightADemographic.body);
+            });
+
+            it("by storing demographic data for a flight before receiving position data", function(){
+                expect(flightStore.flightData.get(FlightCDemographic.icao)).not.toBeDefined();
+                flightStore.addDemographics(FlightCDemographic);
+                let flightRecord =  flightStore.flightData.get(FlightCDemographic.icao) as FlightRecord;
+                expect(flightRecord.demographic).toEqual(FlightCDemographic.body);
+                expect(flightRecord.positions.length).toEqual(0)
             });
 
             it("by creating Geo resources", function() {
