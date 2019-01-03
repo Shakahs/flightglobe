@@ -62,7 +62,7 @@ const FlightCDemographic:DemographicsUpdate = {
 };
 
 
-describe("FlightGlobe tests", function() {
+describe("FlightGlobe", function() {
     let viewer:Cesium.Viewer;
     let cesiumDiv:HTMLDivElement;
     let flightStore: FlightStore;
@@ -174,46 +174,61 @@ describe("FlightGlobe tests", function() {
     });
 
     describe("FlightObj",function(){
-
         it("stores the correct id", function() {
             expect(flightObj.icao).toEqual(FlightAPosition1.icao)
         });
 
-        describe('computes the correct visibility', function () {
+       describe('common functions', function(){
 
-            it('for a flight when there are no filters or selection', function(){
-                expect(flightObj.shouldDisplay).toEqual(true)
-            });
+           it("compute correct Level of Detail", function () {
+               expect<number>(flightObj.levelOfDetail).toEqual(0);
+               flightStore.geoLevelOfDetail.set(FlightAPosition1.body.geohash,1);
+               expect<number>(flightObj.levelOfDetail).toEqual(1);
+           });
 
-            it('for a flight when it is not in the filter result', function(){
-                expect(flightObj.shouldDisplay).toEqual(true)
-                const dummyMap = new Map<string,boolean>([['zzzz',true]]);
-                flightStore.updateFilteredFlights(dummyMap);
-                expect(flightObj.shouldDisplay).toEqual(false)
-            });
+           it('determines if a flight is selected', function(){
+               expect(flightObj.isSelected).toEqual(false);
+               flightStore.updateSelectedFlight(FlightAPosition1.icao);
+               expect(flightObj.isSelected).toEqual(true);
+           });
 
-            it('for a flight when it is in the filter result', function(){
-                expect(flightObj.shouldDisplay).toEqual(true);
-                const dummyMap = new Map<string,boolean>([[FlightAPosition1.icao,true]]);
-                flightStore.updateFilteredFlights(dummyMap);
-                expect(flightObj.shouldDisplay).toEqual(true)
-            });
+           describe('computes the correct visibility', function () {
+               it('for a flight when there are no filters or selection', function(){
+                   expect(flightObj.shouldDisplay).toEqual(true)
+               });
 
-            // it('for a flight when it is selected, but not in the filter result', function(){
-            //     expect(flightObj.shouldDisplay).toEqual(true);
-            //     const dummyMap = new Map<string,boolean>([['zzzz',true]]);
-            //     flightStore.updateFilteredFlights(dummyMap);
-            //     expect(flightObj.shouldDisplay).toEqual(false);
-            //     flightStore.updateSelectedFlight(FlightAPosition1.icao)
-            //     expect(flightObj.shouldDisplay).toEqual(true);
-            // });
+               it('for a flight when it is not in the filter result', function(){
+                   expect(flightObj.shouldDisplay).toEqual(true)
+                   const dummyMap = new Map<string,boolean>([['zzzz',true]]);
+                   flightStore.updateFilteredFlights(dummyMap);
+                   expect(flightObj.shouldDisplay).toEqual(false)
+               });
 
-            it("by computing the correct Level of Detail", function () {
-                expect<number>(flightObj.levelOfDetail).toEqual(0);
-                flightStore.geoLevelOfDetail.set(FlightAPosition1.body.geohash,1);
-                expect<number>(flightObj.levelOfDetail).toEqual(1);
-            });
-        });
+               it('for a flight when it is in the filter result', function(){
+                   expect(flightObj.shouldDisplay).toEqual(true);
+                   const dummyMap = new Map<string,boolean>([[FlightAPosition1.icao,true]]);
+                   flightStore.updateFilteredFlights(dummyMap);
+                   expect(flightObj.shouldDisplay).toEqual(true)
+               });
+
+               it('for a flight when it is selected, but not in the filter result', function(){
+                   expect(flightObj.shouldDisplay).toEqual(true); //everything visible by default
+                   const dummyMap = new Map<string,boolean>([['zzzz',true]]);
+                   flightStore.updateFilteredFlights(dummyMap);
+                   expect(flightObj.shouldDisplay).toEqual(false); //filtered out
+                   flightStore.updateSelectedFlight(FlightAPosition1.icao);
+                   expect(flightObj.shouldDisplay).toEqual(true); //selected
+               });
+
+
+           });
+
+           xit('gets the demographic data', function () {
+               expect(flightObj.demographics).not.toBeDefined();
+               flightStore.addDemographics(FlightADemographic);
+               expect(flightObj.demographics).toEqual(FlightADemographic.body)
+           })
+       });
 
         describe('determines the correct positions', function () {
             it("by computing Positions", function() {

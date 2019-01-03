@@ -235,6 +235,8 @@ export class FlightObj {
         this.disposers = [pointUpdater,labelUpdater];
     }
 
+    // common
+
     @computed get levelOfDetail():number {
         if(this.isSelected){return 1}
         if(this.latestPosition){
@@ -247,6 +249,24 @@ export class FlightObj {
     @computed get isSelected():boolean {
         return this.icao === this.flightStore.selectedFlight;
     }
+
+    @computed get shouldDisplay():boolean {
+        if(this.isSelected){return true} //specifically selected
+        if(this.flightStore.filterResult.size > 0){
+            return this.flightStore.filterResult.has(this.icao)  //filter present, check filter
+        }
+        return true //visible by default
+    }
+
+    @computed get demographics():FlightDemographics|undefined {
+        const flightRecord = this.flightStore.flightData.get(this.icao);
+        if(flightRecord){
+            return flightRecord.demographic
+        }
+        return undefined
+    }
+
+    // position
 
     @computed get latestPosition():FlightPosition|null {
         const flightRecord = this.flightStore.flightData.get(this.icao);
@@ -263,21 +283,7 @@ export class FlightObj {
         return null
     }
 
-    @computed get demographics():FlightDemographics|undefined {
-        const flightRecord = this.flightStore.flightData.get(this.icao);
-        if(flightRecord){
-            return flightRecord.demographic
-        }
-        return undefined
-    }
-
-    @computed get shouldDisplay():boolean {
-        if(this.isSelected){return true} //specifically selected
-        if(this.flightStore.filterResult.size > 0){ //filter present, check filter
-            return this.flightStore.filterResult.has(this.icao)
-        }
-        return true //visible by default
-    }
+    // points
 
     destroyPoint(){
         if(this.point){
@@ -289,6 +295,8 @@ export class FlightObj {
     @computed get shouldTrailDisplay(){
         return this.levelOfDetail >= 1;
     }
+
+    // trails
 
     destroyTrail(){
         if(this.trail){
@@ -309,6 +317,8 @@ export class FlightObj {
         }
         return subPosList.map((p)=>convertPositionToCartesian(p))
     }
+
+    // labels
 
     @computed get shouldLabelDisplay(){
         return this.levelOfDetail >= 1;
@@ -339,6 +349,8 @@ export class FlightObj {
             this.label = null;
         }
     }
+
+    // cleanup
 
     destroy(){
         this.destroyPoint();
