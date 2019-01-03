@@ -48,8 +48,6 @@ export class FlightStore {
     viewer:Cesium.Viewer;
     cameraEventDisposer:Cesium.Event.RemoveCallback;
     @observable selectedFlight:string = '';
-    @observable.ref displayedDemographics:FlightDemographics[] = [];
-    disposer:IReactionDisposer
 
     constructor(viewer: Cesium.Viewer){
         this.viewer = viewer;
@@ -125,6 +123,11 @@ export class FlightStore {
     @action('updateFilteredFlights')
     updateFilteredFlights(filtered: Map<string,boolean>){
         this.filterResult.replace(filtered)
+    }
+
+    @action('updateSelectedFlight')
+    updateSelectedFlight(id: Icao){
+        this.selectedFlight = id;
     }
 
     updateLatestTimestamp(pos:PositionUpdate){
@@ -269,10 +272,11 @@ export class FlightObj {
     }
 
     @computed get shouldDisplay():boolean {
-        if(this.flightStore.filterResult.size > 0){
+        if(this.isSelected){return true} //specifically selected
+        if(this.flightStore.filterResult.size > 0){ //filter present, check filter
             return this.flightStore.filterResult.has(this.icao)
         }
-        return true
+        return true //visible by default
     }
 
     destroyPoint(){

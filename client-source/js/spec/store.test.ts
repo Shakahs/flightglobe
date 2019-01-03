@@ -1,10 +1,6 @@
 import {FlightObj, FlightStore} from "../store";
 import * as Cesium from "cesium";
 import {DemographicsUpdate, FlightPosition, FlightRecord, PositionUpdate} from "../types";
-import {toJS} from "mobx";
-import {convertPositionToCartesian} from "../utility";
-import {Cartesian3} from "cesium";
-
 
 const FlightAPosition1:PositionUpdate = {
     body:{
@@ -159,23 +155,77 @@ describe("FlightGlobe tests", function() {
 
         });
 
+        describe('handles selection criteria', function(){
+            it('by updating the selected flight', function () {
+                expect(flightStore.selectedFlight).toEqual('');
+                flightStore.updateSelectedFlight(FlightAPosition1.icao);
+                expect(flightStore.selectedFlight).toEqual(FlightAPosition1.icao)
+            });
+
+            it('by updating the filtered set', function(){
+               expect(flightStore.filterResult.get('zzz')).not.toBeDefined();
+               const testMap = new Map<string,boolean>([['zzz',true]]);
+               flightStore.updateFilteredFlights(testMap);
+               expect(flightStore.filterResult.get('zzz')).toBeDefined();
+               expect(flightStore.filterResult.get('xxx')).not.toBeDefined();
+            })
+        })
+
     });
 
     describe("FlightObj",function(){
 
-        describe('computes data', function () {
+        it("stores the correct id", function() {
+            expect(flightObj.icao).toEqual(FlightAPosition1.icao)
+        });
 
+        describe('computes the correct visibility', function () {
 
-            it("computes Positions", function() {
+            it('for a flight when there are no filters or selection', function(){
+                expect(flightObj.shouldDisplay).toEqual(true)
+            });
+
+            it('for a flight when it is not in the filter result', function(){
+                expect(flightObj.shouldDisplay).toEqual(true)
+                const dummyMap = new Map<string,boolean>([['zzzz',true]]);
+                flightStore.updateFilteredFlights(dummyMap);
+                expect(flightObj.shouldDisplay).toEqual(false)
+            });
+
+            it('for a flight when it is in the filter result', function(){
+                expect(flightObj.shouldDisplay).toEqual(true);
+                const dummyMap = new Map<string,boolean>([[FlightAPosition1.icao,true]]);
+                flightStore.updateFilteredFlights(dummyMap);
+                expect(flightObj.shouldDisplay).toEqual(true)
+            });
+
+            // it('for a flight when it is selected, but not in the filter result', function(){
+            //     expect(flightObj.shouldDisplay).toEqual(true);
+            //     const dummyMap = new Map<string,boolean>([['zzzz',true]]);
+            //     flightStore.updateFilteredFlights(dummyMap);
+            //     expect(flightObj.shouldDisplay).toEqual(false);
+            //     flightStore.updateSelectedFlight(FlightAPosition1.icao)
+            //     expect(flightObj.shouldDisplay).toEqual(true);
+            // });
+
+            it("by computing the correct Level of Detail", function () {
+                expect<number>(flightObj.levelOfDetail).toEqual(0);
+                flightStore.geoLevelOfDetail.set(FlightAPosition1.body.geohash,1);
+                expect<number>(flightObj.levelOfDetail).toEqual(1);
+            });
+        });
+
+        describe('determines the correct positions', function () {
+            it("by computing Positions", function() {
                 expect<FlightPosition>(flightObj.latestPosition as FlightPosition).toEqual(FlightAPosition1.body);
             })
 
-            it("updates the computed position", function(){
+            it("by updating the computed position", function(){
                 flightStore.addOrUpdateFlight(FlightAPosition2);
                 expect<FlightPosition>(flightObj.latestPosition as FlightPosition).toEqual(FlightAPosition2.body);
             });
 
-            it("computes the correct Cartesian Positions", function(){
+            it("by computing the correct Cartesian Position", function(){
                 expect<Cesium.Cartesian3>(flightObj.cartesianPosition as Cesium.Cartesian3).toEqual(Cesium.Cartesian3.fromDegrees(
                     FlightAPosition1.body.longitude,
                     FlightAPosition1.body.latitude,
@@ -188,13 +238,7 @@ describe("FlightGlobe tests", function() {
                     FlightAPosition2.body.altitude,
                 ));
             });
-
-            it("computes the correct Level of Detail", function () {
-                expect<number>(flightObj.levelOfDetail).toEqual(0);
-                flightStore.geoLevelOfDetail.set(FlightAPosition1.body.geohash,1);
-                expect<number>(flightObj.levelOfDetail).toEqual(1);
-            });
-        });
+        })
 
         describe('handles Points', function () {
 
