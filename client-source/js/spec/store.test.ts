@@ -263,7 +263,7 @@ describe("FlightGlobe", function() {
             //     expect<boolean>(flightObj.shouldPointDisplay).toBeTruthy()
             // });
 
-            it("creates the Point Primitive", function () {
+            it("by creating the Point Primitive", function () {
                 expect(flightObj.point).not.toBeNull();
                 const point = flightObj.point;
                 if(point){
@@ -278,7 +278,7 @@ describe("FlightGlobe", function() {
                 }
             });
 
-            it("updates the Point Primitive location reactively", function () {
+            it("by updating the Point Primitive location reactively", function () {
                 expect(flightObj.point).not.toBeNull();
                 const point = flightObj.point;
                 if(point){
@@ -293,7 +293,7 @@ describe("FlightGlobe", function() {
                 }
             });
 
-            it("updates the Point Primitive location manually", function () {
+            it("by updating the Point Primitive location manually", function () {
                 expect(flightObj.point).not.toBeNull();
                 const point = flightObj.point;
                 if(point){
@@ -317,7 +317,7 @@ describe("FlightGlobe", function() {
                 }
             });
 
-            it('by creating visible new Points when they match filter', function(){
+            it('by creating visible new Points when they match the filter', function(){
                 flightStore.updateFilteredFlights(new Map<string,boolean>([[FlightBPosition1.icao,true]]))
                 flightStore.addOrUpdateFlight(FlightBPosition1);
                 const flightB = flightStore.flights.get(FlightBPosition1.icao) as FlightObj;
@@ -325,13 +325,22 @@ describe("FlightGlobe", function() {
                 expect(point.show).toEqual(true);
             });
 
-            it('by creating non-visible new Points when they do not match filter', function(){
-                flightStore.updateFilteredFlights(new Map<string,boolean>([['zzz',true]]))
+            it('by creating non-visible new Points when they do not match the filter', function(){
+                flightStore.updateFilteredFlights(new Map<string,boolean>([['zzz',true]]));
                 flightStore.addOrUpdateFlight(FlightBPosition1);
                 const flightB = flightStore.flights.get(FlightBPosition1.icao) as FlightObj;
                 const point = flightB.point as PointPrimitive;
                 expect(point.show).toEqual(false)
             });
+
+            it('by toggling visibility when visibility criteria changes', function () {
+                const point = flightObj.point as PointPrimitive;
+                expect(point.show).toBeTruthy();
+                flightStore.updateFilteredFlights(new Map<string,boolean>([['zzz',true]]));
+                expect(point.show).toBeFalsy();
+                flightStore.updateFilteredFlights(new Map<string,boolean>([]));
+                expect(point.show).toBeTruthy();
+            })
 
         });
 

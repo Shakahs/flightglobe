@@ -165,16 +165,18 @@ export class FlightObj {
         this.geoCollection = geo;
 
         const visibilityUpdater = autorun(()=>{
-            const shouldDisplay = this.shouldDisplay
-            if(shouldDisplay){
-                if (this.point){
-                    this.point.show = true
-                }
-            } else {
-                if (this.point){
-                    this.point.show = false
-                }
-            }
+            const shouldDisplay = this.shouldDisplay;
+            const shouldTrailDisplay = this.shouldTrailDisplay;
+            const shouldLabelDisplay = this.shouldLabelDisplay;
+            
+            if(this.point && shouldDisplay){this.point.show=true}
+            if(this.point && !shouldDisplay){this.point.show=false}
+
+            if(this.trail && shouldTrailDisplay){this.trail.show=true}
+            if(this.trail && !shouldTrailDisplay){this.trail.show=false}
+
+            if(this.label && shouldLabelDisplay){this.label.show=true}
+            if(this.label && !shouldLabelDisplay){this.label.show=false}
         }, {name: 'visibilityUpdater'});
 
         const pointUpdater = autorun(()=>{
@@ -225,7 +227,7 @@ export class FlightObj {
             }
         },{name:'labelUpdater'});
 
-        this.disposers = [pointUpdater,labelUpdater];
+        this.disposers = [visibilityUpdater,pointUpdater,trailUpdater,labelUpdater];
     }
 
     // common
