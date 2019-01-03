@@ -157,18 +157,19 @@ describe("FlightGlobe", function() {
         });
 
         describe('handles selection criteria', function(){
-            it('by updating the selected flight', function () {
-                expect(flightStore.selectedFlight).toEqual('');
-                flightStore.updateSelectedFlight(FlightAPosition1.icao);
-                expect(flightStore.selectedFlight).toEqual(FlightAPosition1.icao)
+            it('by updating the selected flight map', function () {
+                expect(flightStore.selectedFlights.has(FlightAPosition1.icao)).toBeFalsy();
+                flightStore.updateSelectedFlight(new Map<string,boolean>([[FlightAPosition1.icao,true]]));
+                expect(flightStore.selectedFlights.has(FlightAPosition1.icao)).toBeTruthy()
+                expect(flightStore.selectedFlights.has('zzz')).toBeFalsy();
             });
 
-            it('by updating the filtered set', function(){
-               expect(flightStore.filterResult.get('zzz')).not.toBeDefined();
+            it('by updating the filtered flight map', function(){
+               expect(flightStore.filteredFlights.get('zzz')).not.toBeDefined();
                const testMap = new Map<string,boolean>([['zzz',true]]);
                flightStore.updateFilteredFlights(testMap);
-               expect(flightStore.filterResult.get('zzz')).toBeDefined();
-               expect(flightStore.filterResult.get('xxx')).not.toBeDefined();
+               expect(flightStore.filteredFlights.get('zzz')).toBeDefined();
+               expect(flightStore.filteredFlights.get('xxx')).not.toBeDefined();
             })
         })
 
@@ -189,7 +190,7 @@ describe("FlightGlobe", function() {
 
            it('determines if a flight is selected', function(){
                expect(flightObj.isSelected).toEqual(false);
-               flightStore.updateSelectedFlight(FlightAPosition1.icao);
+               flightStore.updateSelectedFlight(new Map<string,boolean>([[FlightAPosition1.icao,true]]));
                expect(flightObj.isSelected).toEqual(true);
            });
 
@@ -217,7 +218,7 @@ describe("FlightGlobe", function() {
                    const dummyMap = new Map<string,boolean>([['zzzz',true]]);
                    flightStore.updateFilteredFlights(dummyMap);
                    expect(flightObj.shouldDisplay).toEqual(false); //filtered out
-                   flightStore.updateSelectedFlight(FlightAPosition1.icao);
+                   flightStore.updateSelectedFlight(new Map<string,boolean>([[FlightAPosition1.icao,true]]));
                    expect(flightObj.shouldDisplay).toEqual(true); //selected
                });
 

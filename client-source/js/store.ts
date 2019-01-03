@@ -40,14 +40,14 @@ const labelOffset = new Cesium.Cartesian2(10, 20);
 
 export class FlightStore {
     flightData = new ObservableMap<Icao, FlightRecord>(undefined,undefined, "flightData");
-    geoLevelOfDetail = new ObservableMap<string, number>(undefined, undefined, "geoLODMap");
-    filterResult = new ObservableMap<string, boolean>(undefined, undefined, "filterResultMap");
+    geoLevelOfDetail = new ObservableMap<string, number>(undefined, undefined, "geoLevelOfDetail");
+    filteredFlights = new ObservableMap<string, boolean>(undefined, undefined, "filteredFlights");
+    selectedFlights = new ObservableMap<string, boolean>(undefined, undefined, "selectedFlights");
     geoAreas = new Map<Icao, GeoCollection>();
     flights = new Map<Icao, FlightObj>();
     newestPositionTimestamp = 0;
     viewer:Cesium.Viewer;
     cameraEventDisposer:Cesium.Event.RemoveCallback;
-    @observable selectedFlight:string = '';
 
     constructor(viewer: Cesium.Viewer){
         this.viewer = viewer;
@@ -122,12 +122,12 @@ export class FlightStore {
 
     @action('updateFilteredFlights')
     updateFilteredFlights(filtered: Map<string,boolean>){
-        this.filterResult.replace(filtered)
+        this.filteredFlights.replace(filtered)
     }
 
     @action('updateSelectedFlight')
-    updateSelectedFlight(id: Icao){
-        this.selectedFlight = id;
+    updateSelectedFlight(selected: Map<string,boolean>){
+        this.selectedFlights.replace(selected)
     }
 
     updateLatestTimestamp(pos:PositionUpdate){
@@ -240,13 +240,13 @@ export class FlightObj {
     }
 
     @computed get isSelected():boolean {
-        return this.icao === this.flightStore.selectedFlight;
+        return this.flightStore.selectedFlights.has(this.icao);
     }
 
     @computed get shouldDisplay():boolean {
         if(this.isSelected){return true} //specifically selected
-        if(this.flightStore.filterResult.size > 0){
-            return this.flightStore.filterResult.has(this.icao)  //filter present, check filter
+        if(this.flightStore.filteredFlights.size > 0){
+            return this.flightStore.filteredFlights.has(this.icao)  //filter present, check filter
         }
         return true //visible by default
     }
