@@ -9,6 +9,9 @@ import * as Cesium from "cesium";
 // const airportData = new Cesium.CustomDataSource('airports');
 // loadAirports(airportData, airportDataRaw);
 
+//@ts-ignore. This is not in the Cesium TypeScript definitions yet
+Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0OThjM2RiYS02MjA0LTQ1MDEtYjU2Ni00MzY2NjlkY2Q1ODMiLCJpZCI6NjQxMywic2NvcGVzIjpbImFzciIsImdjIl0sImlhdCI6MTU0NjQ3NzQ1NX0.Z85-lIf_qTbJ2z2FcSez-bDeVHJ_H9u_OjxPFO16ios';
+
 const viewer = new Cesium.Viewer('cesiumContainer', {
     animation: false,
     baseLayerPicker: false,
@@ -29,6 +32,12 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
     // shouldAnimate: true,
     // automaticallyTrackDataSourceClocks: false,
 });
+
+viewer.imageryLayers.addImageryProvider(
+    new Cesium.IonImageryProvider({
+        assetId: 3,
+    })
+);
 
 // viewer.camera.defaultZoomAmount = 1000000.0;
 // viewer.screenSpaceEventHandler.setInputAction(
