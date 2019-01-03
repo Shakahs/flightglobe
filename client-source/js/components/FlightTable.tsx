@@ -31,6 +31,7 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
             ]
         };
         this.gridReady=this.gridReady.bind(this)
+        this.filterChanged=this.filterChanged.bind(this)
     }
 
     gridReady(event: GridReadyEvent){
@@ -48,6 +49,16 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
             })
     }
 
+    filterChanged(data:FilterChangedEvent){
+        const resultMap = new Map<string,boolean>();
+        if(data.api){
+            data.api.forEachNodeAfterFilter((node)=>{
+              resultMap.set(node.data.icao,true)
+            })
+        }
+        this.props.store.updateFilteredFlights(resultMap);
+    }
+
     render() {
         return(
             <div>
@@ -61,17 +72,8 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
                     <AgGridReact
                         columnDefs={this.state.columnDefs}
                         getRowNodeId={(data)=>{return data.icao}}
-                        onFilterChanged={(data:FilterChangedEvent)=>{
-                            const resultMap = new Map<string,boolean>();
-                            if(data.api){
-                                data.api.forEachNodeAfterFilter((node)=>{
-                                    resultMap.set(node.data.icao,true)
-                                })
-                            }
-                            this.props.store.updateFilteredFlights(resultMap);
-                        }}
+                        onFilterChanged={this.filterChanged}
                         onGridReady={this.gridReady}
-                        deltaRowDataMode
                         enableSorting
                         enableFilter
                     >
