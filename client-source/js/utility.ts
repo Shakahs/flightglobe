@@ -1,6 +1,6 @@
 import {Cartesian3} from "cesium";
 import * as Cesium from "cesium";
-import {Flight, FlightMap, FlightPosition, Icao} from "./types";
+import {FlightPosition} from "./types";
 
 const scratchC3 = new Cartesian3();
 export const convertPositionToCartesian = function(pos:FlightPosition):Cesium.Cartesian3 {

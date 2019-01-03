@@ -6,8 +6,8 @@ import {size,forEach} from 'lodash-es'
 import { interval } from 'rxjs';
 import * as React from 'react';
 import ReactDOM from 'react-dom';
-import {FlightPosition, FlightMap, PositionUpdate, DemographicsUpdate, GeoMap} from "../types";
-import {FlightObj, FlightStore} from '../store'
+import {PositionUpdate, DemographicsUpdate} from "../types";
+import { FlightStore} from '../store'
 import applyClickHandler from "../globe/clickHandler";
 import FlightTable from './FlightTable'
 
