@@ -179,17 +179,10 @@ export class FlightObj {
 
         const pointUpdater = autorun(()=>{
             const flightRecord = this.flightStore.flightData.get(this.icao);
-            if(flightRecord){
-                const newC3 = convertPositionToCartesian(flightRecord.positions[flightRecord.positions.length-1]);
-                if(this.point){
-                    this.point.position = newC3;
-                } else {
-                    this.point = this.geoCollection.points.add({
-                        position: newC3,
-                        pixelSize: 4,
-                        id: this.icao
-                    });
-                }
+            const newPosition = this.cartesianPosition;
+            const shouldDisplay = this.shouldDisplay;
+            if(flightRecord && newPosition){
+                this.createPoint(newPosition,shouldDisplay)
             }
         },{name:'pointUpdater'});
 
@@ -284,6 +277,19 @@ export class FlightObj {
     }
 
     // points
+
+    createPoint(pos: Cartesian3, visibility: boolean){
+        if(this.point){
+            this.point.position = pos;
+        } else {
+            this.point = this.geoCollection.points.add({
+                position: pos,
+                pixelSize: 4,
+                id: this.icao,
+                show: visibility
+            });
+        }
+    }
 
     destroyPoint(){
         if(this.point){

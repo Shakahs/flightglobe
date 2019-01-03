@@ -1,6 +1,7 @@
 import {FlightObj, FlightStore} from "../store";
 import * as Cesium from "cesium";
 import {DemographicsUpdate, FlightPosition, FlightRecord, PositionUpdate} from "../types";
+import {PointPrimitive} from "cesium";
 
 const FlightAPosition1:PositionUpdate = {
     body:{
@@ -274,7 +275,6 @@ describe("FlightGlobe", function() {
                 } else {
                     fail('point not defined')
                 }
-
             });
 
             it("updates the Point Primitive location reactively", function () {
@@ -314,7 +314,24 @@ describe("FlightGlobe", function() {
                 } else {
                     fail('point not defined')
                 }
-            })
+            });
+
+            it('by creating visible new Points when they match filter', function(){
+                flightStore.updateFilteredFlights(new Map<string,boolean>([[FlightBPosition1.icao,true]]))
+                flightStore.addOrUpdateFlight(FlightBPosition1);
+                const flightB = flightStore.flights.get(FlightBPosition1.icao) as FlightObj;
+                const point = flightB.point as PointPrimitive;
+                expect(point.show).toEqual(true);
+            });
+
+            it('by creating non-visible new Points when they do not match filter', function(){
+                flightStore.updateFilteredFlights(new Map<string,boolean>([['zzz',true]]))
+                flightStore.addOrUpdateFlight(FlightBPosition1);
+                const flightB = flightStore.flights.get(FlightBPosition1.icao) as FlightObj;
+                const point = flightB.point as PointPrimitive;
+                expect(point.show).toEqual(false)
+            });
+
         });
 
         describe('handles Trails', function () {
