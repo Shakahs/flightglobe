@@ -17,7 +17,7 @@ export interface FlightPosition  {
 }
 
 export interface Message {
-    type: string
+    type: "demographicUpdate" | "positionUpdate"
     body: any
     icao: Icao
 }
