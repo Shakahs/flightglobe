@@ -64,27 +64,6 @@ export class FlightStore {
                 this.geoLevelOfDetail.set(neighbor, 1)
             })
         });
-
-        this.disposer = reaction(
-            ()=>{
-                const newData:FlightDemographics[]=[];
-                for(let e of this.flightData.entries()){
-                    if(e[1].demographic){
-                        newData.push({
-                            icao:e[0],
-                            origin: e[1].demographic.origin,
-                            destination: e[1].demographic.destination,
-                            model: e[1].demographic.model
-                        })
-                    }
-                }
-                return newData
-            },
-            (newData)=>{
-                this.displayedDemographics = newData;
-            },
-            {delay: 2000}
-        )
     }
 
     getOrCreateGeoCollection(id: string):GeoCollection{

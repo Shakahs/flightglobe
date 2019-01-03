@@ -8,6 +8,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-balham-dark.css';
 import {GridApi,AgGridEvent,FilterChangedEvent} from 'ag-grid-community'
 import {FlightStore} from "../store";
+import {GridReadyEvent} from "ag-grid-community/dist/lib/events";
 
 interface FlightTableProps {
     store: FlightStore
@@ -24,11 +25,27 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
         this.state = {
             columnDefs: [
                 {field:"icao"},
-                {field:"origin"},
-                {field:"destination"},
-                {field:"model"}
+                {field:"demographic.origin", headerName: "Origin"},
+                {field:"demographic.destination", headerName: "Destination"},
+                {field:"demographic.model", headerName: "Plane"}
             ]
         };
+        this.gridReady=this.gridReady.bind(this)
+    }
+
+    gridReady(event: GridReadyEvent){
+            this.props.store.flightData.observe((change)=>{
+                if(change.type==='add' && event.api){
+                    event.api.batchUpdateRowData({
+                        add:[change.newValue]
+                    })
+                }
+                else if(change.type==='update' && event.api){
+                    event.api.batchUpdateRowData({
+                        update:[change.newValue]
+                    })
+                }
+            })
     }
 
     render() {
@@ -43,7 +60,6 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
                 >
                     <AgGridReact
                         columnDefs={this.state.columnDefs}
-                        rowData={this.props.store.displayedDemographics}
                         getRowNodeId={(data)=>{return data.icao}}
                         onFilterChanged={(data:FilterChangedEvent)=>{
                             const resultMap = new Map<string,boolean>();
@@ -54,6 +70,7 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
                             }
                             this.props.store.updateFilteredFlights(resultMap);
                         }}
+                        onGridReady={this.gridReady}
                         deltaRowDataMode
                         enableSorting
                         enableFilter
