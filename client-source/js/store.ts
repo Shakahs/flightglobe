@@ -40,7 +40,7 @@ const labelOffset = new Cesium.Cartesian2(10, 20);
 
 export class FlightStore {
     flightData = new ObservableMap<Icao, FlightRecord>(undefined,undefined, "flightData");
-    geoLevelOfDetail = new ObservableMap<string, number>(undefined, undefined, "geoLevelOfDetail");
+    detailedFlights = new ObservableMap<string, boolean>(undefined, undefined, "geoLevelOfDetail");
     filteredFlights = new ObservableMap<string, boolean>(undefined, undefined, "filteredFlights");
     selectedFlights = new ObservableMap<string, boolean>(undefined, undefined, "selectedFlights");
     geoAreas = new Map<Icao, GeoCollection>();
@@ -56,10 +56,10 @@ export class FlightStore {
           const cameraPosition = ellipsoid.cartesianToCartographic(this.viewer.camera.position);
           const focusGeo = Geohash.encode(cameraPosition.latitude*180/Math.PI,
               cameraPosition.longitude*180/Math.PI, 3);
-            this.geoLevelOfDetail.clear();
-            this.geoLevelOfDetail.set(focusGeo, 1)
+            this.detailedFlights.clear();
+            this.detailedFlights.set(focusGeo, true);
             forEach(Geohash.neighbours(focusGeo), (neighbor)=>{
-                this.geoLevelOfDetail.set(neighbor, 1)
+                this.detailedFlights.set(neighbor, true);
             })
         });
     }
@@ -219,12 +219,11 @@ export class FlightObj {
 
     // common
 
-    @computed get levelOfDetail():number {
+    @computed get shouldDisplayDetailed():boolean {
         if(this.latestPosition){
-            const level = this.flightStore.geoLevelOfDetail.get(this.latestPosition.geohash);
-            return level ? level : 0;
+            return this.flightStore.detailedFlights.has(this.latestPosition.geohash);
         }
-        return 0;
+        return false;
     }
 
     @computed get isSelected():boolean {
@@ -298,7 +297,7 @@ export class FlightObj {
     @computed get shouldTrailDisplay():boolean{
         if(this.allPositions.length===1){return false}
         if(this.isSelected){return true}
-        return this.shouldDisplay && this.levelOfDetail >= 1;
+        return this.shouldDisplay && this.shouldDisplayDetailed;
     }
 
     createTrail(positions: Cartesian3[]){
@@ -331,7 +330,7 @@ export class FlightObj {
     // labels
 
     @computed get shouldLabelDisplay(){
-        return this.levelOfDetail >= 1;
+        return this.shouldDisplayDetailed;
     }
 
     @computed get labelText(){

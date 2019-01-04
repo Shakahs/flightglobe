@@ -184,9 +184,9 @@ describe("FlightGlobe", function() {
        describe('common functions', function(){
 
            it("compute correct Level of Detail", function () {
-               expect<number>(flightObj.levelOfDetail).toEqual(0);
-               flightStore.geoLevelOfDetail.set(FlightAPosition1.body.geohash,1);
-               expect<number>(flightObj.levelOfDetail).toEqual(1);
+               expect<boolean>(flightObj.shouldDisplayDetailed).toBeFalsy();
+               flightStore.detailedFlights.set(FlightAPosition1.body.geohash,true);
+               expect<boolean>(flightObj.shouldDisplayDetailed).toBeTruthy()
            });
 
            it('determines if a flight is selected', function(){
@@ -368,7 +368,7 @@ describe("FlightGlobe", function() {
                 it('when LOD increases', function(){
                     expect<boolean>(flightObj.shouldTrailDisplay).toBeFalsy();
                     flightStore.addOrUpdateFlight(FlightAPosition2);
-                    flightStore.geoLevelOfDetail.set(FlightAPosition1.body.geohash,1);
+                    flightStore.detailedFlights.set(FlightAPosition1.body.geohash,true);
                     expect<boolean>(flightObj.shouldTrailDisplay).toBeTruthy();
                 })
 
@@ -385,7 +385,7 @@ describe("FlightGlobe", function() {
 
             it('by creating the trail', function () {
                flightStore.addOrUpdateFlight(FlightAPosition2);
-               flightStore.geoLevelOfDetail.set(FlightAPosition2.body.geohash,1);
+               flightStore.detailedFlights.set(FlightAPosition2.body.geohash,true);
                const expectedPositions = [
                    Cesium.Cartesian3.fromDegrees(
                        FlightAPosition1.body.longitude,
@@ -409,9 +409,9 @@ describe("FlightGlobe", function() {
             it('by destroying the trail', function(){
                 expect(flightObj.trail).toBeNull();
                 flightStore.addOrUpdateFlight(FlightAPosition2);
-                flightStore.geoLevelOfDetail.set(FlightAPosition2.body.geohash,1);
+                flightStore.detailedFlights.set(FlightAPosition2.body.geohash,true);
                 expect(flightObj.trail).not.toBeNull();
-                flightStore.geoLevelOfDetail.clear();
+                flightStore.detailedFlights.clear();
                 expect(flightObj.trail).toBeNull();
             })
         });
@@ -419,12 +419,12 @@ describe("FlightGlobe", function() {
         describe('handles Labels', function () {
             it("computes the correct Label display condition", function () {
                 expect<boolean>(flightObj.shouldLabelDisplay).toBeFalsy();
-                flightStore.geoLevelOfDetail.set(FlightAPosition1.body.geohash,1);
+                flightStore.detailedFlights.set(FlightAPosition1.body.geohash,true);
                 expect<boolean>(flightObj.shouldLabelDisplay).toBeTruthy();
             });
 
             xit('creates, displays, and destroys the Label', function () {
-                flightStore.geoLevelOfDetail.set(FlightAPosition1.body.geohash,1);
+                flightStore.detailedFlights.set(FlightAPosition1.body.geohash,true);
                 const flight = flightStore.flights.get(FlightAPosition1.icao);
                 if(flight && flight.label){
                     expect(flight.geoCollection.labels.contains(flight.label)).toBeTruthy();
@@ -433,7 +433,7 @@ describe("FlightGlobe", function() {
                         FlightAPosition1.body.latitude,
                         FlightAPosition1.body.altitude,
                     ));
-                    flightStore.geoLevelOfDetail.clear();
+                    flightStore.detailedFlights.clear();
                     expect(flight.geoCollection.labels.contains(flight.label)).toBeFalsy();
                     expect(flight.label).not.toBeDefined()
                 } else {
@@ -442,10 +442,10 @@ describe("FlightGlobe", function() {
             });
 
             it('updates the Label position', function () {
-                flightStore.geoLevelOfDetail.set(FlightAPosition1.body.geohash,1);
+                flightStore.detailedFlights.set(FlightAPosition1.body.geohash,true);
                 flightStore.addOrUpdateFlight(FlightAPosition2);
-                flightStore.geoLevelOfDetail.clear();
-                flightStore.geoLevelOfDetail.set(FlightAPosition2.body.geohash,1);
+                flightStore.detailedFlights.clear();
+                flightStore.detailedFlights.set(FlightAPosition2.body.geohash,true);
                 const flight = flightStore.flights.get(FlightAPosition1.icao);
                 if(flight && flight.label){
                     expect(flight.label.position).toEqual(Cesium.Cartesian3.fromDegrees(
