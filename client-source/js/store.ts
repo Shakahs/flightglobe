@@ -171,11 +171,10 @@ export class FlightObj {
         }, {name: 'pointVisibilityUpdater'});
 
         const pointUpdater = autorun(()=>{
-            const flightRecord = this.flightStore.flightData.get(this.icao);
             const newPosition = this.cartesianPosition;
             const shouldDisplay = this.shouldDisplay;
-            if(flightRecord && newPosition){
-                this.createPoint(newPosition,shouldDisplay)
+            if(newPosition){
+                this.renderPoint(newPosition,shouldDisplay)
             }
         },{name:'pointUpdater'});
 
@@ -183,32 +182,18 @@ export class FlightObj {
             const shouldTrailDisplay = this.shouldTrailDisplay;
             const positions = this.trailPositions;
             if(shouldTrailDisplay){
-                if(this.trail){
-                    this.trail.positions = positions;
-                } else {
-                    this.createTrail(positions)
-                }
+                this.renderTrail(positions)
             } else {
                 this.destroyTrail()
             }
         },{name:'trailUpdater'});
 
         const labelUpdater = autorun(()=>{
-            const flightRecord = this.flightStore.flightData.get(this.icao);
-            const shouldBeVisible = this.shouldLabelDisplay;
+            const shouldLabelDisplay = this.shouldLabelDisplay;
             const labelText = this.labelText;
-            if(shouldBeVisible && flightRecord && flightRecord.positions.length>0){
-                const newC3 = convertPositionToCartesian(flightRecord.positions[flightRecord.positions.length-1]);
-                if(this.label){
-                    this.label.position = newC3;
-                } else {
-                    this.label = this.geoCollection.labels.add({
-                        position: newC3,
-                        text: labelText,
-                        font: '12px sans-serif',
-                        pixelOffset: labelOffset,
-                    });
-                }
+            const newPosition = this.cartesianPosition;
+            if(shouldLabelDisplay && newPosition){
+                this.renderLabel(newPosition, labelText)
             } else {
                 this.destroyLabel()
             }
@@ -273,7 +258,7 @@ export class FlightObj {
 
     // points
 
-    createPoint(pos: Cartesian3, visibility: boolean){
+    renderPoint(pos: Cartesian3, visibility: boolean){
         if(this.point){
             this.point.position = pos;
         } else {
@@ -299,7 +284,7 @@ export class FlightObj {
         return this.allPositions.length>=1 && this.shouldDisplayDetailed
     }
 
-    createTrail(positions: Cartesian3[]){
+    renderTrail(positions: Cartesian3[]){
         const polyLine = {
             positions: positions,
             id: this.icao
@@ -340,13 +325,15 @@ export class FlightObj {
         }
     }
 
-    createLabel(){
-        if(!this.label){
+    renderLabel(pos: Cartesian3, labelText: string){
+        if(this.label){
+            this.label.position = pos;
+        } else {
             this.label = this.geoCollection.labels.add({
-                text: this.labelText,
+                position: pos,
+                text: labelText,
                 font: '12px sans-serif',
                 pixelOffset: labelOffset,
-                position: this.cartesianPosition
             });
         }
     }
