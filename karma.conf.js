@@ -13,5 +13,7 @@ module.exports = function (config) {
     ],
     browsers: ['ChromeHeadless'],
     webpack: webpackConfig,
+    autoWatchBatchDelay: 1000,
+    restartOnFileChange: true,
   });
 };

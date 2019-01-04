@@ -51,17 +51,19 @@ export class FlightStore {
 
     constructor(viewer: Cesium.Viewer){
         this.viewer = viewer;
-        // this.cameraEventDisposer = viewer.camera.changed.addEventListener(() => {
-        //   const ellipsoid = this.viewer.scene.globe.ellipsoid;
-        //   const cameraPosition = ellipsoid.cartesianToCartographic(this.viewer.camera.position);
-        //   const focusGeo = Geohash.encode(cameraPosition.latitude*180/Math.PI,
-        //       cameraPosition.longitude*180/Math.PI, 3);
-        //     this.detailedFlights.clear();
-        //     this.detailedFlights.set(focusGeo, true);
-        //     forEach(Geohash.neighbours(focusGeo), (neighbor)=>{
-        //         this.detailedFlights.set(neighbor, true);
-        //     })
-        // });
+        this.cameraEventDisposer = viewer.camera.changed.addEventListener(() => {
+          const ellipsoid = this.viewer.scene.globe.ellipsoid;
+          const cameraPosition = ellipsoid.cartesianToCartographic(this.viewer.camera.position);
+          const focusGeo = Geohash.encode(cameraPosition.latitude*180/Math.PI,
+              cameraPosition.longitude*180/Math.PI, 3);
+          const newGeoResult=new Map<string,boolean>();
+          newGeoResult.set(focusGeo,true);
+          this.detailedFlights.set(focusGeo, true);
+          forEach(Geohash.neighbours(focusGeo), (neighbor)=>{
+                newGeoResult.set(neighbor,true);
+          })
+          this.updateDetailedFlights(newGeoResult);
+        });
     }
 
     getOrCreateGeoCollection(id: string):GeoCollection{
@@ -130,6 +132,11 @@ export class FlightStore {
         this.selectedFlights.replace(selected)
     }
 
+    @action('updateDetailedFlights')
+    updateDetailedFlights(selected: Map<string,boolean>){
+        this.detailedFlights.replace(selected)
+    }
+
     updateLatestTimestamp(pos:PositionUpdate){
         this.newestPositionTimestamp = (this.newestPositionTimestamp > pos.body.timestamp) ?
             this.newestPositionTimestamp : pos.body.timestamp;
@@ -146,7 +153,7 @@ export class FlightStore {
     destroy(){
         this.flights.forEach((f)=>f.destroy());
         this.geoAreas.forEach((f)=>f.destroy());
-        this.cameraEventDisposer();
+        // this.cameraEventDisposer();
     }
 }
 
@@ -202,7 +209,7 @@ export class FlightObj {
         this.disposers = [pointVisibilityUpdater,pointUpdater,trailUpdater,labelUpdater];
     }
 
-    // common
+    // essential data
 
     @computed get isSelected():boolean {
         return this.flightStore.selectedFlights.has(this.icao);
@@ -216,10 +223,10 @@ export class FlightObj {
     }
 
     @computed get isFilterSelected():boolean {
-        if(this.flightStore.detailedFlights.size === 0){
+        if(this.flightStore.filteredFlights.size === 0){
             return true //the default filter is to include everything
         }
-        return this.flightStore.detailedFlights.has(this.icao); //otherwise, return the actual filter result
+        return this.flightStore.filteredFlights.has(this.icao); //otherwise, return the actual filter result
     }
 
     @computed get shouldDisplay():boolean {
