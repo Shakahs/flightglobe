@@ -14,3 +14,11 @@ export const convertPositionToCartesian = function(pos:FlightPosition):Cesium.Ca
 export const newFlightRecord = function(icao: Icao):FlightRecord {
   return {icao, positions: []}
 };
+
+export const newICAOMap = function(icaos: Icao[]):Map<Icao,boolean> {
+    const resMap = new Map<Icao, boolean>()
+    icaos.forEach((icao)=>{
+        resMap.set(icao,true)
+    })
+    return resMap
+};

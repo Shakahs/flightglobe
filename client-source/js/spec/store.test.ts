@@ -2,6 +2,7 @@ import {FlightObj, FlightStore} from "../store";
 import * as Cesium from "cesium";
 import {DemographicsUpdate, FlightPosition, FlightRecord, PositionUpdate} from "../types";
 import {PointPrimitive} from "cesium";
+import {newICAOMap} from "../utility";
 
 const FlightAPosition1:PositionUpdate = {
     body:{
@@ -233,9 +234,19 @@ describe("FlightGlobe", function() {
        });
 
         describe('determines the correct positions', function () {
-            it("by computing Positions", function() {
+            it("by deriving all positions", function() {
+                flightStore.addOrUpdateFlight(FlightAPosition2);
+                expect(flightObj.allPositions).toEqual([
+                    FlightAPosition1.body,
+                    FlightAPosition2.body,
+                ]);
+            });
+
+            it("by computing latest Position", function() {
                 expect<FlightPosition>(flightObj.latestPosition as FlightPosition).toEqual(FlightAPosition1.body);
-            })
+                flightStore.addOrUpdateFlight(FlightAPosition2);
+                expect<FlightPosition>(flightObj.latestPosition as FlightPosition).toEqual(FlightAPosition2.body);
+            });
 
             it("by updating the computed position", function(){
                 flightStore.addOrUpdateFlight(FlightAPosition2);
@@ -345,10 +356,31 @@ describe("FlightGlobe", function() {
         });
 
         describe('handles Trails', function () {
-            it('computes the correct Trail display condition', function () {
-                expect<boolean>(flightObj.shouldTrailDisplay).toBeFalsy();
-                flightStore.geoLevelOfDetail.set(FlightAPosition1.body.geohash,1);
-                expect<boolean>(flightObj.shouldTrailDisplay).toBeTruthy();
+            describe('by computing the correct Trail display condition', function () {
+
+                it('when the flight is selected', function(){
+                    expect<boolean>(flightObj.shouldTrailDisplay).toBeFalsy();
+                    flightStore.addOrUpdateFlight(FlightAPosition2);
+                    flightStore.updateSelectedFlight(newICAOMap([FlightAPosition1.icao]));
+                    expect<boolean>(flightObj.shouldTrailDisplay).toBeTruthy();
+                });
+
+                it('when LOD increases', function(){
+                    expect<boolean>(flightObj.shouldTrailDisplay).toBeFalsy();
+                    flightStore.addOrUpdateFlight(FlightAPosition2);
+                    flightStore.geoLevelOfDetail.set(FlightAPosition1.body.geohash,1);
+                    expect<boolean>(flightObj.shouldTrailDisplay).toBeTruthy();
+                })
+
+
+                it('when the flight is filtered out but also selected', function(){
+                    expect<boolean>(flightObj.shouldTrailDisplay).toBeFalsy();
+                    flightStore.addOrUpdateFlight(FlightAPosition2);
+                    flightStore.updateFilteredFlights(newICAOMap(['zzz']));
+                    flightStore.updateSelectedFlight(newICAOMap([FlightAPosition1.icao]));
+                    expect<boolean>(flightObj.shouldTrailDisplay).toBeTruthy();
+                });
+
             });
 
             it('creates and displays the Trail', function () {

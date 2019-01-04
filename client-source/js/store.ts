@@ -233,7 +233,6 @@ export class FlightObj {
     // common
 
     @computed get levelOfDetail():number {
-        if(this.isSelected){return 1}
         if(this.latestPosition){
             const level = this.flightStore.geoLevelOfDetail.get(this.latestPosition.geohash);
             return level ? level : 0;
@@ -263,10 +262,17 @@ export class FlightObj {
 
     // position
 
-    @computed get latestPosition():FlightPosition|null {
+    @computed get allPositions():FlightPosition[] {
         const flightRecord = this.flightStore.flightData.get(this.icao);
         if(flightRecord){
-            return flightRecord.positions[flightRecord.positions.length-1];
+            return flightRecord.positions;
+        }
+        return []
+    }
+
+    @computed get latestPosition():FlightPosition|null {
+        if(this.allPositions.length>0){
+            return this.allPositions[this.allPositions.length-1];
         }
         return null
     }
@@ -300,11 +306,13 @@ export class FlightObj {
         }
     }
 
-    @computed get shouldTrailDisplay(){
-        return this.levelOfDetail >= 1;
-    }
-
     // trails
+
+    @computed get shouldTrailDisplay():boolean{
+        if(this.allPositions.length===1){return false}
+        if(this.isSelected){return true}
+        return this.shouldDisplay && this.levelOfDetail >= 1;
+    }
 
     destroyTrail(){
         if(this.trail){
@@ -316,12 +324,11 @@ export class FlightObj {
     //depending on the length of the available position history, and this points selection status
     //return the whole position history or the last 5 positions
     @computed get trailPositions():Cartesian3[]{
-        const flightRecord = this.flightStore.flightData.get(this.icao);
         let subPosList:FlightPosition[] = [];
-        if(flightRecord && flightRecord.positions && flightRecord.positions.length <= 5){
-            subPosList = flightRecord.positions;
-        } else if(flightRecord) {
-            subPosList = this.isSelected ? flightRecord.positions : flightRecord.positions.slice(flightRecord.positions.length-5)
+        if(this.isSelected || this.allPositions.length <= 5){
+            subPosList = this.allPositions;
+        } else {
+            subPosList = this.allPositions.slice(this.allPositions.length-5)
         }
         return subPosList.map((p)=>convertPositionToCartesian(p))
     }
