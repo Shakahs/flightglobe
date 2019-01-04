@@ -383,7 +383,7 @@ describe("FlightGlobe", function() {
 
             });
 
-            it('creates and displays the Trail', function () {
+            it('by creating the trail', function () {
                flightStore.addOrUpdateFlight(FlightAPosition2);
                flightStore.geoLevelOfDetail.set(FlightAPosition2.body.geohash,1);
                const expectedPositions = [
@@ -404,6 +404,15 @@ describe("FlightGlobe", function() {
                } else {
                    fail('trail not defined')
                }
+            })
+
+            it('by destroying the trail', function(){
+                expect(flightObj.trail).toBeNull();
+                flightStore.addOrUpdateFlight(FlightAPosition2);
+                flightStore.geoLevelOfDetail.set(FlightAPosition2.body.geohash,1);
+                expect(flightObj.trail).not.toBeNull();
+                flightStore.geoLevelOfDetail.clear();
+                expect(flightObj.trail).toBeNull();
             })
         });
 

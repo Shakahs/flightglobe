@@ -164,20 +164,11 @@ export class FlightObj {
         this.icao = icao;
         this.geoCollection = geo;
 
-        const visibilityUpdater = autorun(()=>{
+        const pointVisibilityUpdater = autorun(()=>{
             const shouldDisplay = this.shouldDisplay;
-            const shouldTrailDisplay = this.shouldTrailDisplay;
-            const shouldLabelDisplay = this.shouldLabelDisplay;
-            
             if(this.point && shouldDisplay){this.point.show=true}
-            if(this.point && !shouldDisplay){this.point.show=false}
-
-            if(this.trail && shouldTrailDisplay){this.trail.show=true}
-            if(this.trail && !shouldTrailDisplay){this.trail.show=false}
-
-            if(this.label && shouldLabelDisplay){this.label.show=true}
-            if(this.label && !shouldLabelDisplay){this.label.show=false}
-        }, {name: 'visibilityUpdater'});
+            else if(this.point && !shouldDisplay){this.point.show=false}
+        }, {name: 'pointVisibilityUpdater'});
 
         const pointUpdater = autorun(()=>{
             const flightRecord = this.flightStore.flightData.get(this.icao);
@@ -189,17 +180,13 @@ export class FlightObj {
         },{name:'pointUpdater'});
 
         const trailUpdater = autorun(()=>{
-            const shouldBeVisible = this.shouldTrailDisplay;
+            const shouldTrailDisplay = this.shouldTrailDisplay;
             const positions = this.trailPositions;
-            if(shouldBeVisible && positions.length>0){
+            if(shouldTrailDisplay){
                 if(this.trail){
                     this.trail.positions = positions;
                 } else {
-                    const polyLine = {
-                        positions: positions,
-                        id: this.icao
-                    };
-                    this.trail = this.geoCollection.lines.add(polyLine);
+                    this.createTrail(positions)
                 }
             } else {
                 this.destroyTrail()
@@ -227,7 +214,7 @@ export class FlightObj {
             }
         },{name:'labelUpdater'});
 
-        this.disposers = [visibilityUpdater,pointUpdater,trailUpdater,labelUpdater];
+        this.disposers = [pointVisibilityUpdater,pointUpdater,trailUpdater,labelUpdater];
     }
 
     // common
@@ -312,6 +299,14 @@ export class FlightObj {
         if(this.allPositions.length===1){return false}
         if(this.isSelected){return true}
         return this.shouldDisplay && this.levelOfDetail >= 1;
+    }
+
+    createTrail(positions: Cartesian3[]){
+        const polyLine = {
+            positions: positions,
+            id: this.icao
+        };
+        this.trail = this.geoCollection.lines.add(polyLine);
     }
 
     destroyTrail(){
