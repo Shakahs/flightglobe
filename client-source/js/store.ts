@@ -40,7 +40,7 @@ const labelOffset = new Cesium.Cartesian2(10, 20);
 
 export class FlightStore {
     flightData = new ObservableMap<Icao, FlightRecord>(undefined,undefined, "flightData");
-    detailedFlights = new ObservableMap<string, boolean>(undefined, undefined, "geoLevelOfDetail");
+    detailedFlights = new ObservableMap<string, boolean>(undefined, undefined, "detailedFlights");
     filteredFlights = new ObservableMap<string, boolean>(undefined, undefined, "filteredFlights");
     selectedFlights = new ObservableMap<string, boolean>(undefined, undefined, "selectedFlights");
     geoAreas = new Map<Icao, GeoCollection>();
@@ -51,17 +51,17 @@ export class FlightStore {
 
     constructor(viewer: Cesium.Viewer){
         this.viewer = viewer;
-        this.cameraEventDisposer = viewer.camera.changed.addEventListener(() => {
-          const ellipsoid = this.viewer.scene.globe.ellipsoid;
-          const cameraPosition = ellipsoid.cartesianToCartographic(this.viewer.camera.position);
-          const focusGeo = Geohash.encode(cameraPosition.latitude*180/Math.PI,
-              cameraPosition.longitude*180/Math.PI, 3);
-            this.detailedFlights.clear();
-            this.detailedFlights.set(focusGeo, true);
-            forEach(Geohash.neighbours(focusGeo), (neighbor)=>{
-                this.detailedFlights.set(neighbor, true);
-            })
-        });
+        // this.cameraEventDisposer = viewer.camera.changed.addEventListener(() => {
+        //   const ellipsoid = this.viewer.scene.globe.ellipsoid;
+        //   const cameraPosition = ellipsoid.cartesianToCartographic(this.viewer.camera.position);
+        //   const focusGeo = Geohash.encode(cameraPosition.latitude*180/Math.PI,
+        //       cameraPosition.longitude*180/Math.PI, 3);
+        //     this.detailedFlights.clear();
+        //     this.detailedFlights.set(focusGeo, true);
+        //     forEach(Geohash.neighbours(focusGeo), (neighbor)=>{
+        //         this.detailedFlights.set(neighbor, true);
+        //     })
+        // });
     }
 
     getOrCreateGeoCollection(id: string):GeoCollection{
@@ -208,20 +208,27 @@ export class FlightObj {
         return this.flightStore.selectedFlights.has(this.icao);
     }
 
-    @computed get shouldDisplay():boolean {
-        if(this.isSelected){return true} //specifically selected
-        if(this.flightStore.filteredFlights.size > 0){
-            return this.flightStore.filteredFlights.has(this.icao)  //filter present, check filter
+    @computed get isDetailSelected():boolean {
+        if(this.latestPosition){ //selected by LOD
+            return this.flightStore.detailedFlights.has(this.latestPosition.geohash);
         }
-        return true //visible by default
+        return false
+    }
+
+    @computed get isFilterSelected():boolean {
+        if(this.flightStore.detailedFlights.size === 0){
+            return true //the default filter is to include everything
+        }
+        return this.flightStore.detailedFlights.has(this.icao); //otherwise, return the actual filter result
+    }
+
+    @computed get shouldDisplay():boolean {
+        return this.isSelected || this.isFilterSelected
     }
 
     @computed get shouldDisplayDetailed():boolean {
         if(this.isSelected){return true} //selected by user
-        if(this.latestPosition){ //selected by LOD
-            return this.flightStore.detailedFlights.has(this.latestPosition.geohash);
-        }
-        return false;
+        return this.isDetailSelected && this.isFilterSelected //has to qualify for boths
     }
 
     @computed get demographics():FlightDemographics|undefined {

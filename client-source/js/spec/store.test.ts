@@ -1,8 +1,8 @@
 import {FlightObj, FlightStore} from "../store";
 import * as Cesium from "cesium";
 import {DemographicsUpdate, FlightPosition, FlightRecord, PositionUpdate} from "../types";
-import {PointPrimitive} from "cesium";
-import {newICAOMap} from "../utility";
+import { PointPrimitive} from "cesium";
+import {convertPositionToCartesian, newICAOMap} from "../utility";
 
 const FlightAPosition1:PositionUpdate = {
     body:{
@@ -94,8 +94,26 @@ describe("FlightGlobe", function() {
 
 
     describe("FlightStore", function() {
-        it("ensure camera change listener created",function(){
-           expect(viewer.camera.changed.numberOfListeners).toBeGreaterThanOrEqual(2)
+        describe('handles LOD changes from moving the globe', function(){
+            it("by creating the camera change listener",function(){
+                expect(viewer.camera.changed.numberOfListeners).toBeGreaterThanOrEqual(2)
+            });
+
+            it('by responding to camera changes', function(done){
+                // spyOn(flightStore,'updateDetailedFlights');
+                expect(flightObj.shouldDisplayDetailed).toBeFalsy();
+
+                const test = ()=>{
+                    // expect(flightStore.updateDetailedFlights).toHaveBeenCalled();
+                    expect(flightObj.shouldDisplayDetailed).toBeTruthy();
+                    done()
+                };
+
+                viewer.camera.flyTo({
+                    destination: convertPositionToCartesian(FlightAPosition1.body),
+                    complete: test
+                })
+            })
         });
 
         describe("handles flight records",function(){
@@ -370,6 +388,14 @@ describe("FlightGlobe", function() {
                     flightStore.addOrUpdateFlight(FlightAPosition2);
                     flightStore.detailedFlights.set(FlightAPosition1.body.geohash,true);
                     expect<boolean>(flightObj.shouldTrailDisplay).toBeTruthy();
+                })
+
+                it('when LOD increases but the flight is also filtered out', function(){
+                    expect<boolean>(flightObj.shouldTrailDisplay).toBeFalsy();
+                    flightStore.addOrUpdateFlight(FlightAPosition2);
+                    flightStore.detailedFlights.set(FlightAPosition1.body.geohash,true);
+                    flightStore.updateFilteredFlights(newICAOMap(['zzz']));
+                    expect<boolean>(flightObj.shouldTrailDisplay).toBeFalsy();
                 })
 
 
