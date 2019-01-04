@@ -219,13 +219,6 @@ export class FlightObj {
 
     // common
 
-    @computed get shouldDisplayDetailed():boolean {
-        if(this.latestPosition){
-            return this.flightStore.detailedFlights.has(this.latestPosition.geohash);
-        }
-        return false;
-    }
-
     @computed get isSelected():boolean {
         return this.flightStore.selectedFlights.has(this.icao);
     }
@@ -236,6 +229,14 @@ export class FlightObj {
             return this.flightStore.filteredFlights.has(this.icao)  //filter present, check filter
         }
         return true //visible by default
+    }
+
+    @computed get shouldDisplayDetailed():boolean {
+        if(this.isSelected){return true} //selected by user
+        if(this.latestPosition){ //selected by LOD
+            return this.flightStore.detailedFlights.has(this.latestPosition.geohash);
+        }
+        return false;
     }
 
     @computed get demographics():FlightDemographics|undefined {
@@ -295,9 +296,7 @@ export class FlightObj {
     // trails
 
     @computed get shouldTrailDisplay():boolean{
-        if(this.allPositions.length===1){return false}
-        if(this.isSelected){return true}
-        return this.shouldDisplay && this.shouldDisplayDetailed;
+        return this.allPositions.length>=1 && this.shouldDisplayDetailed
     }
 
     createTrail(positions: Cartesian3[]){
