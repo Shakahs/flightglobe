@@ -78,13 +78,13 @@ export class FlightStore {
     @action('addOrUpdateFlight')
     addOrUpdateFlight(pos: PositionUpdate){
         // this.flightPositions.set(pos.icao, pos.body);
-        const currentData = this.flightData.get(pos.icao);
-        if(currentData){
-            currentData.positions.push(pos.body)
+        let flightRecord = this.flightData.get(pos.icao);
+        if(flightRecord){
+            flightRecord.positions.push(pos.body)
         } else {
-            const newData = newFlightRecord(pos.icao);
-            newData.positions.push(pos.body);
-            this.flightData.set(pos.icao, newData)
+            flightRecord = newFlightRecord(pos.icao);
+            flightRecord.positions.push(pos.body);
+            this.flightData.set(pos.icao, flightRecord)
         }
 
         const geoColl = this.getOrCreateGeoCollection(pos.body.geohash[0]);
@@ -94,7 +94,7 @@ export class FlightStore {
             thisFlight = undefined;
         }
         if(!thisFlight){
-            this.flights.set(pos.icao, new FlightObj(this, pos.icao, geoColl));
+            this.flights.set(pos.icao, new FlightObj(this, flightRecord, pos.icao, geoColl));
         }
 
         this.updateLatestTimestamp(pos)
@@ -159,6 +159,7 @@ export class FlightStore {
 
 export class FlightObj {
     flightStore:FlightStore;
+    flightRecord: FlightRecord;
     icao:Icao;
     geoCollection:GeoCollection;
     point: null | PointPrimitive = null;
@@ -166,8 +167,9 @@ export class FlightObj {
     label: null | Label = null;
     disposers: Array<IReactionDisposer>;
 
-    constructor(flightStore, icao: Icao, geo){
+    constructor(flightStore, flightRecord, icao: Icao, geo){
         this.flightStore = flightStore;
+        this.flightRecord = flightRecord;
         this.icao = icao;
         this.geoCollection = geo;
 
@@ -238,12 +240,8 @@ export class FlightObj {
         return this.isDetailSelected && this.isFilterSelected //has to qualify for boths
     }
 
-    @computed get demographics():FlightDemographics|undefined {
-        const flightRecord = this.flightStore.flightData.get(this.icao);
-        if(flightRecord){
-            return flightRecord.demographic
-        }
-        return undefined
+    @computed get demographics():FlightDemographics|null{
+        return this.flightRecord.demographic
     }
 
     // position
@@ -332,8 +330,9 @@ export class FlightObj {
     }
 
     @computed get labelText(){
-        if(this.demographics){
-            return `${this.icao}\n${this.demographics.origin}\n${this.demographics.destination}`
+        if(this.flightRecord.demographic){
+            // return `${this.icao}\n${this.flightRecord.demographic.origin}\n${this.flightRecord.demographic.destination}`
+            return ''
         } else {
             return ''
         }
@@ -342,6 +341,7 @@ export class FlightObj {
     renderLabel(pos: Cartesian3, labelText: string){
         if(this.label){
             this.label.position = pos;
+            this.label.text = labelText;
         } else {
             this.label = this.geoCollection.labels.add({
                 position: pos,
