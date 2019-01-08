@@ -64,7 +64,7 @@
     "immutable": "^3.8.2",
     "latlon-geohash": "^1.1.0",
     "lodash-es": "^4.17.4",
-    "mobx": "^4.6.0",
+    "mobx": "^4.8.0",
     "mobx-react": "^5.4.3",
     "prop-types": "^15.5.6",
     "react": "^16.2.0",
