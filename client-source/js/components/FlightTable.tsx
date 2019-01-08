@@ -7,7 +7,7 @@ import {AgGridReact, AgGridColumn, AgGridColumnProps} from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-balham-dark.css';
 import {GridApi,AgGridEvent,FilterChangedEvent} from 'ag-grid-community'
-import {FlightStore} from "../store";
+import {FlightStore} from "../flightStore";
 import {GridReadyEvent} from "ag-grid-community/dist/lib/events";
 
 interface FlightTableProps {

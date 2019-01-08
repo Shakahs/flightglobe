@@ -7,7 +7,7 @@ import { interval } from 'rxjs';
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import {PositionUpdate, DemographicsUpdate} from "../types";
-import { FlightStore} from '../store'
+import { FlightStore} from '../flightStore'
 import applyClickHandler from "../globe/clickHandler";
 import FlightTable from './FlightTable'
 
