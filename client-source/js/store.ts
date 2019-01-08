@@ -114,7 +114,9 @@ export class FlightStore {
     addDemographics(dem: DemographicsUpdate){
         const currentData = this.flightData.get(dem.icao);
         if(currentData){
-            currentData.demographic=dem.body;
+            currentData.demographic.origin = dem.body.origin;
+            currentData.demographic.destination = dem.body.destination;
+            currentData.demographic.model = dem.body.model;
         } else {
             const newData = newFlightRecord(dem.icao);
             newData.demographic=dem.body
@@ -241,7 +243,11 @@ export class FlightObj {
     }
 
     @computed get demographics():FlightDemographics|null{
-        return this.flightRecord.demographic
+        const flightRecord = this.flightStore.flightData.get(this.icao);
+        if(flightRecord && flightRecord.demographic){
+            return flightRecord.demographic;
+        }
+        return null;
     }
 
     // position
@@ -329,13 +335,12 @@ export class FlightObj {
         return this.shouldDisplayDetailed;
     }
 
-    @computed get labelText(){
-        if(this.flightRecord.demographic){
-            // return `${this.icao}\n${this.flightRecord.demographic.origin}\n${this.flightRecord.demographic.destination}`
-            return ''
-        } else {
-            return ''
+    @computed get labelText():string {
+        if(this.demographics){
+            return `${this.icao}\n${this.demographics.origin}\n${this.demographics.destination}`
         }
+
+        return '';
     }
 
     renderLabel(pos: Cartesian3, labelText: string){

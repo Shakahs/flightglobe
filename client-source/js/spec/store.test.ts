@@ -152,7 +152,7 @@ describe("FlightGlobe", function() {
 
             it("by storing demographic data for a flight which received position data first", function(){
                const flightRecord = flightStore.flightData.get(FlightAPosition1.icao) as FlightRecord;
-               expect(flightRecord.demographic).toBeNull();
+               expect(flightRecord.demographic).toEqual({destination:'',origin:'',model:''});
                flightStore.addDemographics(FlightADemographic);
                expect(flightRecord.demographic).toEqual(FlightADemographic.body);
             });
@@ -270,7 +270,7 @@ describe("FlightGlobe", function() {
            });
 
            it('gets the demographic data', function () {
-               expect(flightObj.demographics).toBeNull();
+               expect(flightObj.demographics).toEqual({destination:'',origin:'',model:''});
                flightStore.addDemographics(FlightADemographic);
                expect(flightObj.demographics).toEqual(FlightADemographic.body)
            })
@@ -474,10 +474,7 @@ describe("FlightGlobe", function() {
                 expect<boolean>(flightObj.shouldLabelDisplay).toBeTruthy();
             });
 
-            it('by computing the correct label text', function(){
-                flightStore.updateDetailedFlights(new Map([[FlightAPosition1.body.geohash,true]]));
-                expect(flightObj.labelText).toEqual('');
-
+            it('by computing the correct label text when demographics are available', function(){
                 flightStore.addDemographics(FlightADemographic);
                 expect(flightObj.labelText.length).toBeGreaterThan(0);
                 expect(flightObj.labelText.indexOf("Tokyo")).toBeGreaterThan(0);
@@ -487,7 +484,6 @@ describe("FlightGlobe", function() {
                 flightStore.updateDetailedFlights(new Map([[FlightAPosition1.body.geohash,true]]));
                 const flight = flightStore.flights.get(FlightAPosition1.icao);
                 if(flight && flight.label){
-                    expect(flight.label.text).toEqual('');
                     expect(flight.geoCollection.labels.contains(flight.label)).toBeTruthy();
                     expect(flight.label.position).toEqual(Cesium.Cartesian3.fromDegrees(
                         FlightAPosition1.body.longitude,
@@ -495,7 +491,6 @@ describe("FlightGlobe", function() {
                         FlightAPosition1.body.altitude,
                     ));
                     flightStore.addDemographics(FlightADemographic);
-                    expect(flight.label.text.indexOf("Tokyo")).toBeGreaterThan(0);
                     flightStore.updateDetailedFlights(new Map());
                     expect(flight.geoCollection.labels.contains(flight.label)).toBeFalsy();
                     expect(flight.label).toBeNull();

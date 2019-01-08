@@ -33,6 +33,6 @@ export interface DemographicsUpdate extends Message {
 export interface FlightRecord {
     icao: string,
     positions: FlightPosition[],
-    demographic: FlightDemographics | null,
+    demographic: FlightDemographics,
     time?: Date
 }
