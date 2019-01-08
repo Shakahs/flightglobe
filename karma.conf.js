@@ -6,9 +6,11 @@ module.exports = function (config) {
     frameworks: ['jasmine'],
     preprocessors: {
       'client-source/**/*.ts': ['webpack'],
+      'client-source/**/*.tsx': ['webpack'],
     },
     files: [
       { pattern: 'client-source/**/*.test.ts' },
+      { pattern: 'client-source/**/*.test.tsx' },
       // 'client-source/js/spec/index.ts',
     ],
     browsers: ['ChromeHeadless'],
