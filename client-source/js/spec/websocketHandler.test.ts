@@ -72,11 +72,15 @@ describe('websocketHandler',()=>{
         expect(mockServer.clients().length).toEqual(1)
     })
 
-    it('unsubscribes',()=>{
+    it('unsubscribes',(done)=>{
         const wsh = new WebsocketHandler(testServerURL);
         expect(mockServer.clients().length).toEqual(1);
         const ws = wsh.ws as WebSocket;
         wsh.setShouldSubscribe(false);
         expect(ws.readyState).toEqual(2)
+        setTimeout(()=>{
+            expect(wsh.ws).toBeNull();
+            done()
+        }, 1000)
     })
 });

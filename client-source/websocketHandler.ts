@@ -28,13 +28,18 @@ export default class WebsocketHandler {
         this.shouldSubscribe = v;
     }
 
+    @computed get isSubscribed():boolean {
+        if(this.ws && this.ws.readyState <= 1){
+            return true
+        }
+        return false
+    }
+
     @action('wsSubscribe')
     wsSubscribe() {
         this.ws = new WebSocket(this.url);
-        this.ws.onmessage = (msg: MessageEvent)=>{
-            this.message = msg.data
-        };
-        this.ws.onclose = this.wsClose;
+        this.ws.onmessage = (msg: MessageEvent)=>this.wsMessage(msg);
+        this.ws.onclose = ()=>this.wsClose();
     }
 
     @action('wsClose')
@@ -42,10 +47,5 @@ export default class WebsocketHandler {
         this.ws = null;
     }
 
-    @computed get isSubscribed():boolean {
-        if(this.ws && this.ws.readyState <= 1){
-            return true
-        }
-        return false
-    }
+
 }
