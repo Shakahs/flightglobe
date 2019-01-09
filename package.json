@@ -49,6 +49,7 @@
     "karma-detect-browsers": "^2.3.3",
     "karma-jasmine": "^2.0.1",
     "karma-webpack": "^3.0.5",
+    "mock-socket": "^8.0.5",
     "requirejs": "^2.3.6",
     "style-loader": "^0.23.1",
     "typescript": "^3.1.3",

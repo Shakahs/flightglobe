@@ -11,12 +11,13 @@ export default class WebsocketHandler {
         this.url = url;
         this.shouldSubscribe = shouldSubscribe;
 
-        // const wsAutorun = autorun(() => {
-        //     const isSubscribed = this.isSubscribed;
-        //     if (!isSubscribed) {
-        //         this.subscribe()
-        //     }
-        // }, {name: 'wsAutorun'});
+        const wsAutorun = autorun(() => {
+            const isSubscribed = this.isSubscribed;
+            const shouldSubscribe = this.shouldSubscribe;
+            if (!isSubscribed && shouldSubscribe) {
+                this.wsSubscribe()
+            }
+        }, {name: 'wsAutorun'});
     }
 
     @action('setShouldSubscribe')
@@ -24,15 +25,18 @@ export default class WebsocketHandler {
         this.shouldSubscribe = v;
     }
 
-    @action('subscribe')
-    subscribe() {
+    @action('wsSubscribe')
+    wsSubscribe() {
         this.ws = new WebSocket(this.url);
         this.ws.onmessage = (msg: MessageEvent)=>{
             this.message = msg.data
         };
-        this.ws.onclose = ()=>{
-            this.ws = null;
-        };
+        this.ws.onclose = this.wsClose;
+    }
+
+    @action('wsClose')
+    wsClose(){
+        this.ws = null;
     }
 
     @computed get isSubscribed():boolean {

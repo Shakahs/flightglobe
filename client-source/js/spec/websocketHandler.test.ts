@@ -1,19 +1,23 @@
-// import { Server } from 'mock-socket';
+import { Server, WebSocket } from 'mock-socket';
 import WebsocketHandler from "../../websocketHandler";
 import {FlightAPosition1} from "./mockData";
 
 describe('websocketHandler',()=>{
 
     const testServerURL = 'ws://localhost:8080';
-    let mockServer;
-    let mockSocket;
+    let mockServer: Server;
+    let mockSocket: WebSocket;
 
-    beforeAll( ()=>{
-        // mockServer = new Server(testServerURL);
-        // mockServer.on('connection', socket => {
-        //     mockSocket = socket
-        // });
+    beforeEach( ()=>{
+        mockServer = new Server(testServerURL);
+        mockServer.on('connection', socket => {
+            mockSocket = socket
+        });
     });
+
+    afterEach(()=>{
+        mockServer.close()
+    })
 
     it('initializes and stores the default websocket url', ()=>{
         const wsh = new WebsocketHandler();
@@ -44,16 +48,23 @@ describe('websocketHandler',()=>{
         expect(wsh.shouldSubscribe).toBeTruthy();
     });
 
-   xit('determines if a new handler is not subscribed',()=>{
+   it('determines if a new handler is not subscribed',()=>{
        const wsh = new WebsocketHandler(testServerURL,false);
        expect(wsh.isSubscribed).toBeFalsy()
    })
 
-    xit('attempts to subscribe', ()=>{
+    it('subscribes',()=>{
+        expect(mockServer.clients().length).toEqual(0);
+        const wsh = new WebsocketHandler(testServerURL);
+        expect(mockServer.clients().length).toEqual(1)
+    })
+
+    it('respects shouldSubscribe when subscribing',()=>{
+        expect(mockServer.clients().length).toEqual(0);
         const wsh = new WebsocketHandler(testServerURL,false);
-        const spy = spyOn(wsh,'subscribe');
-        wsh.shouldSubscribe = true;
-        expect(spy).toHaveBeenCalled()
+        expect(mockServer.clients().length).toEqual(0)
+        wsh.setShouldSubscribe(true);
+        expect(mockServer.clients().length).toEqual(1)
     })
 
 });
