@@ -17,6 +17,9 @@ export default class WebsocketHandler {
             if (!isSubscribed && shouldSubscribe) {
                 this.wsSubscribe()
             }
+            if(isSubscribed && !shouldSubscribe && this.ws) {
+                this.ws.close()
+            }
         }, {name: 'wsAutorun'});
     }
 
@@ -40,7 +43,7 @@ export default class WebsocketHandler {
     }
 
     @computed get isSubscribed():boolean {
-        if(this.ws && this.ws.readyState <= 2){
+        if(this.ws && this.ws.readyState <= 1){
             return true
         }
         return false

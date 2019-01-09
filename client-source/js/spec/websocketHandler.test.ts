@@ -48,7 +48,7 @@ describe('websocketHandler',()=>{
         expect(wsh.shouldSubscribe).toBeTruthy();
     });
 
-   it('determines if a new handler is not subscribed',()=>{
+   it('determines if an unsubscribed handler is not subscribed',()=>{
        const wsh = new WebsocketHandler(testServerURL,false);
        expect(wsh.isSubscribed).toBeFalsy()
    })
@@ -59,6 +59,11 @@ describe('websocketHandler',()=>{
         expect(mockServer.clients().length).toEqual(1)
     })
 
+    it('determines if a subscribed handler is subscribed',()=>{
+        const wsh = new WebsocketHandler(testServerURL);
+        expect(wsh.isSubscribed).toBeTruthy()
+    })
+
     it('respects shouldSubscribe when subscribing',()=>{
         expect(mockServer.clients().length).toEqual(0);
         const wsh = new WebsocketHandler(testServerURL,false);
@@ -67,4 +72,11 @@ describe('websocketHandler',()=>{
         expect(mockServer.clients().length).toEqual(1)
     })
 
+    it('unsubscribes',()=>{
+        const wsh = new WebsocketHandler(testServerURL);
+        expect(mockServer.clients().length).toEqual(1);
+        const ws = wsh.ws as WebSocket;
+        wsh.setShouldSubscribe(false);
+        expect(ws.readyState).toEqual(2)
+    })
 });
