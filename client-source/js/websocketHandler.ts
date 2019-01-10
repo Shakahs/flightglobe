@@ -1,4 +1,4 @@
-import {createAtom, autorun, IAtom, observable, computed, action, reaction} from "mobx";
+import {createAtom, autorun, IAtom, observable, computed, action, reaction, IReactionDisposer} from "mobx";
 import {Message, UpdateRequest} from "./types";
 import {forEach, noop} from "lodash-es";
 
@@ -7,14 +7,16 @@ export default class WebsocketHandler {
     @observable messages: Message[] = [];
     @observable shouldSubscribe:boolean;
     url: string;
-    wsCallback: (msg: Message)=>void;
+    wsCallback: (msg: Message)=>void | null;
+    wsAutorunDisposer: IReactionDisposer;
+    wsCallbackReactionDisposer: IReactionDisposer;
 
     constructor(wsCallback: (msg: Message)=>void = noop, url: string = `ws://${ window.location.host }/sub`, shouldSubscribe: boolean = true) {
         this.url = url;
         this.shouldSubscribe = shouldSubscribe;
         this.wsCallback = wsCallback;
 
-        const wsAutorun = autorun(() => {
+        this.wsAutorunDisposer = autorun(() => {
             const isSubscribed = this.isSubscribed;
             const shouldSubscribe = this.shouldSubscribe;
             if (!isSubscribed && shouldSubscribe) {
@@ -25,8 +27,12 @@ export default class WebsocketHandler {
             }
         }, {name: 'wsAutorun'});
 
-        const wsCallbackReaction = reaction(
-            ()=>this.messages,
+        this.wsCallbackReactionDisposer = reaction(
+            ()=>{
+                const returnedMessages:Message[] = [];
+                this.messages.forEach((m)=>returnedMessages.push(m));
+                return returnedMessages;
+            },
             (messages: Message[])=>{
                 forEach(messages, (message)=>{
                     this.wsCallback(message)

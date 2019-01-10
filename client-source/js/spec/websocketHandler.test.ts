@@ -1,7 +1,8 @@
 import { Server, WebSocket } from 'mock-socket';
 import WebsocketHandler from "../websocketHandler";
 import {FlightAPosition1, FlightAPosition2} from "./mockData";
-import {UpdateRequest} from "../types";
+import {Message, UpdateRequest} from "../types";
+import {noop} from "lodash-es";
 
 describe('websocketHandler handles connection housekeeping',()=>{
 
@@ -22,7 +23,7 @@ describe('websocketHandler handles connection housekeeping',()=>{
     });
 
     it('initializes and stores the provided websocket url', ()=>{
-       const wsh = new WebsocketHandler(testServerURL);
+       const wsh = new WebsocketHandler(undefined, testServerURL);
        expect(wsh.url).toEqual(testServerURL)
     });
 
@@ -32,7 +33,7 @@ describe('websocketHandler handles connection housekeeping',()=>{
     });
 
     it('initializes and stores the provided shouldSubscribe option', ()=>{
-        const wsh = new WebsocketHandler(undefined, false);
+        const wsh = new WebsocketHandler(undefined,undefined, false);
         expect(wsh.shouldSubscribe).toBeFalsy()
     });
 
@@ -46,31 +47,31 @@ describe('websocketHandler handles connection housekeeping',()=>{
     });
 
    it('determines if an unsubscribed handler is not subscribed',()=>{
-       const wsh = new WebsocketHandler(testServerURL,false);
+       const wsh = new WebsocketHandler(undefined,testServerURL,false);
        expect(wsh.isSubscribed).toBeFalsy()
    })
 
     it('subscribes',()=>{
         expect(mockServer.clients().length).toEqual(0);
-        const wsh = new WebsocketHandler(testServerURL);
+        const wsh = new WebsocketHandler(undefined,testServerURL);
         expect(mockServer.clients().length).toEqual(1)
     })
 
     it('determines if a subscribed handler is subscribed',()=>{
-        const wsh = new WebsocketHandler(testServerURL);
+        const wsh = new WebsocketHandler(undefined,testServerURL);
         expect(wsh.isSubscribed).toBeTruthy()
     })
 
     it('respects shouldSubscribe when subscribing',()=>{
         expect(mockServer.clients().length).toEqual(0);
-        const wsh = new WebsocketHandler(testServerURL,false);
+        const wsh = new WebsocketHandler(undefined,testServerURL,false);
         expect(mockServer.clients().length).toEqual(0)
         wsh.setShouldSubscribe(true);
         expect(mockServer.clients().length).toEqual(1)
     })
 
     it('unsubscribes',(done)=>{
-        const wsh = new WebsocketHandler(testServerURL);
+        const wsh = new WebsocketHandler(noop,testServerURL);
         expect(mockServer.clients().length).toEqual(1);
         const ws = wsh.ws as WebSocket;
         wsh.setShouldSubscribe(false);
@@ -124,8 +125,31 @@ describe('websocketHandler handles connection housekeeping',()=>{
         wsh.send(updateRequest);
     })
 
-    xit('gives a message to the callback',()=>{
+    it('gives a message to the callback',(done)=>{
+        mockServer.on('connection', socket => {
+            socket.send(JSON.stringify(FlightAPosition1));
+        });
 
+        const cb = (msg: Message)=>{
+            expect(msg).toEqual(FlightAPosition1);
+            done()
+        };
+
+        const wsh = new WebsocketHandler(cb,testServerURL);
+
+        setTimeout(noop,1100)
     })
+
+    it('clears messages after calling the callback',(done)=>{
+        mockServer.on('connection', socket => {
+            socket.send(JSON.stringify(FlightAPosition1));
+        });
+        const wsh = new WebsocketHandler(noop,testServerURL);
+        setTimeout(()=>{
+            expect(wsh.messages.length).toEqual(0)
+            done()
+        },1500)
+    })
+
 });
 
