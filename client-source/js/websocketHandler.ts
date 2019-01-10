@@ -4,7 +4,7 @@ import {forEach, noop} from "lodash-es";
 
 export default class WebsocketHandler {
     @observable ws: WebSocket|null = null;
-    @observable messages: Message[] = [];
+    @observable.shallow messages: Message[] = [];
     @observable shouldSubscribe:boolean;
     url: string;
     wsCallback: (msg: Message[])=>void | null;
