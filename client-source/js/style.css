@@ -22,5 +22,5 @@ html, body, #cesiumContainer {
     position: absolute;
     bottom: 1em;
     left: 1em;
-    width: 90%
+    right: 1em;
 }

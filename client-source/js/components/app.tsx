@@ -4,10 +4,11 @@ import { Container, Row, Col } from 'reactstrap';
 import Menu from "./Menu";
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {faBars} from '@fortawesome/free-solid-svg-icons/faBars'
+import {faFilter} from '@fortawesome/free-solid-svg-icons/faFilter'
 import {FontAwesomeIcon as FontAwesome} from "@fortawesome/react-fontawesome";
 import {FlightStore} from "../flightStore";
 
-library.add(faBars);
+library.add(faBars,faFilter);
 
 interface AppProps {
     flightStore: FlightStore

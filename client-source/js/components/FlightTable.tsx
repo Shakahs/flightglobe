@@ -66,7 +66,7 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
                     className="ag-theme-balham-dark"
                     style={{
                         height: '500px',
-                        width: '600px'
+                        width: '100%'
                     }}
                 >
                     <AgGridReact

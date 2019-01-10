@@ -12,6 +12,11 @@ const Menu: React.SFC<MenuProps> = (props) => (
         >
             <FontAwesome icon='bars' size='lg' />
         </button>
+        <button
+            onClick={props.flightTableToggle}
+        >
+            <FontAwesome icon='filter' size='lg' />
+        </button>
     </div>
 );
 
