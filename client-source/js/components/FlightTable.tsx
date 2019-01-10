@@ -61,7 +61,7 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
 
     render() {
         return(
-            <div>
+            <div className={'flightTable'}>
                 <div
                     className="ag-theme-balham-dark"
                     style={{

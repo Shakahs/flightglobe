@@ -11,6 +11,7 @@ import {FlightStore} from '../flightStore'
 import applyClickHandler from "../globe/clickHandler";
 import App from "./app";
 import WebsocketHandler from "../websocketHandler";
+import '../style.css'
 
 const flightStore = new FlightStore(viewer);
 const wsh = new WebsocketHandler(flightStore.routeUpdate.bind(flightStore));
