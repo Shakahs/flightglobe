@@ -36,3 +36,7 @@ export interface FlightRecord {
     demographic: FlightDemographics,
     time?: Date
 }
+
+export interface UpdateRequest {
+    lastReceivedTimestamp: number
+}

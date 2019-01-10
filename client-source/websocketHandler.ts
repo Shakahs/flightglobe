@@ -1,5 +1,5 @@
 import {createAtom, autorun, IAtom, observable, computed, action} from "mobx";
-import {Message} from "./js/types";
+import {Message, UpdateRequest} from "./js/types";
 
 export default class WebsocketHandler {
     @observable ws: WebSocket|null = null;
@@ -59,5 +59,10 @@ export default class WebsocketHandler {
         this.ws = null;
     }
 
+    send(msg: UpdateRequest){
+        if(this.ws){
+            this.ws.send(JSON.stringify(msg))
+        }
+    }
 
 }

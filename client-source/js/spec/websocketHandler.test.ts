@@ -1,6 +1,7 @@
 import { Server, WebSocket } from 'mock-socket';
 import WebsocketHandler from "../../websocketHandler";
 import {FlightAPosition1, FlightAPosition2} from "./mockData";
+import {UpdateRequest} from "../types";
 
 describe('websocketHandler handles connection housekeeping',()=>{
 
@@ -93,7 +94,7 @@ describe('websocketHandler handles connection housekeeping',()=>{
     })
 });
 
-describe('websocketHandler handles message', ()=>{
+describe('websocketHandler handles message send and receive', ()=>{
   it('by receiving a message', (done)=>{
       const testServerURL = 'ws://localhost:32000';
       const mockServer = new Server(testServerURL);
@@ -132,4 +133,19 @@ describe('websocketHandler handles message', ()=>{
         },100)
     })
 
+    it('by sending update requests', ()=>{
+        const testServerURL = 'ws://localhost:32000';
+        const mockServer = new Server(testServerURL);
+        const updateRequest: UpdateRequest = {lastReceivedTimestamp: 22222};
+
+        mockServer.on('connection', socket => {
+            //@ts-ignore
+            socket.on('message', data => {
+                expect(JSON.parse(data)).toEqual(updateRequest);
+            });
+        });
+
+        const wsh = new WebsocketHandler(testServerURL);
+        wsh.send(updateRequest);
+    })
 })
