@@ -3,7 +3,14 @@ import * as Cesium from "cesium";
 import {PointPrimitive} from "cesium";
 import {FlightPosition, FlightRecord} from "../types";
 import {convertPositionToCartesian, newICAOMap} from "../utility";
-import {FlightADemographic, FlightAPosition1, FlightAPosition2, FlightBPosition1, FlightCDemographic} from "./mockData";
+import {
+    FlightADemographic,
+    FlightAPosition1,
+    FlightAPosition2,
+    FlightBPosition1,
+    FlightCDemographic,
+    FlightCPosition1
+} from "./mockData";
 import {flightObj, flightStore, viewer} from "./mockSetup";
 import {FlightObj} from "../flightObj";
 
@@ -30,6 +37,23 @@ describe("FlightStore", function() {
             })
         })
     });
+
+    describe('routes update messages',()=>{
+        it('by routing position updates', ()=>{
+            expect(flightStore.flightData.size).toEqual(2);
+            flightStore.routeUpdate(FlightCPosition1);
+            expect(flightStore.flightData.size).toEqual(3);
+            const flightC = flightStore.flightData.get(FlightCPosition1.icao) as FlightRecord;
+            expect(flightC.positions[0]).toEqual(FlightCPosition1.body)
+        })
+        it('by routing demographic updates', ()=>{
+            expect(flightStore.flightData.size).toEqual(2);
+            flightStore.routeUpdate(FlightCDemographic);
+            expect(flightStore.flightData.size).toEqual(3);
+            const flightC = flightStore.flightData.get(FlightCDemographic.icao) as FlightRecord;
+            expect(flightC.demographic).toEqual(FlightCDemographic.body)
+        })
+    })
 
     describe("handles flight records",function(){
 

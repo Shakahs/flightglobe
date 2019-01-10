@@ -1,10 +1,11 @@
-import {action, configure, ObservableMap} from 'mobx';
-import {DemographicsUpdate, FlightRecord, Icao, PositionUpdate} from "./types";
+import {action, configure, IReactionDisposer, ObservableMap, reaction} from 'mobx';
+import {DemographicsUpdate, FlightRecord, Icao, Message, PositionUpdate} from "./types";
 import * as Cesium from "cesium";
 import {newFlightRecord} from "./utility";
 import {forEach} from "lodash-es";
 import {FlightObj} from "./flightObj";
 import {GeoCollection} from "./geoCollection";
+import WebsocketHandler from "../websocketHandler";
 
 const Geohash = require('latlon-geohash');
 
@@ -22,6 +23,8 @@ export class FlightStore {
     newestPositionTimestamp = 0;
     viewer:Cesium.Viewer;
     cameraEventDisposer:Cesium.Event.RemoveCallback;
+    websocketHandler: WebsocketHandler;
+    websocketReactionDisposer: IReactionDisposer;
 
     constructor(viewer: Cesium.Viewer){
         this.viewer = viewer;
@@ -38,6 +41,16 @@ export class FlightStore {
           })
           this.updateDetailedFlights(newGeoResult);
         });
+        this.websocketHandler = new WebsocketHandler();
+        this.websocketReactionDisposer = reaction(
+            ()=>this.websocketHandler.currentMessages,
+            (messages: Message[])=>{
+                forEach(messages, (message)=>{
+                    this.routeUpdate(message)
+                });
+            },
+            {delay:1000}
+        )
     }
 
     getOrCreateGeoCollection(id: string):GeoCollection{
@@ -47,6 +60,19 @@ export class FlightStore {
             this.geoAreas.set(id, geo)
         }
         return geo
+    }
+
+    routeUpdate(message: Message){
+        switch (message.type) {
+            case "positionUpdate":
+                const pUpdate = message as PositionUpdate;
+                this.addOrUpdateFlight(pUpdate);
+                break;
+            case "demographicUpdate":
+                const dUpdate = message as DemographicsUpdate;
+                this.addDemographics(dUpdate);
+                break;
+        }
     }
 
     @action('addOrUpdateFlight')
@@ -130,6 +156,7 @@ export class FlightStore {
         this.flights.forEach((f)=>f.destroy());
         this.geoAreas.forEach((f)=>f.destroy());
         // this.cameraEventDisposer();
+        this.websocketReactionDisposer()
     }
 }
 

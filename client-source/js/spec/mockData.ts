@@ -45,6 +45,18 @@ export const FlightBPosition1: PositionUpdate = {
     type: "positionUpdate",
     icao: "BCDEF"
 };
+export const FlightCPosition1: PositionUpdate = {
+    body: {
+        timestamp: Date.now(),
+        altitude: 9000,
+        latitude: 55,
+        longitude: 33,
+        heading: 100,
+        geohash: "abc"
+    },
+    type: "positionUpdate",
+    icao: "ZZZF"
+};
 export const FlightCDemographic: DemographicsUpdate = {
     type: "demographicUpdate",
     icao: "ZZZF",
