@@ -62,7 +62,8 @@ export class FlightStore {
                     const dUpdate = message as DemographicsUpdate;
                     this.addDemographics(dUpdate);
                     break;
-            }})
+            }});
+        this.viewer.scene.requestRender()
     }
 
 
