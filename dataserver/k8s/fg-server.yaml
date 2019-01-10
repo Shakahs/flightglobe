@@ -1,18 +1,3 @@
-kind: Service
-apiVersion: v1
-metadata:
-  name: fg-server
-  labels:
-    app: "fg-server"
-spec:
-  type: LoadBalancer
-  ports:
-  - port: 80
-    targetPort: 8081
-    name: http
-  selector:
-    app: fg-server
----
 apiVersion: "extensions/v1beta1"
 kind: "Deployment"
 metadata:
