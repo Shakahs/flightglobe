@@ -1,5 +1,5 @@
 import { Server, WebSocket } from 'mock-socket';
-import WebsocketHandler from "../../websocketHandler";
+import WebsocketHandler from "../websocketHandler";
 import {FlightAPosition1, FlightAPosition2} from "./mockData";
 import {UpdateRequest} from "../types";
 

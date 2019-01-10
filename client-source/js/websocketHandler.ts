@@ -1,5 +1,5 @@
 import {createAtom, autorun, IAtom, observable, computed, action} from "mobx";
-import {Message, UpdateRequest} from "./js/types";
+import {Message, UpdateRequest} from "./types";
 
 export default class WebsocketHandler {
     @observable ws: WebSocket|null = null;

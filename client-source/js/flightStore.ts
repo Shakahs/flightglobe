@@ -5,7 +5,7 @@ import {newFlightRecord} from "./utility";
 import {forEach} from "lodash-es";
 import {FlightObj} from "./flightObj";
 import {GeoCollection} from "./geoCollection";
-import WebsocketHandler from "../websocketHandler";
+import WebsocketHandler from "./websocketHandler";
 
 const Geohash = require('latlon-geohash');
 
@@ -23,8 +23,6 @@ export class FlightStore {
     newestPositionTimestamp = 0;
     viewer:Cesium.Viewer;
     cameraEventDisposer:Cesium.Event.RemoveCallback;
-    websocketHandler: WebsocketHandler;
-    websocketReactionDisposer: IReactionDisposer;
 
     constructor(viewer: Cesium.Viewer){
         this.viewer = viewer;
@@ -41,16 +39,6 @@ export class FlightStore {
           })
           this.updateDetailedFlights(newGeoResult);
         });
-        this.websocketHandler = new WebsocketHandler();
-        this.websocketReactionDisposer = reaction(
-            ()=>this.websocketHandler.currentMessages,
-            (messages: Message[])=>{
-                forEach(messages, (message)=>{
-                    this.routeUpdate(message)
-                });
-            },
-            {delay:1000}
-        )
     }
 
     getOrCreateGeoCollection(id: string):GeoCollection{
@@ -156,7 +144,6 @@ export class FlightStore {
         this.flights.forEach((f)=>f.destroy());
         this.geoAreas.forEach((f)=>f.destroy());
         // this.cameraEventDisposer();
-        this.websocketReactionDisposer()
     }
 }
 
