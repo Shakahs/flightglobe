@@ -130,8 +130,8 @@ describe('websocketHandler handles connection housekeeping',()=>{
             socket.send(JSON.stringify(FlightAPosition1));
         });
 
-        const cb = (msg: Message)=>{
-            expect(msg).toEqual(FlightAPosition1);
+        const cb = (msg: Message[])=>{
+            expect(msg).toEqual([FlightAPosition1]);
             done()
         };
 

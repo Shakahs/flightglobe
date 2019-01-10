@@ -7,11 +7,11 @@ export default class WebsocketHandler {
     @observable messages: Message[] = [];
     @observable shouldSubscribe:boolean;
     url: string;
-    wsCallback: (msg: Message)=>void | null;
+    wsCallback: (msg: Message[])=>void | null;
     wsAutorunDisposer: IReactionDisposer;
     wsCallbackReactionDisposer: IReactionDisposer;
 
-    constructor(wsCallback: (msg: Message)=>void = noop, url: string = `ws://${ window.location.host }/sub`, shouldSubscribe: boolean = true) {
+    constructor(wsCallback: (msg: Message[])=>void = noop, url: string = `ws://${ window.location.host }/sub`, shouldSubscribe: boolean = true) {
         this.url = url;
         this.shouldSubscribe = shouldSubscribe;
         this.wsCallback = wsCallback;
@@ -34,9 +34,7 @@ export default class WebsocketHandler {
                 return returnedMessages;
             },
             (messages: Message[])=>{
-                forEach(messages, (message)=>{
-                    this.wsCallback(message)
-                });
+                this.wsCallback(messages);
                 this.clearMessages()
             },
             {delay:1000}

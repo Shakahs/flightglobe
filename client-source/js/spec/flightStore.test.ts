@@ -41,14 +41,14 @@ describe("FlightStore", function() {
     describe('routes update messages',()=>{
         it('by routing position updates', ()=>{
             expect(flightStore.flightData.size).toEqual(2);
-            flightStore.routeUpdate(FlightCPosition1);
+            flightStore.routeUpdate([FlightCPosition1]);
             expect(flightStore.flightData.size).toEqual(3);
             const flightC = flightStore.flightData.get(FlightCPosition1.icao) as FlightRecord;
             expect(flightC.positions[0]).toEqual(FlightCPosition1.body)
         })
         it('by routing demographic updates', ()=>{
             expect(flightStore.flightData.size).toEqual(2);
-            flightStore.routeUpdate(FlightCDemographic);
+            flightStore.routeUpdate([FlightCDemographic]);
             expect(flightStore.flightData.size).toEqual(3);
             const flightC = flightStore.flightData.get(FlightCDemographic.icao) as FlightRecord;
             expect(flightC.demographic).toEqual(FlightCDemographic.body)

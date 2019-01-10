@@ -50,18 +50,21 @@ export class FlightStore {
         return geo
     }
 
-    routeUpdate(message: Message){
-        switch (message.type) {
-            case "positionUpdate":
-                const pUpdate = message as PositionUpdate;
-                this.addOrUpdateFlight(pUpdate);
-                break;
-            case "demographicUpdate":
-                const dUpdate = message as DemographicsUpdate;
-                this.addDemographics(dUpdate);
-                break;
-        }
+    @action('routeUpdate')
+    routeUpdate(messages: Message[]){
+        forEach(messages,(message)=>{
+            switch (message.type) {
+                case "positionUpdate":
+                    const pUpdate = message as PositionUpdate;
+                    this.addOrUpdateFlight(pUpdate);
+                    break;
+                case "demographicUpdate":
+                    const dUpdate = message as DemographicsUpdate;
+                    this.addDemographics(dUpdate);
+                    break;
+            }})
     }
+
 
     @action('addOrUpdateFlight')
     addOrUpdateFlight(pos: PositionUpdate){
