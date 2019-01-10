@@ -1,15 +1,18 @@
-import {createAtom, autorun, IAtom, observable, computed, action} from "mobx";
+import {createAtom, autorun, IAtom, observable, computed, action, reaction} from "mobx";
 import {Message, UpdateRequest} from "./types";
+import {forEach, noop} from "lodash-es";
 
 export default class WebsocketHandler {
     @observable ws: WebSocket|null = null;
     @observable messages: Message[] = [];
     @observable shouldSubscribe:boolean;
     url: string;
+    wsCallback: (msg: Message)=>void;
 
-    constructor(url: string = `ws://${ window.location.host }/sub`, shouldSubscribe: boolean = true) {
+    constructor(wsCallback: (msg: Message)=>void = noop, url: string = `ws://${ window.location.host }/sub`, shouldSubscribe: boolean = true) {
         this.url = url;
         this.shouldSubscribe = shouldSubscribe;
+        this.wsCallback = wsCallback;
 
         const wsAutorun = autorun(() => {
             const isSubscribed = this.isSubscribed;
@@ -21,6 +24,18 @@ export default class WebsocketHandler {
                 this.ws.close()
             }
         }, {name: 'wsAutorun'});
+
+        const wsCallbackReaction = reaction(
+            ()=>this.messages,
+            (messages: Message[])=>{
+                forEach(messages, (message)=>{
+                    this.wsCallback(message)
+                });
+                this.clearMessages()
+            },
+            {delay:1000}
+        )
+
     }
 
     @action('setShouldSubscribe')
@@ -45,8 +60,12 @@ export default class WebsocketHandler {
     @computed get currentMessages(){
         const returnedMessages:Message[] = [];
         this.messages.forEach((m)=>returnedMessages.push(m));
-        this.messages = [];
         return returnedMessages;
+    }
+
+    @action('clearMessages')
+    clearMessages(){
+        this.messages=[]
     }
 
     @action('wsMessage')
