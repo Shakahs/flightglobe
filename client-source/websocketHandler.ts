@@ -3,7 +3,7 @@ import {Message} from "./js/types";
 
 export default class WebsocketHandler {
     @observable ws: WebSocket|null = null;
-    @observable message: Message|null = null;
+    @observable messages: Message[] = [];
     @observable shouldSubscribe:boolean;
     url: string;
 
@@ -40,6 +40,18 @@ export default class WebsocketHandler {
         this.ws = new WebSocket(this.url);
         this.ws.onmessage = (msg: MessageEvent)=>this.wsMessage(msg);
         this.ws.onclose = ()=>this.wsClose();
+    }
+
+    @computed get currentMessages(){
+        const returnedMessages:Message[] = [];
+        this.messages.forEach((m)=>returnedMessages.push(m));
+        this.messages = [];
+        return returnedMessages;
+    }
+
+    @action('wsMessage')
+    wsMessage(msg: MessageEvent){
+        this.messages.push(JSON.parse(msg.data))
     }
 
     @action('wsClose')

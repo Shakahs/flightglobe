@@ -1,22 +1,18 @@
 import { Server, WebSocket } from 'mock-socket';
 import WebsocketHandler from "../../websocketHandler";
-import {FlightAPosition1} from "./mockData";
+import {FlightAPosition1, FlightAPosition2} from "./mockData";
 
-describe('websocketHandler',()=>{
+describe('websocketHandler handles connection housekeeping',()=>{
 
-    const testServerURL = 'ws://localhost:8080';
+    const testServerURL = 'ws://localhost:32000';
     let mockServer: Server;
-    let mockSocket: WebSocket;
 
     beforeEach( ()=>{
         mockServer = new Server(testServerURL);
-        mockServer.on('connection', socket => {
-            mockSocket = socket
-        });
     });
 
     afterEach(()=>{
-        mockServer.close()
+        mockServer.close();
     })
 
     it('initializes and stores the default websocket url', ()=>{
@@ -83,4 +79,57 @@ describe('websocketHandler',()=>{
             done()
         }, 1000)
     })
+
+    xit('receives a message',(done)=>{
+        const wsh = new WebsocketHandler(testServerURL);
+        expect(mockServer.clients().length).toEqual(1)
+        const socket = mockServer.clients()[0];
+        socket.send(JSON.stringify(FlightAPosition1));
+        setTimeout(()=>{
+            // expect(wsh.messages.length).toEqual(1)
+            done()
+        },1000)
+
+    })
 });
+
+describe('websocketHandler handles message', ()=>{
+  it('by receiving a message', (done)=>{
+      const testServerURL = 'ws://localhost:32000';
+      const mockServer = new Server(testServerURL);
+      mockServer.on('connection', socket => {
+              socket.send(JSON.stringify(FlightAPosition1));
+      });
+
+      const wsh = new WebsocketHandler(testServerURL);
+      setTimeout(()=>{
+          const newMessages = wsh.currentMessages;
+          expect(newMessages.length).toEqual(1);
+          expect(newMessages[0]).toEqual(FlightAPosition1);
+          // expect(wsh.messages.length).toEqual(0)
+          mockServer.close()
+          done()
+      },100)
+  })
+
+    it('by receiving multiple messages', (done)=>{
+        const testServerURL = 'ws://localhost:32000';
+        const mockServer = new Server(testServerURL);
+        mockServer.on('connection', socket => {
+            socket.send(JSON.stringify(FlightAPosition1));
+            socket.send(JSON.stringify(FlightAPosition2));
+        });
+
+        const wsh = new WebsocketHandler(testServerURL);
+        setTimeout(()=>{
+            const newMessages = wsh.currentMessages;
+            expect(newMessages.length).toEqual(2);
+            expect(newMessages[0]).toEqual(FlightAPosition1);
+            expect(newMessages[1]).toEqual(FlightAPosition2);
+            // expect(wsh.messages.length).toEqual(0)
+            mockServer.close()
+            done()
+        },100)
+    })
+
+})
