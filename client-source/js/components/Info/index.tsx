@@ -8,10 +8,13 @@ import NavLink from "reactstrap/lib/NavLink";
 import NavItem from "reactstrap/lib/NavItem";
 import Nav from "reactstrap/lib/Nav";
 import classnames from 'classnames';
+import {FlightStore} from "../../flightStore";
+import Stats from "../Stats";
 
 interface InfoProps {
     showModal: boolean,
-    toggle: ()=>void
+    toggle: ()=>void,
+    flightStore: FlightStore
 }
 
 interface InfoState {
@@ -41,7 +44,7 @@ class Info extends React.Component<InfoProps, InfoState> {
                 isOpen={this.props.showModal}
                 toggle={this.props.toggle}
             >
-                <ModalHeader>
+                <ModalHeader toggle={this.props.toggle}>
                     FlightGlobe
                 </ModalHeader>
                 <ModalBody>
@@ -59,7 +62,7 @@ class Info extends React.Component<InfoProps, InfoState> {
                                 className={classnames({ active: this.state.activeTab === 'stats' })}
                                 onClick={() => { this.toggle('stats'); }}
                             >
-                                Statistics
+                                Stats
                             </NavLink>
                         </NavItem>
                         <NavItem>
@@ -76,7 +79,7 @@ class Info extends React.Component<InfoProps, InfoState> {
                             Settings tab
                         </TabPane>
                         <TabPane tabId={'stats'}>
-                            stats
+                            <Stats flightstore={this.props.flightStore}/>
                         </TabPane>
                         <TabPane tabId={'about'}>
                             about

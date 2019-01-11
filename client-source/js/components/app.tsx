@@ -50,7 +50,11 @@ class App extends React.Component<AppProps, AppState> {
         return (
             <React.Fragment>
                 <LoadingScreen viewer={this.props.viewer}/>
-                <Info showModal={this.state.showInfoModal} toggle={this.toggleShowInfoModal}/>
+                <Info
+                    showModal={this.state.showInfoModal}
+                    toggle={this.toggleShowInfoModal}
+                    flightStore={this.props.flightStore}
+                />
                 <Menu
                     toggleShowFlightTable={this.toggleShowFlightTable}
                     toggleShowInfoModal={this.toggleShowInfoModal}
