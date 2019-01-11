@@ -4,8 +4,8 @@ import { observer } from "mobx-react"
 import {ObservableMap} from "mobx";
 import {sampleSize} from "lodash-es";
 import {AgGridReact, AgGridColumn, AgGridColumnProps} from 'ag-grid-react';
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-balham-dark.css';
+// import 'ag-grid-community/dist/styles/ag-grid.css';
+// import 'ag-grid-community/dist/styles/ag-theme-balham-dark.css';
 import {GridApi,AgGridEvent,FilterChangedEvent} from 'ag-grid-community'
 import {FlightStore} from "../flightStore";
 import {GridReadyEvent} from "ag-grid-community/dist/lib/events";
@@ -61,12 +61,11 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
 
     render() {
         return(
-            <div className={'flightTable'}>
+            <div className={'fixed-bottom px-2 pb-2'}>
                 <div
-                    className="ag-theme-balham-dark"
+                    className="ag-theme-balham-dark w-100"
                     style={{
                         height: '500px',
-                        width: '100%'
                     }}
                 >
                     <AgGridReact

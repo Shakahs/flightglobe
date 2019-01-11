@@ -1,3 +1,9 @@
+@import "../../node_modules/bootstrap/scss/bootstrap";
+
+$icons-path: "'../../node_modules/ag-grid-community/src/styles/balham-icons/";
+@import '../../node_modules/ag-grid-community/src/styles/ag-grid';
+@import '../../node_modules/ag-grid-community/src/styles/ag-theme-balham-dark';
+
 html, body, #cesiumContainer {
     width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
 }
