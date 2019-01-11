@@ -3,13 +3,13 @@ import * as React from "react";
 import { Container, Row, Col } from 'reactstrap';
 import Menu from "./Menu";
 import { library } from '@fortawesome/fontawesome-svg-core'
-import {faBars} from '@fortawesome/free-solid-svg-icons/faBars'
+import {faCog} from '@fortawesome/free-solid-svg-icons/faCog'
 import {faFilter} from '@fortawesome/free-solid-svg-icons/faFilter'
 import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch'
 import {FlightStore} from "../flightStore";
 import LoadingScreen from "./LoadingScreen";
 
-library.add(faBars,faFilter,faCircleNotch);
+library.add(faCog,faFilter,faCircleNotch);
 
 interface AppProps {
     flightStore: FlightStore
