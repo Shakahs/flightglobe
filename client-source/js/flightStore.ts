@@ -1,4 +1,4 @@
-import {action, configure, IReactionDisposer, ObservableMap, reaction} from 'mobx';
+import {action, configure, IReactionDisposer, observable, ObservableMap, reaction} from 'mobx';
 import {DemographicsUpdate, FlightRecord, Icao, Message, PositionUpdate} from "./types";
 import * as Cesium from "cesium";
 import {newFlightRecord} from "./utility";
@@ -20,7 +20,7 @@ export class FlightStore {
     selectedFlights = new ObservableMap<string, boolean>(undefined, undefined, "selectedFlights");
     geoAreas = new Map<Icao, GeoCollection>();
     flights = new Map<Icao, FlightObj>();
-    newestPositionTimestamp = 0;
+    @observable newestPositionTimestamp = 0;
     viewer:Cesium.Viewer;
     cameraEventDisposer:Cesium.Event.RemoveCallback;
 
@@ -131,9 +131,11 @@ export class FlightStore {
         this.detailedFlights.replace(selected)
     }
 
+    @action('updateLatestTimestamp')
     updateLatestTimestamp(pos:PositionUpdate){
-        this.newestPositionTimestamp = (this.newestPositionTimestamp > pos.body.timestamp) ?
-            this.newestPositionTimestamp : pos.body.timestamp;
+        if(pos.body.timestamp > this.newestPositionTimestamp){
+            this.newestPositionTimestamp = pos.body.timestamp
+        }
     }
 
     numberFlights():number {
