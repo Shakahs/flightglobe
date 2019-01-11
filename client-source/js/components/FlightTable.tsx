@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {FlightDemographics, Icao} from "../types";
+import {FlightDemographics, FlightRecord, Icao} from "../types";
 import { observer } from "mobx-react"
 import {ObservableMap} from "mobx";
 import {sampleSize} from "lodash-es";
@@ -35,7 +35,17 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
     }
 
     gridReady(event: GridReadyEvent){
-            this.props.store.flightData.observe((change)=>{
+            //initial load
+            const initialLoad: FlightRecord[] = [];
+            this.props.store.flightData.forEach((f)=>{
+                initialLoad.push(f)
+            });
+            if(event.api){
+                event.api.setRowData(initialLoad)
+            }
+
+            //continuous updates
+            const disposer = this.props.store.flightData.observe((change)=>{
                 if(change.type==='add' && event.api){
                     event.api.batchUpdateRowData({
                         add:[change.newValue]
