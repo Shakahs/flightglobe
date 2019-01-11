@@ -23,3 +23,13 @@ html, body, #cesiumContainer {
     top: 1em;
     left: 1em;
 }
+
+.flightTable {
+    height: 35vh;
+}
+
+@media screen and (max-height: 900px) {
+    .flightTable {
+        height: 85vh;
+    }
+}

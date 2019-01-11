@@ -72,10 +72,7 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
     render() {
         return(
                 <div
-                    className="ag-theme-balham-dark w-100"
-                    style={{
-                        height: '500px',
-                    }}
+                    className="ag-theme-balham-dark w-100 h-100"
                 >
                     <AgGridReact
                         columnDefs={this.state.columnDefs}

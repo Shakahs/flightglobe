@@ -61,7 +61,7 @@ class App extends React.Component<AppProps, AppState> {
                     toggleShowInfoModal={this.toggleShowInfoModal}
                 />
                 <div
-                    className={classnames('px-2', 'pb-2', {'fixed-bottom':this.state.showFlightTable})}
+                    className={classnames('px-2', 'pb-2', 'flightTable', {'fixed-bottom':this.state.showFlightTable})}
                 >
                     <FlightTable store={this.props.flightStore}/>
                 </div>
