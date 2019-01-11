@@ -9,6 +9,7 @@ import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch'
 import {FlightStore} from "../flightStore";
 import LoadingScreen from "./LoadingScreen";
 import Info from "./Info";
+import classnames from 'classnames';
 
 library.add(faCog,faFilter,faCircleNotch);
 
@@ -59,9 +60,11 @@ class App extends React.Component<AppProps, AppState> {
                     toggleShowFlightTable={this.toggleShowFlightTable}
                     toggleShowInfoModal={this.toggleShowInfoModal}
                 />
-                {this.state.showFlightTable &&
-                <FlightTable store={this.props.flightStore}/>
-                }
+                <div
+                    className={classnames('px-2', 'pb-2', {'fixed-bottom':this.state.showFlightTable})}
+                >
+                    <FlightTable store={this.props.flightStore}/>
+                </div>
             </React.Fragment>
         );
     }

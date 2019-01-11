@@ -71,7 +71,6 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
 
     render() {
         return(
-            <div className={'fixed-bottom px-2 pb-2'}>
                 <div
                     className="ag-theme-balham-dark w-100"
                     style={{
@@ -88,8 +87,6 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
                     >
                     </AgGridReact>
                 </div>
-
-            </div>
         )
     }
 }
