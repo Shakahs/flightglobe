@@ -5,13 +5,15 @@ import Menu from "./Menu";
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {faBars} from '@fortawesome/free-solid-svg-icons/faBars'
 import {faFilter} from '@fortawesome/free-solid-svg-icons/faFilter'
-import {FontAwesomeIcon as FontAwesome} from "@fortawesome/react-fontawesome";
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch'
 import {FlightStore} from "../flightStore";
+import LoadingScreen from "./LoadingScreen";
 
-library.add(faBars,faFilter);
+library.add(faBars,faFilter,faCircleNotch);
 
 interface AppProps {
     flightStore: FlightStore
+    viewer: Cesium.Viewer
 }
 
 interface AppState {
@@ -36,6 +38,7 @@ class App extends React.Component<AppProps, AppState> {
     render() {
         return (
             <React.Fragment>
+                <LoadingScreen viewer={this.props.viewer}/>
                 <Menu
                     flightTableToggle={this.toggleShowFlightTable}
                 />

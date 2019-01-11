@@ -53,4 +53,9 @@ setInterval(()=>{
     // console.log(flightData)
 }, 15000);
 
-ReactDOM.render(<App flightStore={flightStore}/>,document.getElementById('reactApp'));
+ReactDOM.render(
+    <App
+        viewer={viewer}
+        flightStore={flightStore}
+    />,
+    document.getElementById('reactApp'));
