@@ -8,6 +8,7 @@ import {faFilter} from '@fortawesome/free-solid-svg-icons/faFilter'
 import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch'
 import {FlightStore} from "../flightStore";
 import LoadingScreen from "./LoadingScreen";
+import Info from "./Info";
 
 library.add(faCog,faFilter,faCircleNotch);
 
@@ -18,15 +19,19 @@ interface AppProps {
 
 interface AppState {
     showFlightTable: boolean
+    showInfoModal: boolean
 }
 
 class App extends React.Component<AppProps, AppState> {
     constructor(props) {
         super(props);
         this.state = {
-            showFlightTable: false
-        }
-        this.toggleShowFlightTable = this.toggleShowFlightTable.bind(this)
+            showFlightTable: false,
+            showInfoModal: false
+        };
+
+        this.toggleShowFlightTable = this.toggleShowFlightTable.bind(this);
+        this.toggleShowInfoModal = this.toggleShowInfoModal.bind(this);
     }
 
     toggleShowFlightTable(){
@@ -35,12 +40,20 @@ class App extends React.Component<AppProps, AppState> {
         })
     }
 
+    toggleShowInfoModal(){
+        this.setState({
+            showInfoModal: !this.state.showInfoModal,
+        })
+    }
+
     render() {
         return (
             <React.Fragment>
                 <LoadingScreen viewer={this.props.viewer}/>
+                <Info showModal={this.state.showInfoModal} toggle={this.toggleShowInfoModal}/>
                 <Menu
-                    flightTableToggle={this.toggleShowFlightTable}
+                    toggleShowFlightTable={this.toggleShowFlightTable}
+                    toggleShowInfoModal={this.toggleShowInfoModal}
                 />
                 {this.state.showFlightTable &&
                 <FlightTable store={this.props.flightStore}/>

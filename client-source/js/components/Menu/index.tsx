@@ -5,7 +5,8 @@ import {size} from "lodash-es";
 import {icon} from "@fortawesome/fontawesome-svg-core";
 
 interface MenuProps {
-    flightTableToggle: ()=>void
+    toggleShowFlightTable: ()=>void
+    toggleShowInfoModal: ()=>void
 }
 
 interface MenuState {
@@ -33,12 +34,12 @@ class Menu extends React.Component<MenuProps, MenuState> {
             className={'fixed-top p-2'}
             >
                 <button
-                    onClick={this.props.flightTableToggle}
+                    onClick={this.props.toggleShowInfoModal}
                 >
                     <FontAwesome icon='cog' size='lg'/>
                 </button>
                 <button
-                    onClick={this.props.flightTableToggle}
+                    onClick={this.props.toggleShowFlightTable}
                 >
                     <FontAwesome icon='filter' size='lg'/>
                 </button>

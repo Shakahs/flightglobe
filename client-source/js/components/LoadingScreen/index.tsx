@@ -40,6 +40,7 @@ class LoadingScreen extends React.Component<LoadingScreenProps, LoadingScreenSta
                 this.setState({
                     cesiumReady: true
                 });
+                clearInterval(this.state.timerID);
             }
         }, 1000);
         //browser setInterval returns an integer ID, Node returns an object, TypeScript is following Node definition
