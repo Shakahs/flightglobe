@@ -1,6 +1,13 @@
 import * as React from 'react';
 import Modal from "reactstrap/lib/Modal";
 import ModalHeader from "reactstrap/lib/ModalHeader";
+import ModalBody from "reactstrap/lib/ModalBody";
+import TabContent from "reactstrap/lib/TabContent";
+import TabPane from "reactstrap/lib/TabPane";
+import NavLink from "reactstrap/lib/NavLink";
+import NavItem from "reactstrap/lib/NavItem";
+import Nav from "reactstrap/lib/Nav";
+import classnames from 'classnames';
 
 interface InfoProps {
     showModal: boolean,
@@ -8,15 +15,25 @@ interface InfoProps {
 }
 
 interface InfoState {
+    activeTab: string
 }
 
 class Info extends React.Component<InfoProps, InfoState> {
     constructor(props) {
         super(props);
         this.state = {
+            activeTab: 'settings'
         };
+        this.toggle = this.toggle.bind(this);
     }
 
+    toggle(tab) {
+        if (this.state.activeTab !== tab) {
+            this.setState({
+                activeTab: tab
+            });
+        }
+    }
 
     render() {
         return (
@@ -27,6 +44,45 @@ class Info extends React.Component<InfoProps, InfoState> {
                 <ModalHeader>
                     FlightGlobe
                 </ModalHeader>
+                <ModalBody>
+                    <Nav tabs>
+                        <NavItem>
+                            <NavLink
+                                className={classnames({ active: this.state.activeTab === 'settings' })}
+                                onClick={() => { this.toggle('settings'); }}
+                            >
+                                Settings
+                            </NavLink>
+                        </NavItem>
+                        <NavItem>
+                            <NavLink
+                                className={classnames({ active: this.state.activeTab === 'stats' })}
+                                onClick={() => { this.toggle('stats'); }}
+                            >
+                                Statistics
+                            </NavLink>
+                        </NavItem>
+                        <NavItem>
+                            <NavLink
+                                className={classnames({ active: this.state.activeTab === 'about' })}
+                                onClick={() => { this.toggle('about'); }}
+                            >
+                                About
+                            </NavLink>
+                        </NavItem>
+                    </Nav>
+                    <TabContent activeTab={this.state.activeTab}>
+                        <TabPane tabId={'settings'}>
+                            Settings tab
+                        </TabPane>
+                        <TabPane tabId={'stats'}>
+                            stats
+                        </TabPane>
+                        <TabPane tabId={'about'}>
+                            about
+                        </TabPane>
+                    </TabContent>
+                </ModalBody>
             </Modal>
         );
     }
