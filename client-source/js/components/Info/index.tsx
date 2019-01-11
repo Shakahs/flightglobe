@@ -51,6 +51,7 @@ class Info extends React.Component<InfoProps, InfoState> {
                     <Nav tabs>
                         <NavItem>
                             <NavLink
+                                href="#"
                                 className={classnames({ active: this.state.activeTab === 'settings' })}
                                 onClick={() => { this.toggle('settings'); }}
                             >
@@ -59,6 +60,7 @@ class Info extends React.Component<InfoProps, InfoState> {
                         </NavItem>
                         <NavItem>
                             <NavLink
+                                href="#"
                                 className={classnames({ active: this.state.activeTab === 'stats' })}
                                 onClick={() => { this.toggle('stats'); }}
                             >
@@ -67,6 +69,7 @@ class Info extends React.Component<InfoProps, InfoState> {
                         </NavItem>
                         <NavItem>
                             <NavLink
+                                href="#"
                                 className={classnames({ active: this.state.activeTab === 'about' })}
                                 onClick={() => { this.toggle('about'); }}
                             >
