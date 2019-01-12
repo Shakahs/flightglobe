@@ -45,7 +45,8 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
     // }),
 
     imageryProvider: new Cesium.UrlTemplateImageryProvider({
-        url : 'https://maps.tilehosting.com/styles/topo/{z}/{x}/{y}.png?key=9qrA7uHFK1DPBSBaY60R',
+        //@ts-ignore
+        url : `https://maps.tilehosting.com/styles/topo/{z}/{x}/{y}.png?key=${MAPTILER_KEY}`,
         maximumLevel : 13
     })
 });
