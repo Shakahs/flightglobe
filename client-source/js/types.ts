@@ -40,3 +40,11 @@ export interface FlightRecord {
 export interface UpdateRequest {
     lastReceivedTimestamp: number
 }
+
+export interface PointDisplayOptions {
+    color: {
+        r: number,
+        g: number,
+        b: number,
+    }
+}

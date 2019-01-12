@@ -1,5 +1,5 @@
 import {action, configure, IReactionDisposer, observable, ObservableMap, reaction} from 'mobx';
-import {DemographicsUpdate, FlightRecord, Icao, Message, PositionUpdate} from "./types";
+import {DemographicsUpdate, FlightRecord, Icao, Message, PositionUpdate, PointDisplayOptions} from "./types";
 import * as Cesium from "cesium";
 import {newFlightRecord} from "./utility";
 import {forEach} from "lodash-es";
@@ -23,6 +23,9 @@ export class FlightStore {
     @observable newestPositionTimestamp = 0;
     viewer:Cesium.Viewer;
     cameraEventDisposer:Cesium.Event.RemoveCallback;
+    @observable pointDisplayOptions:PointDisplayOptions = {
+        color: {r:100,g:100,b:100}
+    };
 
     constructor(viewer: Cesium.Viewer){
         this.viewer = viewer;
@@ -65,7 +68,6 @@ export class FlightStore {
             }});
         this.viewer.scene.requestRender()
     }
-
 
     @action('addOrUpdateFlight')
     addOrUpdateFlight(pos: PositionUpdate){
@@ -136,6 +138,11 @@ export class FlightStore {
         if(pos.body.timestamp > this.newestPositionTimestamp){
             this.newestPositionTimestamp = pos.body.timestamp
         }
+    }
+
+    @action('updatePointDisplay')
+    updatePointDisplay(newOptions: PointDisplayOptions){
+        this.pointDisplayOptions = newOptions
     }
 
     numberFlights():number {
