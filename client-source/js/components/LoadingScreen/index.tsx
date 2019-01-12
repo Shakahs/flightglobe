@@ -65,7 +65,7 @@ class LoadingScreen extends React.Component<LoadingScreenProps, LoadingScreenSta
                         Flight Globe
                 </ModalHeader>
                 <ModalBody>
-                    <p>Welcome to Flight Globe, a real-time map of worldwide air traffic.</p>
+                    <p>Welcome to Flight Globe, a real-time map of worldwide air traffic. Every dot you see is the live location of an  aircraft in transit right now.</p>
                 </ModalBody>
                 <ModalFooter>
                     <Button

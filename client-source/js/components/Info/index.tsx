@@ -10,6 +10,7 @@ import Nav from "reactstrap/lib/Nav";
 import classnames from 'classnames';
 import {FlightStore} from "../../flightStore";
 import Stats from "../Stats";
+import Settings from "../Settings";
 
 interface InfoProps {
     showModal: boolean,
@@ -79,7 +80,7 @@ class Info extends React.Component<InfoProps, InfoState> {
                     </Nav>
                     <TabContent activeTab={this.state.activeTab}>
                         <TabPane tabId={'settings'}>
-                            Settings tab
+                            <Settings flightstore={this.props.flightStore}/>
                         </TabPane>
                         <TabPane tabId={'stats'}>
                             <Stats flightstore={this.props.flightStore}/>
