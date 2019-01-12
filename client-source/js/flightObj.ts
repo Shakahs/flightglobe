@@ -138,7 +138,10 @@ export class FlightObj {
                 position: pos,
                 pixelSize: 4,
                 id: this.icao,
-                show: visibility
+                show: visibility,
+                color: Cesium.Color.AQUA,
+                outlineColor: Cesium.Color.WHITE,
+                outlineWidth: 1,
             });
         }
     }
@@ -207,6 +210,8 @@ export class FlightObj {
                 text: labelText,
                 font: '12px sans-serif',
                 pixelOffset: labelOffset,
+                fillColor: Cesium.Color.AQUA,
+                outlineWidth: 2.0
             });
         }
     }

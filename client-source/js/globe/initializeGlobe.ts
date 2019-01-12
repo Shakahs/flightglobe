@@ -31,11 +31,23 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
     // targetFrameRate: 30
     // shouldAnimate: true,
     // automaticallyTrackDataSourceClocks: false,
-    imageryProvider : new Cesium.BingMapsImageryProvider({
-        url: 'http://dev.virtualearth.net',
-        key: 'Annkf_qhmEYkCSYC9PrxYrFwP1ZJOH1wm1x_g5GeuoXkWII7RU94Npx8VJUFwDMZ',
-        mapStyle: 'AerialWithLabels'
-    }),
+
+    // imageryProvider : new Cesium.BingMapsImageryProvider({
+    //     url: 'http://dev.virtualearth.net',
+    //     key: 'Annkf_qhmEYkCSYC9PrxYrFwP1ZJOH1wm1x_g5GeuoXkWII7RU94Npx8VJUFwDMZ',
+    //     mapStyle: 'AerialWithLabels'
+    // }),
+
+    //@ts-ignore MapboxImageryProvider not in typings
+    // imageryProvider : new Cesium.MapboxImageryProvider({
+    //     accessToken: 'pk.eyJ1Ijoic2hha2FocyIsImEiOiJjamNsbzd5djYwZWJlMnhtcmVtZXVlMTRmIn0.NmQSM1rRe71p3r2-fbf1ww',
+    //     mapId: 'mapbox.satellite'
+    // }),
+
+    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+        url : 'https://maps.tilehosting.com/styles/topo/{z}/{x}/{y}.png?key=9qrA7uHFK1DPBSBaY60R',
+        maximumLevel : 13
+    })
 });
 
 // viewer.imageryLayers.addImageryProvider(
