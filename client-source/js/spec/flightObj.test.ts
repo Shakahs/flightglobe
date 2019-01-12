@@ -121,83 +121,97 @@ describe("FlightObj",function(){
         //     expect<boolean>(flightObj.shouldPointDisplay).toBeTruthy()
         // });
 
-        it("by creating the Point Primitive", function () {
-            expect(flightObj.point).not.toBeNull();
-            const point = flightObj.point;
-            if(point){
-                expect(point.position).toEqual(Cesium.Cartesian3.fromDegrees(
-                    FlightAPosition1.body.longitude,
-                    FlightAPosition1.body.latitude,
-                    FlightAPosition1.body.altitude,
-                ));
-                expect(flightObj.geoCollection.points.contains(point)).toBeTruthy()
-            } else {
-                fail('point not defined')
-            }
-        });
+        describe('basics', function () {
+            it("by creating the Point Primitive", function () {
+                expect(flightObj.point).not.toBeNull();
+                const point = flightObj.point;
+                if(point){
+                    expect(point.position).toEqual(Cesium.Cartesian3.fromDegrees(
+                        FlightAPosition1.body.longitude,
+                        FlightAPosition1.body.latitude,
+                        FlightAPosition1.body.altitude,
+                    ));
+                    expect(flightObj.geoCollection.points.contains(point)).toBeTruthy()
+                } else {
+                    fail('point not defined')
+                }
+            });
 
-        it("by updating the Point Primitive location reactively", function () {
-            expect(flightObj.point).not.toBeNull();
-            const point = flightObj.point;
-            if(point){
-                flightStore.addOrUpdateFlight(FlightAPosition2);
-                expect<Cesium.Cartesian3>(point.position).toEqual(Cesium.Cartesian3.fromDegrees(
-                    FlightAPosition2.body.longitude,
-                    FlightAPosition2.body.latitude,
-                    FlightAPosition2.body.altitude,
-                ));
-            } else {
-                fail('point not defined')
-            }
-        });
+            it("by updating the Point Primitive location reactively", function () {
+                expect(flightObj.point).not.toBeNull();
+                const point = flightObj.point;
+                if(point){
+                    flightStore.addOrUpdateFlight(FlightAPosition2);
+                    expect<Cesium.Cartesian3>(point.position).toEqual(Cesium.Cartesian3.fromDegrees(
+                        FlightAPosition2.body.longitude,
+                        FlightAPosition2.body.latitude,
+                        FlightAPosition2.body.altitude,
+                    ));
+                } else {
+                    fail('point not defined')
+                }
+            });
 
-        it("by updating the Point Primitive location manually", function () {
-            expect(flightObj.point).not.toBeNull();
-            const point = flightObj.point;
-            if(point){
-                expect(point.position).toEqual(Cesium.Cartesian3.fromDegrees(
-                    FlightAPosition1.body.longitude,
-                    FlightAPosition1.body.latitude,
-                    FlightAPosition1.body.altitude,
-                ));
-                point.position = (Cesium.Cartesian3.fromDegrees(
-                    FlightAPosition2.body.longitude,
-                    FlightAPosition2.body.latitude,
-                    FlightAPosition2.body.altitude,
-                ));
-                expect(point.position).toEqual(Cesium.Cartesian3.fromDegrees(
-                    FlightAPosition2.body.longitude,
-                    FlightAPosition2.body.latitude,
-                    FlightAPosition2.body.altitude,
-                ))
-            } else {
-                fail('point not defined')
-            }
-        });
+            it("by updating the Point Primitive location manually", function () {
+                expect(flightObj.point).not.toBeNull();
+                const point = flightObj.point;
+                if(point){
+                    expect(point.position).toEqual(Cesium.Cartesian3.fromDegrees(
+                        FlightAPosition1.body.longitude,
+                        FlightAPosition1.body.latitude,
+                        FlightAPosition1.body.altitude,
+                    ));
+                    point.position = (Cesium.Cartesian3.fromDegrees(
+                        FlightAPosition2.body.longitude,
+                        FlightAPosition2.body.latitude,
+                        FlightAPosition2.body.altitude,
+                    ));
+                    expect(point.position).toEqual(Cesium.Cartesian3.fromDegrees(
+                        FlightAPosition2.body.longitude,
+                        FlightAPosition2.body.latitude,
+                        FlightAPosition2.body.altitude,
+                    ))
+                } else {
+                    fail('point not defined')
+                }
+            });
+        })
 
-        it('by creating visible new Points when they match the filter', function(){
-            flightStore.updateFilteredFlights(new Map<string,boolean>([[FlightBPosition1.icao,true]]))
-            flightStore.addOrUpdateFlight(FlightBPosition1);
-            const flightB = flightStore.flights.get(FlightBPosition1.icao) as FlightObj;
-            const point = flightB.point as PointPrimitive;
-            expect(point.show).toEqual(true);
-        });
+        describe('filtering and visiblity', function(){
+            it('by creating visible new Points when they match the filter', function(){
+                flightStore.updateFilteredFlights(new Map<string,boolean>([[FlightBPosition1.icao,true]]))
+                flightStore.addOrUpdateFlight(FlightBPosition1);
+                const flightB = flightStore.flights.get(FlightBPosition1.icao) as FlightObj;
+                const point = flightB.point as PointPrimitive;
+                expect(point.show).toEqual(true);
+            });
 
-        it('by creating non-visible new Points when they do not match the filter', function(){
-            flightStore.updateFilteredFlights(new Map<string,boolean>([['zzz',true]]));
-            flightStore.addOrUpdateFlight(FlightBPosition1);
-            const flightB = flightStore.flights.get(FlightBPosition1.icao) as FlightObj;
-            const point = flightB.point as PointPrimitive;
-            expect(point.show).toEqual(false)
-        });
+            it('by creating non-visible new Points when they do not match the filter', function(){
+                flightStore.updateFilteredFlights(new Map<string,boolean>([['zzz',true]]));
+                flightStore.addOrUpdateFlight(FlightBPosition1);
+                const flightB = flightStore.flights.get(FlightBPosition1.icao) as FlightObj;
+                const point = flightB.point as PointPrimitive;
+                expect(point.show).toEqual(false)
+            });
 
-        it('by toggling visibility when visibility criteria changes', function () {
-            const point = flightObj.point as PointPrimitive;
-            expect(point.show).toBeTruthy();
-            flightStore.updateFilteredFlights(new Map<string,boolean>([['zzz',true]]));
-            expect(point.show).toBeFalsy();
-            flightStore.updateFilteredFlights(new Map<string,boolean>([]));
-            expect(point.show).toBeTruthy();
+            it('by toggling visibility when visibility criteria changes', function () {
+                const point = flightObj.point as PointPrimitive;
+                expect(point.show).toBeTruthy();
+                flightStore.updateFilteredFlights(new Map<string,boolean>([['zzz',true]]));
+                expect(point.show).toBeFalsy();
+                flightStore.updateFilteredFlights(new Map<string,boolean>([]));
+                expect(point.show).toBeTruthy();
+            })
+        })
+
+        describe('display options', function(){
+            it('updates the point color', function(){
+                const point = flightObj.point as PointPrimitive;
+                expect(point.color.equals(Cesium.Color.fromCssColorString('#3399ff'))).toBeTruthy();
+                const newColor = '#3399ff';
+                flightStore.updatePointDisplay({color: newColor});
+                expect(point.color.equals(Cesium.Color.fromCssColorString(newColor))).toBeTruthy()
+            })
         })
 
     });

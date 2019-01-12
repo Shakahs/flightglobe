@@ -139,6 +139,21 @@ describe("FlightStore", function() {
 
     })
 
+    describe('handles display setting updates', function(){
+        describe('for points', function () {
+            it('should update the point display options', function () {
+                expect(flightStore.pointDisplayOptions).toEqual({
+                    color: '#3399ff'
+                })
+                const newColor = {
+                    color: '#ff6699'
+                }
+                flightStore.updatePointDisplay(newColor);
+                expect(flightStore.pointDisplayOptions).toEqual(newColor);
+            });
+        });
+    })
+
 });
 
 

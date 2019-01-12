@@ -1,4 +1,4 @@
-import {FlightDemographics, FlightPosition, FlightRecord, Icao} from "./types";
+import {FlightDemographics, FlightPosition, FlightRecord, Icao, PointDisplayOptions} from "./types";
 import {Cartesian3, Label, PointPrimitive, Polyline} from "cesium";
 import {autorun, computed, IReactionDisposer} from "mobx";
 import {convertPositionToCartesian} from "./utility";
@@ -36,8 +36,9 @@ export class FlightObj {
         const pointUpdater = autorun(() => {
             const newPosition = this.cartesianPosition;
             const shouldDisplay = this.shouldDisplay;
+            const displayOptions = this.flightStore.pointDisplayOptions;
             if (newPosition) {
-                this.renderPoint(newPosition, shouldDisplay)
+                this.renderPoint(newPosition, shouldDisplay, displayOptions)
             }
         }, {name: 'pointUpdater'});
 
@@ -130,7 +131,7 @@ export class FlightObj {
 
     // points
 
-    renderPoint(pos: Cartesian3, visibility: boolean) {
+    renderPoint(pos: Cartesian3, visibility: boolean, displayOptions: PointDisplayOptions) {
         if (this.point) {
             this.point.position = pos;
         } else {
@@ -139,11 +140,11 @@ export class FlightObj {
                 pixelSize: 4,
                 id: this.icao,
                 show: visibility,
-                color: Cesium.Color.AQUA,
                 outlineColor: Cesium.Color.WHITE,
                 outlineWidth: 1,
             });
         }
+        this.point.color = Cesium.Color.fromCssColorString(displayOptions.color)
     }
 
     destroyPoint() {
