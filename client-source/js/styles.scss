@@ -33,3 +33,18 @@ html, body, #cesiumContainer {
         height: 85vh;
     }
 }
+
+.swatch {
+    padding: 5px;
+    background: #fff;
+    border-radius: 1px;
+    border-color: black;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.swatch-inner {
+    width: 36px;
+    height: 14px;
+    border-radius: 2px;
+}
