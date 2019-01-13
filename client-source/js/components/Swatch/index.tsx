@@ -1,16 +1,13 @@
 import * as React from 'react';
-import {FlightStore} from "../../flightStore";
-import {observer} from "mobx-react";
 
 interface SwatchProps {
-    flightStore: FlightStore
+    color: string
 }
 
 interface SwatchState {
     pickerOpen: boolean
 }
 
-@observer
 class Swatch extends React.Component<SwatchProps, SwatchState> {
     constructor(props) {
         super(props);
@@ -31,7 +28,7 @@ class Swatch extends React.Component<SwatchProps, SwatchState> {
         return (
             <React.Fragment>
                 <div className={'swatch'} >
-                    <div className={'swatch-inner'} style={{backgroundColor:this.props.flightStore.pointDisplayOptions.color}}/>
+                    <div className={'swatch-inner'} style={{backgroundColor:this.props.color}}/>
                 </div>
             </React.Fragment>
         );

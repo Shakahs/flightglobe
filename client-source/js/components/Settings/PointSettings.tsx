@@ -7,33 +7,77 @@ import DropdownItem from "reactstrap/lib/DropdownItem";
 import DropdownMenu from "reactstrap/lib/DropdownMenu";
 import DropdownToggle from "reactstrap/lib/DropdownToggle";
 import {UncontrolledDropdown} from "reactstrap";
+import Container from "reactstrap/lib/Container";
+import Col from "reactstrap/lib/Col";
+import Row from "reactstrap/lib/Row";
 
 interface PointSettingsProps {
     flightstore: FlightStore
 }
 
 const PointSettings: React.SFC<PointSettingsProps> = observer((props) => (
-    <div>
-        <UncontrolledDropdown>
-            <DropdownToggle caret>
-                Size: {props.flightstore.pointDisplayOptions.size}
-            </DropdownToggle>
-            <DropdownMenu>
-                {[1,2,3,4,5,6,7,8,9,0].map((i)=>(
-                    <DropdownItem key={i} onClick={()=>{
-                        props.flightstore.updatePointDisplay({color: props.flightstore.pointDisplayOptions.color, size: i})
-                    }} >{i}</DropdownItem>
-                ))}
-            </DropdownMenu>
-        </UncontrolledDropdown>
-        <Swatch flightStore={props.flightstore}/>
-        <GithubPicker
-            color={props.flightstore.pointDisplayOptions.color}
-            onChangeComplete={(color)=>{
-                props.flightstore.updatePointDisplay({color:color.hex, size: props.flightstore.pointDisplayOptions.size})
-            }}
-        />
-    </div>
+    <Container>
+        <Row>
+            <Col>
+                Point Size:
+            </Col>
+            <Col>
+                <UncontrolledDropdown>
+                    <DropdownToggle caret>
+                        {props.flightstore.pointDisplayOptions.size}
+                    </DropdownToggle>
+                    <DropdownMenu>
+                        {[1,2,3,4,5,6,7,8,9,0].map((i)=>(
+                            <DropdownItem key={i} onClick={()=>{
+                                props.flightstore.updatePointDisplay({size: i})
+                            }} >{i}</DropdownItem>
+                        ))}
+                    </DropdownMenu>
+                </UncontrolledDropdown>
+            </Col>
+        </Row>
+        <Row>
+            <Col>
+                Point Color
+            </Col>
+            <Col>
+                <Swatch color={props.flightstore.pointDisplayOptions.color}/>
+            </Col>
+        </Row>
+        <Row>
+            <Col>
+                Outline Size:
+            </Col>
+            <Col>
+                <UncontrolledDropdown>
+                    <DropdownToggle caret>
+                        {props.flightstore.pointDisplayOptions.outlineSize}
+                    </DropdownToggle>
+                    <DropdownMenu>
+                        {[1,2,3,4,5,6,7,8,9,0].map((i)=>(
+                            <DropdownItem key={i} onClick={()=>{
+                                props.flightstore.updatePointDisplay({outlineSize: i})
+                            }} >{i}</DropdownItem>
+                        ))}
+                    </DropdownMenu>
+                </UncontrolledDropdown>
+            </Col>
+        </Row>
+        <Row>
+            <Col>
+                Outline Color
+            </Col>
+            <Col>
+                <Swatch color={props.flightstore.pointDisplayOptions.outlineColor}/>
+            </Col>
+        </Row>
+        {/*<GithubPicker*/}
+            {/*color={props.flightstore.pointDisplayOptions.color}*/}
+            {/*onChangeComplete={(color)=>{*/}
+                {/*props.flightstore.updatePointDisplay({color:color.hex})*/}
+            {/*}}*/}
+        {/*/>*/}
+    </Container>
 ));
 
 export default PointSettings;

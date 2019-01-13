@@ -139,12 +139,12 @@ export class FlightObj {
                 position: pos,
                 id: this.icao,
                 show: visibility,
-                outlineColor: Cesium.Color.WHITE,
-                outlineWidth: 1,
             });
         }
-        this.point.color = Cesium.Color.fromCssColorString(displayOptions.color)
-        this.point.pixelSize = displayOptions.size
+        this.point.color = Cesium.Color.fromCssColorString(displayOptions.color);
+        this.point.pixelSize = displayOptions.size;
+        this.point.outlineColor = Cesium.Color.fromCssColorString(displayOptions.outlineColor);
+        this.point.outlineWidth = displayOptions.outlineSize;
     }
 
     destroyPoint() {
