@@ -1,7 +1,11 @@
 import * as React from 'react';
+import Collapse from "reactstrap/lib/Collapse";
+import Container from "../Settings/PointSettings";
+import {Color, ColorResult, GithubPicker} from "react-color";
 
 interface SwatchProps {
-    color: string
+    color: string,
+    onChange: (color: string)=>void
 }
 
 interface SwatchState {
@@ -27,9 +31,15 @@ class Swatch extends React.Component<SwatchProps, SwatchState> {
     render() {
         return (
             <React.Fragment>
-                <div className={'swatch'} >
+                <div className={'swatch'} onClick={this.toggle}>
                     <div className={'swatch-inner'} style={{backgroundColor:this.props.color}}/>
                 </div>
+                <Collapse isOpen={this.state.pickerOpen}>
+                    <GithubPicker
+                        color={this.props.color}
+                        onChangeComplete={(color:ColorResult)=>this.props.onChange(color.hex)}
+                    />
+                </Collapse>
             </React.Fragment>
         );
     }

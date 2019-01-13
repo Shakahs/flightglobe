@@ -41,7 +41,10 @@ const PointSettings: React.SFC<PointSettingsProps> = observer((props) => (
                 Point Color
             </Col>
             <Col>
-                <Swatch color={props.flightstore.pointDisplayOptions.color}/>
+                <Swatch
+                    color={props.flightstore.pointDisplayOptions.color}
+                    onChange={(color:string)=>props.flightstore.updatePointDisplay({color})}
+                />
             </Col>
         </Row>
         <Row>
@@ -68,15 +71,13 @@ const PointSettings: React.SFC<PointSettingsProps> = observer((props) => (
                 Outline Color
             </Col>
             <Col>
-                <Swatch color={props.flightstore.pointDisplayOptions.outlineColor}/>
+                <Swatch
+                    color={props.flightstore.pointDisplayOptions.outlineColor}
+                    onChange={(color:string)=>props.flightstore.updatePointDisplay({outlineColor: color})}
+                />
             </Col>
         </Row>
-        {/*<GithubPicker*/}
-            {/*color={props.flightstore.pointDisplayOptions.color}*/}
-            {/*onChangeComplete={(color)=>{*/}
-                {/*props.flightstore.updatePointDisplay({color:color.hex})*/}
-            {/*}}*/}
-        {/*/>*/}
+
     </Container>
 ));
 
