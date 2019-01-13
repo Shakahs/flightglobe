@@ -10,6 +10,7 @@ import {FlightStore} from "../flightStore";
 import LoadingScreen from "./LoadingScreen";
 import Info from "./Info";
 import classnames from 'classnames';
+import { hot } from 'react-hot-loader/root'
 
 library.add(faCog,faFilter,faCircleNotch);
 
@@ -70,4 +71,4 @@ class App extends React.Component<AppProps, AppState> {
     }
 }
 
-export default App;
+export default hot(App)

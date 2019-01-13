@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "main": "server/index.js",
   "scripts": {
-    "dev": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js",
+    "dev": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js --hot",
     "build": "rm -rf ./dataserver/cmd/fg-server/static/ && node --max_old_space_size=8000 ./node_modules/webpack/bin/webpack.js --config webpack.config.prod.js --profile --json > webpack-stats.json",
     "analyze-bundle": "./node_modules/webpack-bundle-analyzer/lib/bin/analyzer.js ./webpack-stats.json ./dataserver/cmd/fg-server/static/bundle.js",
     "lint-break-on-errors": "eslint ./client-source/js ./webpack.config.js -f table --ext .js --ext .jsx",
@@ -85,6 +85,7 @@
     "react": "^16.2.0",
     "react-color": "^2.17.0",
     "react-dom": "^16.2.0",
+    "react-hot-loader": "^4.6.3",
     "react-router": "^4.1.2",
     "react-router-dom": "^4.1.2",
     "reactstrap": "^7.0.2",
