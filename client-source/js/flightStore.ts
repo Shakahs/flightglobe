@@ -1,8 +1,16 @@
 import {action, configure, IReactionDisposer, observable, ObservableMap, reaction} from 'mobx';
-import {DemographicsUpdate, FlightRecord, Icao, Message, PositionUpdate, PointDisplayOptions} from "./types";
+import {
+    DemographicsUpdate,
+    FlightRecord,
+    Icao,
+    Message,
+    PositionUpdate,
+    PointDisplayOptions,
+    PointDisplayOptionsUpdate
+} from "./types";
 import * as Cesium from "cesium";
 import {newFlightRecord} from "./utility";
-import {forEach} from "lodash-es";
+import {forEach, merge} from "lodash-es";
 import {FlightObj} from "./flightObj";
 import {GeoCollection} from "./geoCollection";
 import WebsocketHandler from "./websocketHandler";
@@ -12,6 +20,13 @@ const Geohash = require('latlon-geohash');
 configure({
     enforceActions: "observed"
 });
+
+export const PointDisplayOptionDefaults:PointDisplayOptions = {
+    color: '#3399ff',
+    size: 4,
+    outlineColor: '#FFF',
+    outlineSize: 1,
+};
 
 export class FlightStore {
     flightData = new ObservableMap<Icao, FlightRecord>(undefined,undefined, "flightData");
@@ -23,10 +38,7 @@ export class FlightStore {
     @observable newestPositionTimestamp = 0;
     viewer:Cesium.Viewer;
     cameraEventDisposer:Cesium.Event.RemoveCallback;
-    @observable pointDisplayOptions:PointDisplayOptions = {
-        color: '#3399ff',
-        size: 4
-    };
+    @observable pointDisplayOptions:PointDisplayOptions = PointDisplayOptionDefaults;
 
     constructor(viewer: Cesium.Viewer){
         this.viewer = viewer;
@@ -142,8 +154,8 @@ export class FlightStore {
     }
 
     @action('updatePointDisplay')
-    updatePointDisplay(newOptions: PointDisplayOptions){
-        this.pointDisplayOptions = newOptions
+    updatePointDisplay(newOptions: PointDisplayOptionsUpdate){
+        merge<PointDisplayOptions,PointDisplayOptionsUpdate>(this.pointDisplayOptions, newOptions);
     }
 
     numberFlights():number {

@@ -1,7 +1,7 @@
-import {FlightStore} from "../flightStore";
+import {FlightStore, PointDisplayOptionDefaults} from "../flightStore";
 import * as Cesium from "cesium";
 import {PointPrimitive} from "cesium";
-import {FlightPosition, FlightRecord} from "../types";
+import {FlightPosition, FlightRecord, PointDisplayOptions, PointDisplayOptionsUpdate} from "../types";
 import {convertPositionToCartesian, newICAOMap} from "../utility";
 import {
     FlightADemographic,
@@ -13,6 +13,7 @@ import {
 } from "./mockData";
 import {flightObj, flightStore, viewer} from "./mockSetup";
 import {FlightObj} from "../flightObj";
+import {cloneDeep, merge} from "lodash-es";
 
 
 describe("FlightStore", function() {
@@ -142,16 +143,14 @@ describe("FlightStore", function() {
     describe('handles display setting updates', function(){
         describe('for points', function () {
             it('should update the point display options', function () {
-                expect(flightStore.pointDisplayOptions).toEqual({
-                    color: '#3399ff',
-                    size: 4
-                });
+                expect(flightStore.pointDisplayOptions).toEqual(PointDisplayOptionDefaults);
                 const newColor = {
                     color: '#ff6699',
-                    size: 4
                 };
                 flightStore.updatePointDisplay(newColor);
-                expect(flightStore.pointDisplayOptions).toEqual(newColor);
+                const finalResult = cloneDeep(PointDisplayOptionDefaults)
+                merge<PointDisplayOptions,PointDisplayOptionsUpdate>(finalResult, newColor)
+                expect(flightStore.pointDisplayOptions).toEqual(finalResult);
             });
         });
     })

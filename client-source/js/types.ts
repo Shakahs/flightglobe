@@ -44,4 +44,8 @@ export interface UpdateRequest {
 export interface PointDisplayOptions {
     color: string
     size: number
+    outlineColor: string
+    outlineSize: number
 }
+
+export type PointDisplayOptionsUpdate = Partial<PointDisplayOptions>
