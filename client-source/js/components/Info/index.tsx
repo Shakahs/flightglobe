@@ -49,7 +49,7 @@ class Info extends React.Component<InfoProps, InfoState> {
                     FlightGlobe
                 </ModalHeader>
                 <ModalBody>
-                    <Nav tabs>
+                    <Nav tabs justified pills>
                         <NavItem>
                             <NavLink
                                 href="#"

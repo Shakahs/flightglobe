@@ -10,12 +10,10 @@ import {UncontrolledDropdown} from "reactstrap";
 
 interface PointSettingsProps {
     flightstore: FlightStore
-
 }
 
 const PointSettings: React.SFC<PointSettingsProps> = observer((props) => (
     <div>
-        <h5>Points:</h5>
         <UncontrolledDropdown>
             <DropdownToggle caret>
                 Size: {props.flightstore.pointDisplayOptions.size}
