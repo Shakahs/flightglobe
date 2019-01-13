@@ -43,4 +43,5 @@ export interface UpdateRequest {
 
 export interface PointDisplayOptions {
     color: string
+    size: number
 }

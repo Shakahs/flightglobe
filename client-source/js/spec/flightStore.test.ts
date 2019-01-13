@@ -143,11 +143,13 @@ describe("FlightStore", function() {
         describe('for points', function () {
             it('should update the point display options', function () {
                 expect(flightStore.pointDisplayOptions).toEqual({
-                    color: '#3399ff'
-                })
+                    color: '#3399ff',
+                    size: 4
+                });
                 const newColor = {
-                    color: '#ff6699'
-                }
+                    color: '#ff6699',
+                    size: 4
+                };
                 flightStore.updatePointDisplay(newColor);
                 expect(flightStore.pointDisplayOptions).toEqual(newColor);
             });

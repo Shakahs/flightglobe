@@ -209,7 +209,7 @@ describe("FlightObj",function(){
                 const point = flightObj.point as PointPrimitive;
                 expect(point.color.equals(Cesium.Color.fromCssColorString('#3399ff'))).toBeTruthy();
                 const newColor = '#3399ff';
-                flightStore.updatePointDisplay({color: newColor});
+                flightStore.updatePointDisplay({color: newColor, size:4});
                 expect(point.color.equals(Cesium.Color.fromCssColorString(newColor))).toBeTruthy()
             })
         })

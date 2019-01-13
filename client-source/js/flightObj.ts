@@ -137,7 +137,6 @@ export class FlightObj {
         } else {
             this.point = this.geoCollection.points.add({
                 position: pos,
-                pixelSize: 4,
                 id: this.icao,
                 show: visibility,
                 outlineColor: Cesium.Color.WHITE,
@@ -145,6 +144,7 @@ export class FlightObj {
             });
         }
         this.point.color = Cesium.Color.fromCssColorString(displayOptions.color)
+        this.point.pixelSize = displayOptions.size
     }
 
     destroyPoint() {

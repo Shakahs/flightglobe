@@ -24,7 +24,8 @@ export class FlightStore {
     viewer:Cesium.Viewer;
     cameraEventDisposer:Cesium.Event.RemoveCallback;
     @observable pointDisplayOptions:PointDisplayOptions = {
-        color: '#3399ff'
+        color: '#3399ff',
+        size: 4
     };
 
     constructor(viewer: Cesium.Viewer){

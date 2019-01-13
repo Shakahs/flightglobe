@@ -1,11 +1,5 @@
 import * as React from 'react';
-import PopoverBody from "reactstrap/lib/PopoverBody";
-import Popover from "reactstrap/lib/Popover";
 import {FlightStore} from "../../flightStore";
-import PopoverHeader from "reactstrap/lib/PopoverHeader";
-import Button from "reactstrap/lib/Button";
-import {GithubPicker} from "react-color";
-import { Manager, Reference, Popper } from 'react-popper';
 import {observer} from "mobx-react";
 
 interface SwatchProps {
