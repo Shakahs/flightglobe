@@ -1,11 +1,13 @@
 import {createAtom, autorun, IAtom, observable, computed, action, reaction, IReactionDisposer} from "mobx";
 import {Message, UpdateRequest} from "./types";
 import {forEach, noop} from "lodash-es";
+const differenceInMilliseconds = require('date-fns/difference_in_milliseconds');
 
 export default class WebsocketHandler {
     @observable ws: WebSocket|null = null;
     @observable.shallow messages: Message[] = [];
     @observable shouldSubscribe:boolean;
+    @observable lastDialTime:Date = new Date(2017);
     url: string;
     wsCallback: (msg: Message[])=>void | null;
     wsAutorunDisposer: IReactionDisposer;
@@ -20,6 +22,12 @@ export default class WebsocketHandler {
             const isSubscribed = this.isSubscribed;
             const shouldSubscribe = this.shouldSubscribe;
             if (!isSubscribed && shouldSubscribe) {
+                const timeElapsed:number = differenceInMilliseconds(
+                    this.lastDialTime,
+                    new Date()
+                );
+                const timeToWait = 10 - timeElapsed;
+                // setTimeout(()=>this.wsSubscribe(), Math.max(timeToWait,10));
                 this.wsSubscribe()
             }
             if(isSubscribed && !shouldSubscribe && this.ws) {
@@ -83,9 +91,8 @@ export default class WebsocketHandler {
     }
 
     send(msg: UpdateRequest){
-        if(this.ws){
+        if(this.ws && this.ws.readyState === 1){
             this.ws.send(JSON.stringify(msg))
         }
     }
-
 }

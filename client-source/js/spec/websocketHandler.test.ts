@@ -114,15 +114,16 @@ describe('websocketHandler handles connection housekeeping',()=>{
         const updateRequest: UpdateRequest = {lastReceivedTimestamp: 22222};
 
         mockServer.on('connection', socket => {
+            wsh.send(updateRequest);
+
             //@ts-ignore
-            socket.on('message', data => {
+            socket.on('message', data =>{
                 expect(JSON.parse(data)).toEqual(updateRequest);
                 done()
-            });
+            })
         });
 
         const wsh = new WebsocketHandler(undefined,testServerURL);
-        wsh.send(updateRequest);
     })
 
     it('gives a message to the callback',(done)=>{
@@ -151,5 +152,17 @@ describe('websocketHandler handles connection housekeeping',()=>{
         },1500)
     })
 
+    it('does not attempt to send when the connection is not ready', (done)=>{
+        const wsh = new WebsocketHandler(noop,'ws://localhost:32001'); //non existent / offline server
+        if(wsh.ws){
+            spyOn(wsh.ws,'send');
+            const updateRequest: UpdateRequest = {lastReceivedTimestamp: 22222};
+            expect(()=>wsh.send(updateRequest)).not.toThrow();
+            expect(wsh.ws.send).not.toHaveBeenCalled()
+        } else {
+            fail('ws connection object not detected')
+        }
+        done()
+    })
 });
 
