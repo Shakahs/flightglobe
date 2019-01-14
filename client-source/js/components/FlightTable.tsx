@@ -1,11 +1,7 @@
 import * as React from 'react';
 import {FlightDemographics, FlightRecord, Icao} from "../types";
 import { observer } from "mobx-react"
-import {ObservableMap} from "mobx";
-import {sampleSize} from "lodash-es";
 import {AgGridReact, AgGridColumn, AgGridColumnProps} from 'ag-grid-react';
-// import 'ag-grid-community/dist/styles/ag-grid.css';
-// import 'ag-grid-community/dist/styles/ag-theme-balham-dark.css';
 import {GridApi,AgGridEvent,FilterChangedEvent} from 'ag-grid-community'
 import {FlightStore} from "../flightStore";
 import {GridReadyEvent} from "ag-grid-community/dist/lib/events";
@@ -25,9 +21,21 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
         this.state = {
             columnDefs: [
                 {field:"icao"},
-                {field:"demographic.origin", headerName: "Origin"},
-                {field:"demographic.destination", headerName: "Destination"},
-                {field:"demographic.model", headerName: "Plane"}
+                {
+                    field:"demographic.origin",
+                    headerName: "Origin",
+                    filter:'agTextColumnFilter'
+                },
+                {
+                    field:"demographic.destination",
+                    headerName: "Destination",
+                    filter:'agTextColumnFilter'
+                },
+                {
+                    field:"demographic.model",
+                    headerName: "Plane",
+                    filter:'agTextColumnFilter'
+                }
             ]
         };
         this.gridReady=this.gridReady.bind(this)
@@ -81,6 +89,8 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
                         onGridReady={this.gridReady}
                         enableSorting
                         enableFilter
+                        rowSelection={'multiple'}
+                        floatingFilter
                     >
                     </AgGridReact>
                 </div>

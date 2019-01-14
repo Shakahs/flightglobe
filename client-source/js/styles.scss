@@ -1,8 +1,8 @@
 @import "../../node_modules/bootstrap/scss/bootstrap";
 
-$icons-path: "'../../node_modules/ag-grid-community/src/styles/balham-icons/";
+$icons-path: "../../node_modules/ag-grid-community/src/styles/ag-theme-balham/icons/";
 @import '../../node_modules/ag-grid-community/src/styles/ag-grid';
-@import '../../node_modules/ag-grid-community/src/styles/ag-theme-balham-dark';
+@import '../../node_modules/ag-grid-community/src/styles/ag-theme-balham-dark/sass/ag-theme-balham-dark';
 
 html, body, #cesiumContainer {
     width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
@@ -47,4 +47,8 @@ html, body, #cesiumContainer {
     width: 36px;
     height: 14px;
     border-radius: 2px;
+}
+
+.ag-theme-balham-dark .ag-header {
+ background-color: lighten(#1c1f20, 20%);
 }
