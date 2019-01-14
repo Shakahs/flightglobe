@@ -6,7 +6,11 @@ import {
     Message,
     PositionUpdate,
     PointDisplayOptions,
-    PointDisplayOptionsUpdate
+    PointDisplayOptionsUpdate,
+    TrailDisplayOptions,
+    TrailDisplayOptionsUpdate,
+    LabelDisplayOptions,
+    LabelDisplayOptionsUpdate
 } from "./types";
 import * as Cesium from "cesium";
 import {newFlightRecord} from "./utility";
@@ -28,6 +32,16 @@ export const PointDisplayOptionDefaults:PointDisplayOptions = {
     outlineSize: 1,
 };
 
+export const TrailDisplayOptionDefaults:TrailDisplayOptions = {
+    color: '#3399ff',
+    size: 4,
+};
+
+export const LabelDisplayOptionDefaults:LabelDisplayOptions = {
+    color: '#3399ff',
+    size: 12
+};
+
 export class FlightStore {
     flightData = new ObservableMap<Icao, FlightRecord>(undefined,undefined, "flightData");
     detailedFlights = new ObservableMap<string, boolean>(undefined, undefined, "detailedFlights");
@@ -39,6 +53,8 @@ export class FlightStore {
     viewer:Cesium.Viewer;
     cameraEventDisposer:Cesium.Event.RemoveCallback;
     @observable pointDisplayOptions:PointDisplayOptions = PointDisplayOptionDefaults;
+    @observable trailDisplayOptions:TrailDisplayOptions = TrailDisplayOptionDefaults;
+    @observable labelDisplayOptions:LabelDisplayOptions = LabelDisplayOptionDefaults;
 
     constructor(viewer: Cesium.Viewer){
         this.viewer = viewer;
@@ -155,6 +171,16 @@ export class FlightStore {
     @action('updatePointDisplay')
     updatePointDisplay(newOptions: PointDisplayOptionsUpdate){
         merge<PointDisplayOptions,PointDisplayOptionsUpdate>(this.pointDisplayOptions, newOptions);
+    }
+
+    @action('updateTrailDisplay')
+    updateTrailDisplay(newOptions: TrailDisplayOptionsUpdate){
+        merge<TrailDisplayOptions,TrailDisplayOptionsUpdate>(this.trailDisplayOptions, newOptions);
+    }
+
+    @action('updateLabelDisplay')
+    updateLabelDisplay(newOptions: LabelDisplayOptionsUpdate){
+        merge<LabelDisplayOptions,LabelDisplayOptionsUpdate>(this.labelDisplayOptions, newOptions);
     }
 
     numberFlights():number {

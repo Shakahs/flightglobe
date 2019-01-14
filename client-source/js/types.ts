@@ -49,3 +49,17 @@ export interface PointDisplayOptions {
 }
 
 export type PointDisplayOptionsUpdate = Partial<PointDisplayOptions>
+
+export interface TrailDisplayOptions {
+    color: string
+    size: number
+}
+
+export type TrailDisplayOptionsUpdate = Partial<TrailDisplayOptions>
+
+export interface LabelDisplayOptions {
+    color: string
+    size: number
+}
+
+export type LabelDisplayOptionsUpdate = Partial<LabelDisplayOptions>

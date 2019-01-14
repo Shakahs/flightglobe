@@ -1,4 +1,11 @@
-import {FlightDemographics, FlightPosition, FlightRecord, Icao, PointDisplayOptions} from "./types";
+import {
+    FlightDemographics,
+    FlightPosition,
+    FlightRecord,
+    Icao, LabelDisplayOptions,
+    PointDisplayOptions,
+    TrailDisplayOptions
+} from "./types";
 import {Cartesian3, Label, PointPrimitive, Polyline} from "cesium";
 import {autorun, computed, IReactionDisposer} from "mobx";
 import {convertPositionToCartesian} from "./utility";
@@ -45,8 +52,9 @@ export class FlightObj {
         const trailUpdater = autorun(() => {
             const shouldTrailDisplay = this.shouldTrailDisplay;
             const positions = this.trailPositions;
+            const displayOptions = this.flightStore.trailDisplayOptions;
             if (shouldTrailDisplay) {
-                this.renderTrail(positions)
+                this.renderTrail(positions, displayOptions)
             } else {
                 this.destroyTrail()
             }
@@ -56,8 +64,9 @@ export class FlightObj {
             const shouldLabelDisplay = this.shouldLabelDisplay;
             const labelText = this.labelText;
             const newPosition = this.cartesianPosition;
+            const displayOptions = this.flightStore.labelDisplayOptions;
             if (shouldLabelDisplay && newPosition) {
-                this.renderLabel(newPosition, labelText)
+                this.renderLabel(newPosition, labelText, displayOptions)
             } else {
                 this.destroyLabel()
             }
@@ -160,12 +169,27 @@ export class FlightObj {
         return this.allPositions.length >= 1 && this.shouldDisplayDetailed
     }
 
-    renderTrail(positions: Cartesian3[]) {
-        const polyLine = {
-            positions: positions,
-            id: this.icao
-        };
-        this.trail = this.geoCollection.lines.add(polyLine);
+    renderTrail(positions: Cartesian3[], displayOptions:TrailDisplayOptions) {
+        if(this.trail){
+            this.trail.positions = positions
+        } else {
+            const polyLine = {
+                positions: positions,
+                id: this.icao
+            };
+            this.trail = this.geoCollection.lines.add(polyLine);
+        }
+        if(this.trail){
+            this.trail.width = displayOptions.size;
+            this.trail.material =  new Cesium.Material({
+                fabric : {
+                    type : 'Color',
+                    uniforms : {
+                        color : Cesium.Color.fromCssColorString(displayOptions.color)
+                    }
+                }
+            });
+        }
     }
 
     destroyTrail() {
@@ -201,7 +225,7 @@ export class FlightObj {
         return '';
     }
 
-    renderLabel(pos: Cartesian3, labelText: string) {
+    renderLabel(pos: Cartesian3, labelText: string, displayOptions: LabelDisplayOptions) {
         if (this.label) {
             this.label.position = pos;
             this.label.text = labelText;
@@ -209,12 +233,12 @@ export class FlightObj {
             this.label = this.geoCollection.labels.add({
                 position: pos,
                 text: labelText,
-                font: '12px sans-serif',
                 pixelOffset: labelOffset,
-                fillColor: Cesium.Color.AQUA,
                 outlineWidth: 2.0
             });
         }
+        this.label.fillColor = Cesium.Color.fromCssColorString(displayOptions.color)
+        this.label.font = `${displayOptions.size}px sans-serif`
     }
 
     destroyLabel() {

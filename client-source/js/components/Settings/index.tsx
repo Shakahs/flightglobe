@@ -7,6 +7,8 @@ import TabContent from "reactstrap/lib/TabContent";
 import TabPane from "reactstrap/lib/TabPane";
 import PointSettings from "./PointSettings";
 import classnames from "classnames";
+import TrailSettings from "./TrailSettings";
+import LabelSettings from "./LabelSettings";
 
 interface SettingsProps {
     flightstore: FlightStore
@@ -69,6 +71,12 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
                 <TabContent activeTab={this.state.activeTab}>
                     <TabPane tabId={'points'}>
                         <PointSettings flightstore={this.props.flightstore}/>
+                    </TabPane>
+                    <TabPane tabId={'trails'}>
+                        <TrailSettings flightstore={this.props.flightstore}/>
+                    </TabPane>
+                    <TabPane tabId={'labels'}>
+                        <LabelSettings flightstore={this.props.flightstore}/>
                     </TabPane>
                 </TabContent>
             </React.Fragment>
