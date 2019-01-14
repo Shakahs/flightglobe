@@ -7,7 +7,7 @@ export default class WebsocketHandler {
     @observable ws: WebSocket|null = null;
     @observable.shallow messages: Message[] = [];
     @observable shouldSubscribe:boolean;
-    @observable lastDialTime:Date = new Date(2017);
+    lastDialTime:Date = new Date(2017);
     url: string;
     wsCallback: (msg: Message[])=>void | null;
     wsAutorunDisposer: IReactionDisposer;
@@ -23,12 +23,17 @@ export default class WebsocketHandler {
             const shouldSubscribe = this.shouldSubscribe;
             if (!isSubscribed && shouldSubscribe) {
                 const timeElapsed:number = differenceInMilliseconds(
-                    this.lastDialTime,
-                    new Date()
+                    new Date(),
+                    this.lastDialTime
                 );
-                const timeToWait = 10 - timeElapsed;
-                // setTimeout(()=>this.wsSubscribe(), Math.max(timeToWait,10));
-                this.wsSubscribe()
+                const timeToWait = (10*1000) - timeElapsed;
+                if(timeToWait>0){
+                    setTimeout(()=>{
+                        this.wsSubscribe()
+                    }, Math.max(timeToWait,10));
+                } else {
+                    this.wsSubscribe()
+                }
             }
             if(isSubscribed && !shouldSubscribe && this.ws) {
                 this.ws.close()
@@ -64,6 +69,7 @@ export default class WebsocketHandler {
 
     @action('wsSubscribe')
     wsSubscribe() {
+        this.lastDialTime = new Date();
         this.ws = new WebSocket(this.url);
         this.ws.onmessage = (msg: MessageEvent)=>this.wsMessage(msg);
         this.ws.onclose = ()=>this.wsClose();

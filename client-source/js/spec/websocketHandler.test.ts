@@ -3,6 +3,7 @@ import WebsocketHandler from "../websocketHandler";
 import {FlightAPosition1, FlightAPosition2} from "./mockData";
 import {Message, UpdateRequest} from "../types";
 import {noop} from "lodash-es";
+const differenceInMilliseconds = require('date-fns/difference_in_milliseconds');
 
 describe('websocketHandler handles connection housekeeping',()=>{
 
@@ -51,15 +52,20 @@ describe('websocketHandler handles connection housekeeping',()=>{
        expect(wsh.isSubscribed).toBeFalsy()
    })
 
-    it('subscribes',()=>{
+    it('subscribes',(done)=>{
         expect(mockServer.clients().length).toEqual(0);
-        const wsh = new WebsocketHandler(undefined,testServerURL);
-        expect(mockServer.clients().length).toEqual(1)
+        setTimeout(()=>{
+            const wsh = new WebsocketHandler(undefined,testServerURL);
+            done()
+        },100)
     })
 
-    it('determines if a subscribed handler is subscribed',()=>{
+    it('determines if a subscribed handler is subscribed',(done)=>{
         const wsh = new WebsocketHandler(undefined,testServerURL);
-        expect(wsh.isSubscribed).toBeTruthy()
+        setTimeout(()=>{
+            expect(wsh.isSubscribed).toBeTruthy()
+            done()
+        },100)
     })
 
     it('respects shouldSubscribe when subscribing',()=>{
@@ -92,7 +98,7 @@ describe('websocketHandler handles connection housekeeping',()=>{
             expect(wsh.messages.length).toEqual(1);
             expect(wsh.currentMessages[0]).toEqual(FlightAPosition1);
             done()
-        },100)
+        },1000)
     });
 
     it('receives multiple messages',(done)=>{
@@ -101,13 +107,13 @@ describe('websocketHandler handles connection housekeeping',()=>{
             socket.send(JSON.stringify(FlightAPosition2));
         });
         const wsh = new WebsocketHandler(undefined,testServerURL);
-        expect(mockServer.clients().length).toEqual(1)
         setTimeout(()=>{
+            expect(mockServer.clients().length).toEqual(1)
             expect(wsh.messages.length).toEqual(2);
             expect(wsh.currentMessages[0]).toEqual(FlightAPosition1);
             expect(wsh.currentMessages[1]).toEqual(FlightAPosition2);
             done()
-        },100)
+        },1000)
     });
 
     it('send update requests',(done)=>{
@@ -164,5 +170,29 @@ describe('websocketHandler handles connection housekeeping',()=>{
         }
         done()
     })
+
+    describe('failed connection tests', function () {
+        let originalTimeout;
+
+        beforeEach(function() {
+            originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+            jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
+        });
+
+        afterEach(function() {
+            jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+        });
+
+        it('redials a failed connection after the appropriate delay', (done)=>{
+            const originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+            const wsh = new WebsocketHandler(noop,'ws://localhost:32001'); //non existent / offline server
+            spyOn(wsh,'wsSubscribe');
+            setTimeout(()=>{
+                expect(wsh.wsSubscribe).toHaveBeenCalledTimes(1)
+                done()
+            },11000)
+        })
+
+    });
 });
 
