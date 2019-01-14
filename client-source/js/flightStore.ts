@@ -49,7 +49,6 @@ export class FlightStore {
               cameraPosition.longitude*180/Math.PI, 3);
           const newGeoResult=new Map<string,boolean>();
           newGeoResult.set(focusGeo,true);
-          this.detailedFlights.set(focusGeo, true);
           forEach(Geohash.neighbours(focusGeo), (neighbor)=>{
                 newGeoResult.set(neighbor,true);
           })
