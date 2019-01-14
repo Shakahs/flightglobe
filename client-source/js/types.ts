@@ -63,3 +63,9 @@ export interface LabelDisplayOptions {
 }
 
 export type LabelDisplayOptionsUpdate = Partial<LabelDisplayOptions>
+
+export interface AircraftModelData  {
+    [model: string]: {
+        name: string
+    }
+}

@@ -10,14 +10,14 @@ import {
     TrailDisplayOptions,
     TrailDisplayOptionsUpdate,
     LabelDisplayOptions,
-    LabelDisplayOptionsUpdate
+    LabelDisplayOptionsUpdate, AircraftModelData
 } from "./types";
 import * as Cesium from "cesium";
 import {newFlightRecord} from "./utility";
-import {forEach, merge} from "lodash-es";
+import {forEach, has, merge} from "lodash-es";
 import {FlightObj} from "./flightObj";
 import {GeoCollection} from "./geoCollection";
-import WebsocketHandler from "./websocketHandler";
+const aircraftModels:AircraftModelData = require('../resources/aircraft.json');
 
 const Geohash = require('latlon-geohash');
 
@@ -134,15 +134,16 @@ export class FlightStore {
 
     @action('addDemographics')
     addDemographics(dem: DemographicsUpdate){
-        const currentData = this.flightData.get(dem.icao);
-        if(currentData){
-            currentData.demographic.origin = dem.body.origin;
-            currentData.demographic.destination = dem.body.destination;
-            currentData.demographic.model = dem.body.model;
-        } else {
-            const newData = newFlightRecord(dem.icao);
-            newData.demographic=dem.body
-            this.flightData.set(dem.icao, newData)
+        let flightRecord = this.flightData.get(dem.icao);
+        if(!flightRecord){
+            flightRecord = newFlightRecord(dem.icao);
+            this.flightData.set(dem.icao, flightRecord)
+        }
+        flightRecord.demographic.origin = dem.body.origin;
+        flightRecord.demographic.destination = dem.body.destination;
+        flightRecord.demographic.model = dem.body.model;
+        if(has(aircraftModels, flightRecord.demographic.model)){
+            flightRecord.demographic.model = aircraftModels[flightRecord.demographic.model].name;
         }
     }
 
