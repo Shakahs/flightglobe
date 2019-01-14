@@ -6,9 +6,9 @@ import (
 	"github.com/NYTimes/gziphandler"
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"github.com/go-redis/redis"
+	"github.com/gobuffalo/packr/v2"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -169,13 +169,13 @@ func init() {
 
 	positionCache = pkg.CreateCache()
 
-	jsonFile, err := os.Open("airports.json")
+	resourceFiles := packr.New("resources", "./resources")
+	airportJSON, err := resourceFiles.Find("airports.json")
 	if err != nil {
-		fmt.Println("Could not open airports.json")
+		fmt.Println("Could not find airports.json")
 	}
-	defer jsonFile.Close()
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-	err = json.Unmarshal([]byte(byteValue), &airportMap)
+
+	err = json.Unmarshal(airportJSON, &airportMap)
 	if err != nil {
 		fmt.Println("Could not parse airports.json:", err)
 	}

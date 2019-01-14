@@ -9,10 +9,10 @@ coverage/
 /.env
 /client-build/
 /cesium/
-dataserver/cmd/fg-server/airports.json
 dataserver/cmd/fr-collector/fr-collector
 dataserver/cmd/redis-point-persistor/redis-point-persistor
 dataserver/cmd/fg-server/fg-server
 dataserver/cmd/fg-server/static
 dataserver/cmd/fr-db-persistor/fr-db-persistor
 dataserver/cmd/pipelinedb-sidecar/pipelinedb-sidecar
+*packr*
