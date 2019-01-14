@@ -10,6 +10,7 @@ import {UncontrolledDropdown} from "reactstrap";
 import Container from "reactstrap/lib/Container";
 import Col from "reactstrap/lib/Col";
 import Row from "reactstrap/lib/Row";
+import SizeSelector from "./SizeSelector";
 
 interface PointSettingsProps {
     flightstore: FlightStore
@@ -22,18 +23,11 @@ const PointSettings: React.SFC<PointSettingsProps> = observer((props) => (
                 Point Size:
             </Col>
             <Col>
-                <UncontrolledDropdown>
-                    <DropdownToggle caret>
-                        {props.flightstore.pointDisplayOptions.size}
-                    </DropdownToggle>
-                    <DropdownMenu>
-                        {[1,2,3,4,5,6,7,8,9,0].map((i)=>(
-                            <DropdownItem key={i} onClick={()=>{
-                                props.flightstore.updatePointDisplay({size: i})
-                            }} >{i}</DropdownItem>
-                        ))}
-                    </DropdownMenu>
-                </UncontrolledDropdown>
+                <SizeSelector
+                    currentValue={props.flightstore.pointDisplayOptions.size}
+                    possibleValues={[1,2,3,4,5,6,7,8,9,10]}
+                    onChange={(size: number)=>props.flightstore.updatePointDisplay({size})}
+                />
             </Col>
         </Row>
         <Row>
@@ -52,18 +46,11 @@ const PointSettings: React.SFC<PointSettingsProps> = observer((props) => (
                 Outline Size:
             </Col>
             <Col>
-                <UncontrolledDropdown>
-                    <DropdownToggle caret>
-                        {props.flightstore.pointDisplayOptions.outlineSize}
-                    </DropdownToggle>
-                    <DropdownMenu>
-                        {[1,2,3,4,5,6,7,8,9,0].map((i)=>(
-                            <DropdownItem key={i} onClick={()=>{
-                                props.flightstore.updatePointDisplay({outlineSize: i})
-                            }} >{i}</DropdownItem>
-                        ))}
-                    </DropdownMenu>
-                </UncontrolledDropdown>
+                <SizeSelector
+                    currentValue={props.flightstore.pointDisplayOptions.outlineSize}
+                    possibleValues={[1,2,3,4,5,6,7,8,9,10]}
+                    onChange={(size: number)=>props.flightstore.updatePointDisplay({outlineSize: size})}
+                />
             </Col>
         </Row>
         <Row>
