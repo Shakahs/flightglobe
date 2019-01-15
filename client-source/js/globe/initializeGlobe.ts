@@ -1,4 +1,5 @@
 import * as Cesium from "cesium";
+import {provideMapTilerTopo} from "./imageryLayers";
 
 // import {ScreenSpaceEventHandler} from 'cesium';
 // import {ScreenSpaceEventType} from 'cesium';
@@ -44,11 +45,7 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
     //     mapId: 'mapbox.satellite'
     // }),
 
-    imageryProvider: new Cesium.UrlTemplateImageryProvider({
-        //@ts-ignore
-        url : `https://maps.tilehosting.com/styles/topo/{z}/{x}/{y}.png?key=${MAPTILER_KEY}`,
-        maximumLevel : 13
-    })
+    imageryProvider: provideMapTilerTopo()
 });
 
 // viewer.imageryLayers.addImageryProvider(
