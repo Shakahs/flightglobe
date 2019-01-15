@@ -26,7 +26,7 @@ const LabelSettings: React.SFC<LabelSettingsProps> = observer((props) => (
                 <Row>
                     <SizeSelector
                         currentValue={props.flightstore.labelDisplayOptions.size}
-                        possibleValues={[1,2,3,4,5,6,7,8,9,10]}
+                        possibleValues={[8,10,12,14,16]}
                         onChange={(size: number)=>props.flightstore.updateLabelDisplay({size})}
                     />
                 </Row>
