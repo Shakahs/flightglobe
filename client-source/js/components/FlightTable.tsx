@@ -72,7 +72,8 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
         if(data.api){
             data.api.forEachNodeAfterFilter((node)=>{
               resultMap.set(node.data.icao,true)
-            })
+            });
+            this.props.store.updateIsFiltered(data.api.isAnyFilterPresent())
         }
         this.props.store.updateFilteredFlights(resultMap);
     }
@@ -81,8 +82,11 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
         return(
             <React.Fragment>
                 <div>
-                    Total Flights: {this.props.store.flightData.size} -
-                    Filtered Flights: {this.props.store.filteredFlights.size}
+                    <span>Total Flights: {this.props.store.flightData.size}</span>
+                    {this.props.store.isFiltered &&
+                        <span> - Filtered Flights: {this.props.store.filteredFlights.size}</span>
+                    }
+
                 </div>
                 <div
                     className="ag-theme-balham-dark w-100 h-100"

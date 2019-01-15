@@ -55,6 +55,7 @@ export class FlightStore {
     @observable pointDisplayOptions:PointDisplayOptions = PointDisplayOptionDefaults;
     @observable trailDisplayOptions:TrailDisplayOptions = TrailDisplayOptionDefaults;
     @observable labelDisplayOptions:LabelDisplayOptions = LabelDisplayOptionDefaults;
+    @observable isFiltered:boolean = false;
 
     constructor(viewer: Cesium.Viewer){
         this.viewer = viewer;
@@ -182,6 +183,11 @@ export class FlightStore {
     @action('updateLabelDisplay')
     updateLabelDisplay(newOptions: LabelDisplayOptionsUpdate){
         merge<LabelDisplayOptions,LabelDisplayOptionsUpdate>(this.labelDisplayOptions, newOptions);
+    }
+
+    @action('updateIsFiltered')
+    updateIsFiltered(filterState: boolean){
+        this.isFiltered = filterState;
     }
 
     numberFlights():number {

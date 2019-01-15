@@ -89,10 +89,10 @@ export class FlightObj {
     }
 
     @computed get isFilterSelected(): boolean {
-        if (this.flightStore.filteredFlights.size === 0) {
-            return true //the default filter is to include everything
+        if (!this.flightStore.isFiltered) {
+            return true // no filter, return everything
         }
-        return this.flightStore.filteredFlights.has(this.icao); //otherwise, return the actual filter result
+        return this.flightStore.filteredFlights.has(this.icao); // filter active, check the filter result
     }
 
     @computed get shouldDisplay(): boolean {
