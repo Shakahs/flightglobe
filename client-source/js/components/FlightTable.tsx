@@ -79,12 +79,19 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
 
     render() {
         return(
+            <React.Fragment>
+                <div>
+                    Total Flights: {this.props.store.flightData.size} -
+                    Filtered Flights: {this.props.store.filteredFlights.size}
+                </div>
                 <div
                     className="ag-theme-balham-dark w-100 h-100"
                 >
                     <AgGridReact
                         columnDefs={this.state.columnDefs}
-                        getRowNodeId={(data)=>{return data.icao}}
+                        getRowNodeId={(data) => {
+                            return data.icao
+                        }}
                         onFilterChanged={this.filterChanged}
                         onGridReady={this.gridReady}
                         enableSorting
@@ -94,6 +101,7 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
                     >
                     </AgGridReact>
                 </div>
+            </React.Fragment>
         )
     }
 }
