@@ -8,9 +8,9 @@ import {faFilter} from '@fortawesome/free-solid-svg-icons/faFilter'
 import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch'
 import {FlightStore} from "../flightStore";
 import LoadingScreen from "./LoadingScreen";
-import Info from "./Info";
 import classnames from 'classnames';
 import { hot } from 'react-hot-loader/root'
+import Settings from "./Settings";
 
 library.add(faCog,faFilter,faCircleNotch);
 
@@ -33,7 +33,7 @@ class App extends React.Component<AppProps, AppState> {
         };
 
         this.toggleShowFlightTable = this.toggleShowFlightTable.bind(this);
-        this.toggleShowInfoModal = this.toggleShowInfoModal.bind(this);
+        this.toggleSettingsModal = this.toggleSettingsModal.bind(this);
     }
 
     toggleShowFlightTable(){
@@ -42,7 +42,7 @@ class App extends React.Component<AppProps, AppState> {
         })
     }
 
-    toggleShowInfoModal(){
+    toggleSettingsModal(){
         this.setState({
             showInfoModal: !this.state.showInfoModal,
         })
@@ -52,14 +52,14 @@ class App extends React.Component<AppProps, AppState> {
         return (
             <React.Fragment>
                 <LoadingScreen viewer={this.props.viewer}/>
-                <Info
+                <Settings
                     showModal={this.state.showInfoModal}
-                    toggle={this.toggleShowInfoModal}
-                    flightStore={this.props.flightStore}
+                    toggleModal={this.toggleSettingsModal}
+                    flightstore={this.props.flightStore}
                 />
                 <Menu
                     toggleShowFlightTable={this.toggleShowFlightTable}
-                    toggleShowInfoModal={this.toggleShowInfoModal}
+                    toggleShowInfoModal={this.toggleSettingsModal}
                 />
                 <div
                     className={classnames('px-2', 'pb-2', 'flightTable', {'fixed-bottom':this.state.showFlightTable})}

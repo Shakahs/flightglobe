@@ -9,9 +9,14 @@ import PointSettings from "./PointSettings";
 import classnames from "classnames";
 import TrailSettings from "./TrailSettings";
 import LabelSettings from "./LabelSettings";
+import ModalBody from "reactstrap/lib/ModalBody";
+import ModalHeader from "reactstrap/lib/ModalHeader";
+import Modal from "reactstrap/lib/Modal";
 
 interface SettingsProps {
     flightstore: FlightStore
+    showModal: boolean,
+    toggleModal: ()=>void,
 }
 
 
@@ -38,7 +43,14 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
 
     render() {
         return (
-            <React.Fragment>
+            <Modal
+                isOpen={this.props.showModal}
+                toggle={this.props.toggleModal}
+            >
+                <ModalHeader toggle={this.props.toggleModal}>
+                    Settings
+                </ModalHeader>
+                <ModalBody>
                 <Nav tabs justified>
                     <NavItem>
                         <NavLink
@@ -79,7 +91,8 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
                         <LabelSettings flightstore={this.props.flightstore}/>
                     </TabPane>
                 </TabContent>
-            </React.Fragment>
+            </ModalBody>
+            </Modal>
         );
     }
 }
