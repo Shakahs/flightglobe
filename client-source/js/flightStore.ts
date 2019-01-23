@@ -138,7 +138,6 @@ export class FlightStore {
         let flightRecord = this.flightData.get(dem.icao);
         if(!flightRecord){
             flightRecord = newFlightRecord(dem.icao);
-            this.flightData.set(dem.icao, flightRecord)
         }
         flightRecord.demographic.origin = dem.body.origin;
         flightRecord.demographic.destination = dem.body.destination;
@@ -146,6 +145,7 @@ export class FlightStore {
         if(has(aircraftModels, flightRecord.demographic.model)){
             flightRecord.demographic.model = aircraftModels[flightRecord.demographic.model].name;
         }
+        this.flightData.set(dem.icao, flightRecord)
     }
 
     @action('updateFilteredFlights')
