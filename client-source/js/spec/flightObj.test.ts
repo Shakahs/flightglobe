@@ -32,45 +32,56 @@ describe("FlightObj",function(){
             });
 
             it('if a flight is filter selected', function(){
-                expect(flightStore.filteredFlights.size).toEqual(0);
-                expect(flightObj.isFilterSelected).toBeTruthy();
+                expect(flightObj.isFilterSelected).toBeFalsy();
                 flightStore.updateFilteredFlights(newICAOMap([FlightBPosition1.icao]));
-                expect(flightStore.filteredFlights.size).toEqual(1);
                 expect(flightObj.isFilterSelected).toBeFalsy();
                 flightStore.updateFilteredFlights(newICAOMap([FlightAPosition1.icao,FlightBPosition1.icao]));
-                // expect(flightObj.isSelected).toBeTruthy();
+                expect(flightObj.isFilterSelected).toBeTruthy();
             });
         })
 
-        describe('by computing visibility', function () {
-            it('for a flight when there are no filters or selection', function(){
-                expect(flightObj.shouldDisplay).toEqual(true)
+        describe('by determining if a flight should display', function () {
+            it('when there are no filters or selection', function(){
+                expect(flightObj.shouldDisplay).toBeTruthy();
             });
 
-            it('for a flight when it is not in the filter result', function(){
-                expect(flightObj.shouldDisplay).toEqual(true)
+            it('when a flight is filtered out', function(){
+                expect(flightObj.shouldDisplay).toBeTruthy();
                 const dummyMap = new Map<string,boolean>([['zzzz',true]]);
                 flightStore.updateFilteredFlights(dummyMap);
-                expect(flightObj.shouldDisplay).toEqual(false)
+                flightStore.updateIsFiltered(true);
+                expect(flightObj.shouldDisplay).toBeFalsy();
             });
 
-            it('for a flight when it is in the filter result', function(){
-                expect(flightObj.shouldDisplay).toEqual(true);
+            it('when a flight is filtered in', function(){
+                expect(flightObj.shouldDisplay).toBeTruthy();
                 const dummyMap = new Map<string,boolean>([[FlightAPosition1.icao,true]]);
                 flightStore.updateFilteredFlights(dummyMap);
-                expect(flightObj.shouldDisplay).toEqual(true)
+                expect(flightObj.shouldDisplay).toBeTruthy();
             });
 
-            it('for a flight when it is selected, but not in the filter result', function(){
-                expect(flightObj.shouldDisplay).toEqual(true); //everything visible by default
+            it('when a flight is filtered out, but also selected', function(){
+                expect(flightObj.shouldDisplay).toBeTruthy(); //visible by default
                 const dummyMap = new Map<string,boolean>([['zzzz',true]]);
                 flightStore.updateFilteredFlights(dummyMap);
-                expect(flightObj.shouldDisplay).toEqual(false); //filtered out
+                flightStore.updateIsFiltered(true);
+                expect(flightObj.shouldDisplay).toBeFalsy(); //filtered out
                 flightStore.updateSelectedFlight(new Map<string,boolean>([[FlightAPosition1.icao,true]]));
-                expect(flightObj.shouldDisplay).toEqual(true); //selected
+                expect(flightObj.shouldDisplay).toBeTruthy(); //selected
             });
 
+            it('when a flight is filtered out, then later filtered in', function(){
+                expect(flightObj.shouldDisplay).toBeTruthy(); //visible by default
+                const dummyMap = new Map<string,boolean>([['zzzz',true]]);
+                flightStore.updateFilteredFlights(dummyMap);
+                flightStore.updateIsFiltered(true);
+                expect(flightObj.shouldDisplay).toBeFalsy(); //filtered out
 
+                const dummyMap2 = new Map<string,boolean>([]);
+                flightStore.updateFilteredFlights(dummyMap2);
+                flightStore.updateIsFiltered(false);
+                expect(flightObj.shouldDisplay).toBeTruthy(); //selected
+            });
         });
 
         it('gets the demographic data', function () {
@@ -188,6 +199,7 @@ describe("FlightObj",function(){
 
             it('by creating non-visible new Points when they do not match the filter', function(){
                 flightStore.updateFilteredFlights(new Map<string,boolean>([['zzz',true]]));
+                flightStore.updateIsFiltered(true);
                 flightStore.addOrUpdateFlight(FlightBPosition1);
                 const flightB = flightStore.flights.get(FlightBPosition1.icao) as FlightObj;
                 const point = flightB.point as PointPrimitive;
@@ -198,8 +210,10 @@ describe("FlightObj",function(){
                 const point = flightObj.point as PointPrimitive;
                 expect(point.show).toBeTruthy();
                 flightStore.updateFilteredFlights(new Map<string,boolean>([['zzz',true]]));
+                flightStore.updateIsFiltered(true);
                 expect(point.show).toBeFalsy();
                 flightStore.updateFilteredFlights(new Map<string,boolean>([]));
+                flightStore.updateIsFiltered(false);
                 expect(point.show).toBeTruthy();
             })
         })
@@ -238,6 +252,7 @@ describe("FlightObj",function(){
                 flightStore.addOrUpdateFlight(FlightAPosition2);
                 flightStore.updateDetailedFlights(new Map([[FlightAPosition1.body.geohash,true]]));
                 flightStore.updateFilteredFlights(newICAOMap(['zzz']));
+                flightStore.updateIsFiltered(true);
                 expect<boolean>(flightObj.shouldTrailDisplay).toBeFalsy();
             })
 

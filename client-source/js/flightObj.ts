@@ -89,21 +89,22 @@ export class FlightObj {
     }
 
     @computed get isFilterSelected(): boolean {
-        if (!this.flightStore.isFiltered) {
-            return true // no filter, return everything
-        }
         return this.flightStore.filteredFlights.has(this.icao); // filter active, check the filter result
     }
 
     @computed get shouldDisplay(): boolean {
-        return this.isSelected || this.isFilterSelected
+        if(this.isSelected){ return true; }
+        if(this.flightStore.isFiltered){
+            return this.isSelected || this.isFilterSelected
+        }
+        return true
     }
 
     @computed get shouldDisplayDetailed(): boolean {
         if (this.isSelected) {
             return true
         } //selected by user
-        return this.isDetailSelected && this.isFilterSelected //has to qualify for boths
+        return this.isDetailSelected
     }
 
     @computed get demographics(): FlightDemographics | null {
@@ -166,7 +167,7 @@ export class FlightObj {
     // trails
 
     @computed get shouldTrailDisplay(): boolean {
-        return this.allPositions.length >= 1 && this.shouldDisplayDetailed
+        return this.allPositions.length >= 1 && this.shouldDisplayDetailed && this.shouldDisplay
     }
 
     renderTrail(positions: Cartesian3[], displayOptions:TrailDisplayOptions) {
