@@ -132,7 +132,7 @@ describe('websocketHandler handles connection housekeeping',()=>{
         const wsh = new WebsocketHandler(undefined,testServerURL);
     })
 
-    it('gives a message to the callback',(done)=>{
+    xit('gives a message to the callback',(done)=>{
         mockServer.on('connection', socket => {
             socket.send(JSON.stringify(FlightAPosition1));
         });
@@ -147,16 +147,23 @@ describe('websocketHandler handles connection housekeeping',()=>{
         setTimeout(noop,1100)
     })
 
-    it('clears messages after calling the callback',(done)=>{
+    it('clears messages after calling the callback',()=>{
+        jasmine.clock().install();
+
         mockServer.on('connection', socket => {
             socket.send(JSON.stringify(FlightAPosition1));
         });
+
         const wsh = new WebsocketHandler(noop,testServerURL);
-        setTimeout(()=>{
-            expect(wsh.messages.length).toEqual(0)
-            done()
-        },1500)
-    })
+
+        jasmine.clock().tick(100);
+        expect(wsh.messages.length).toEqual(1);
+
+        jasmine.clock().tick(1500);
+        expect(wsh.messages.length).toEqual(0);
+
+        jasmine.clock().uninstall();
+    });
 
     it('does not attempt to send when the connection is not ready', (done)=>{
         const wsh = new WebsocketHandler(noop,'ws://localhost:32001'); //non existent / offline server
