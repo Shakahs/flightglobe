@@ -4,7 +4,9 @@ import {FlightPosition, FlightRecord} from "../types";
 import {newICAOMap} from "../utility";
 import * as Cesium from "cesium";
 import {FlightObj} from "../flightObj";
-import {PointPrimitive} from "cesium";
+import {PointPrimitive, Polyline} from "cesium";
+import {get} from 'lodash-es';
+import {TrailDisplayOptionDefaults} from "../flightStore";
 
 describe("FlightObj",function(){
     it("stores the correct FlightRecord", function() {
@@ -188,7 +190,7 @@ describe("FlightObj",function(){
             });
         })
 
-        describe('filtering and visiblity', function(){
+        describe('filtering and visibility', function(){
             it('by creating visible new Points when they match the filter', function(){
                 flightStore.updateFilteredFlights(new Map<string,boolean>([[FlightBPosition1.icao,true]]))
                 flightStore.addOrUpdateFlight(FlightBPosition1);
@@ -222,7 +224,7 @@ describe("FlightObj",function(){
             it('updates the point color', function(){
                 const point = flightObj.point as PointPrimitive;
                 expect(point.color.equals(Cesium.Color.fromCssColorString('#3399ff'))).toBeTruthy();
-                const newColor = '#3399ff';
+                const newColor = '#ff5b43';
                 flightStore.updatePointDisplay({color: newColor});
                 expect(point.color.equals(Cesium.Color.fromCssColorString(newColor))).toBeTruthy()
             })
@@ -231,7 +233,42 @@ describe("FlightObj",function(){
     });
 
     describe('handles Trails', function () {
-        describe('by computing the correct Trail display condition', function () {
+
+        describe('basics',()=>{
+            it('by creating the trail', function () {
+                flightStore.addOrUpdateFlight(FlightAPosition2);
+                flightStore.updateDetailedFlights(new Map([[FlightAPosition2.body.geohash,true]]));
+                const expectedPositions = [
+                    Cesium.Cartesian3.fromDegrees(
+                        FlightAPosition1.body.longitude,
+                        FlightAPosition1.body.latitude,
+                        FlightAPosition1.body.altitude,
+                    ),
+                    Cesium.Cartesian3.fromDegrees(
+                        FlightAPosition2.body.longitude,
+                        FlightAPosition2.body.latitude,
+                        FlightAPosition2.body.altitude,
+                    )
+                ];
+                if(flightObj.trail){
+                    expect(flightObj.trail.positions).toEqual(expectedPositions);
+                    expect(flightObj.geoCollection.lines.contains(flightObj.trail)).toBeTruthy()
+                } else {
+                    fail('trail not defined')
+                }
+            })
+
+            it('by destroying the trail', function(){
+                expect(flightObj.trail).toBeNull();
+                flightStore.addOrUpdateFlight(FlightAPosition2);
+                flightStore.updateDetailedFlights(new Map([[FlightAPosition2.body.geohash,true]]));
+                expect(flightObj.trail).not.toBeNull();
+                flightStore.updateDetailedFlights(new Map());
+                expect(flightObj.trail).toBeNull();
+            })
+        })
+
+        describe('visibility', function () {
 
             it('when the flight is selected', function(){
                 expect<boolean>(flightObj.shouldTrailDisplay).toBeFalsy();
@@ -267,36 +304,24 @@ describe("FlightObj",function(){
 
         });
 
-        it('by creating the trail', function () {
-            flightStore.addOrUpdateFlight(FlightAPosition2);
-            flightStore.updateDetailedFlights(new Map([[FlightAPosition2.body.geohash,true]]));
-            const expectedPositions = [
-                Cesium.Cartesian3.fromDegrees(
-                    FlightAPosition1.body.longitude,
-                    FlightAPosition1.body.latitude,
-                    FlightAPosition1.body.altitude,
-                ),
-                Cesium.Cartesian3.fromDegrees(
-                    FlightAPosition2.body.longitude,
-                    FlightAPosition2.body.latitude,
-                    FlightAPosition2.body.altitude,
-                )
-            ];
-            if(flightObj.trail){
-                expect(flightObj.trail.positions).toEqual(expectedPositions);
-                expect(flightObj.geoCollection.lines.contains(flightObj.trail)).toBeTruthy()
-            } else {
-                fail('trail not defined')
-            }
-        })
+        describe('display options', function(){
+            it('updates the trail color', function(){
+                flightStore.addOrUpdateFlight(FlightAPosition2);
+                flightStore.updateDetailedFlights(new Map([[FlightAPosition2.body.geohash,true]]));
+                const trail = flightObj.trail as Polyline;
 
-        it('by destroying the trail', function(){
-            expect(flightObj.trail).toBeNull();
-            flightStore.addOrUpdateFlight(FlightAPosition2);
-            flightStore.updateDetailedFlights(new Map([[FlightAPosition2.body.geohash,true]]));
-            expect(flightObj.trail).not.toBeNull();
-            flightStore.updateDetailedFlights(new Map());
-            expect(flightObj.trail).toBeNull();
+                const currentColor = get(trail,'material.uniforms.color') as Cesium.Color;
+                const expectedColor = Cesium.Color.fromCssColorString(TrailDisplayOptionDefaults.color)
+                expect(expectedColor.equals(currentColor)).toBeTruthy();
+
+
+                const newColor = '#ff5b43';
+                flightStore.updateTrailDisplay({color: newColor});
+                const newCurrentColor = get(trail,'material.uniforms.color') as Cesium.Color;
+                const newExpectedColor = Cesium.Color.fromCssColorString(newColor);
+                expect(newExpectedColor.equals(newCurrentColor)).toBeTruthy();
+
+            })
         })
     });
 

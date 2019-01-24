@@ -182,14 +182,8 @@ export class FlightObj {
         }
         if(this.trail){
             this.trail.width = displayOptions.size;
-            this.trail.material =  new Cesium.Material({
-                fabric : {
-                    type : 'Color',
-                    uniforms : {
-                        color : Cesium.Color.fromCssColorString(displayOptions.color)
-                    }
-                }
-            });
+            this.trail.material = Cesium.Material.fromType('Color');
+            this.trail.material.uniforms.color = Cesium.Color.fromCssColorString(displayOptions.color);
         }
     }
 
