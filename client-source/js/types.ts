@@ -45,11 +45,11 @@ export interface UpdateRequest {
 
 interface ElementDisplayOptions {
     color: string
+    cesiumColor: Cesium.Color
     size: number
 }
 
 export interface PointDisplayOptions extends ElementDisplayOptions {
-    cesiumColor: Cesium.Color
     outlineColor: string
     outlineSize: number
 }

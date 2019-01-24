@@ -1,7 +1,18 @@
-import {FlightStore, PointDisplayOptionDefaults} from "../flightStore";
+import {
+    FlightStore,
+    LabelDisplayOptionDefaults,
+    PointDisplayOptionDefaults,
+    TrailDisplayOptionDefaults
+} from "../flightStore";
 import * as Cesium from "cesium";
 import {PointPrimitive} from "cesium";
-import {FlightPosition, FlightRecord, PointDisplayOptions, PointDisplayOptionsUpdate} from "../types";
+import {
+    FlightPosition,
+    FlightRecord, LabelDisplayOptions, LabelDisplayOptionsUpdate,
+    PointDisplayOptions,
+    PointDisplayOptionsUpdate,
+    TrailDisplayOptions, TrailDisplayOptionsUpdate
+} from "../types";
 import {convertPositionToCartesian, newICAOMap} from "../utility";
 import {
     FlightADemographic,
@@ -152,6 +163,34 @@ describe("FlightStore", function() {
                 merge<PointDisplayOptions,PointDisplayOptionsUpdate>(finalResult, newOptions)
                 expect(flightStore.pointDisplayOptions).toEqual(finalResult);
                 expect(flightStore.pointDisplayOptions.cesiumColor.equals(Cesium.Color.fromCssColorString(newOptions.color))).toBeTruthy()
+            });
+        });
+
+        describe('for trails', function () {
+            it('should update the trail display options', function () {
+                expect(flightStore.trailDisplayOptions).toEqual(TrailDisplayOptionDefaults);
+                const newOptions = {
+                    color: '#ff6699',
+                };
+                flightStore.updateTrailDisplay(newOptions);
+                const finalResult = cloneDeep(TrailDisplayOptionDefaults);
+                merge<TrailDisplayOptions,TrailDisplayOptionsUpdate>(finalResult, newOptions)
+                expect(flightStore.trailDisplayOptions).toEqual(finalResult);
+                expect(flightStore.trailDisplayOptions.cesiumColor.equals(Cesium.Color.fromCssColorString(newOptions.color))).toBeTruthy()
+            });
+        });
+
+        describe('for labels', function () {
+            it('should update the label display options', function () {
+                expect(flightStore.labelDisplayOptions).toEqual(LabelDisplayOptionDefaults);
+                const newOptions = {
+                    color: '#ff6699',
+                };
+                flightStore.updateLabelDisplay(newOptions);
+                const finalResult = cloneDeep(LabelDisplayOptionDefaults);
+                merge<LabelDisplayOptions,LabelDisplayOptionsUpdate>(finalResult, newOptions)
+                expect(flightStore.labelDisplayOptions).toEqual(finalResult);
+                expect(flightStore.labelDisplayOptions.cesiumColor.equals(Cesium.Color.fromCssColorString(newOptions.color))).toBeTruthy()
             });
         });
     })

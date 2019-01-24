@@ -183,7 +183,7 @@ export class FlightObj {
         if(this.trail){
             this.trail.width = displayOptions.size;
             this.trail.material = Cesium.Material.fromType('Color');
-            this.trail.material.uniforms.color = Cesium.Color.fromCssColorString(displayOptions.color);
+            this.trail.material.uniforms.color = displayOptions.cesiumColor;
         }
     }
 
@@ -232,7 +232,7 @@ export class FlightObj {
                 outlineWidth: 2.0
             });
         }
-        this.label.fillColor = Cesium.Color.fromCssColorString(displayOptions.color)
+        this.label.fillColor = displayOptions.cesiumColor;
         this.label.font = `${displayOptions.size}px sans-serif`
     }
 

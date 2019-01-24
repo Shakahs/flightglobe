@@ -35,11 +35,13 @@ export const PointDisplayOptionDefaults:PointDisplayOptions = {
 
 export const TrailDisplayOptionDefaults:TrailDisplayOptions = {
     color: '#3399ff',
+    cesiumColor: Cesium.Color.fromCssColorString('#3399ff'),
     size: 4,
 };
 
 export const LabelDisplayOptionDefaults:LabelDisplayOptions = {
     color: '#3399ff',
+    cesiumColor: Cesium.Color.fromCssColorString('#3399ff'),
     size: 12
 };
 
@@ -181,11 +183,17 @@ export class FlightStore {
 
     @action('updateTrailDisplay')
     updateTrailDisplay(newOptions: TrailDisplayOptionsUpdate){
+        if(newOptions.color){
+            newOptions.cesiumColor = Cesium.Color.fromCssColorString(newOptions.color);
+        }
         merge<TrailDisplayOptions,TrailDisplayOptionsUpdate>(this.trailDisplayOptions, newOptions);
     }
 
     @action('updateLabelDisplay')
     updateLabelDisplay(newOptions: LabelDisplayOptionsUpdate){
+        if(newOptions.color){
+            newOptions.cesiumColor = Cesium.Color.fromCssColorString(newOptions.color);
+        }
         merge<LabelDisplayOptions,LabelDisplayOptionsUpdate>(this.labelDisplayOptions, newOptions);
     }
 
