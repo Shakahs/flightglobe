@@ -1,5 +1,5 @@
 import * as React from 'react'
-import FlightTable from './FlightTable';
+import FlightTable from './FlightTable/FlightTable';
 import {shallow} from "../spec/karma-enzyme"
 import {viewer} from "../spec/mockSetup";
 import {flightStore} from "../spec/mockSetup";

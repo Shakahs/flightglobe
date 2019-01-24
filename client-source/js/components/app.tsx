@@ -1,16 +1,16 @@
-import FlightTable from "./FlightTable";
+import FlightTable from "./FlightTable/FlightTable";
 import * as React from "react";
 import { Container, Row, Col } from 'reactstrap';
-import Menu from "./Menu";
+import Menu from "./Menu/Menu";
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {faCog} from '@fortawesome/free-solid-svg-icons/faCog'
 import {faFilter} from '@fortawesome/free-solid-svg-icons/faFilter'
 import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch'
 import {FlightStore} from "../flightStore";
-import LoadingScreen from "./LoadingScreen";
+import LoadingScreen from "./LoadingScreen/LoadingScreen";
 import classnames from 'classnames';
 import { hot } from 'react-hot-loader/root'
-import Settings from "./Settings";
+import Settings from "./Settings/Settings";
 
 library.add(faCog,faFilter,faCircleNotch);
 

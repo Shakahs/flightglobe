@@ -1,6 +1,6 @@
 import "@babel/polyfill";
 import 'cesiumSource/Widgets/widgets.css';
-import {viewer} from '../globe';
+import {viewer} from '../globe/globe';
 import {interval} from 'rxjs';
 import * as React from 'react';
 import ReactDOM from 'react-dom';
