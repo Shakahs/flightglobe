@@ -215,7 +215,7 @@ export class FlightObj {
     // labels
 
     @computed get shouldLabelDisplay() {
-        return this.shouldDisplayDetailed;
+        return this.shouldDisplay && this.shouldDisplayDetailed;
     }
 
     @computed get labelText(): string {

@@ -338,7 +338,7 @@ describe("FlightObj",function(){
         })
     });
 
-    describe('handles Labels', function () {
+    describe('handles Label', function () {
 
         describe('basics',()=>{
             it('by computing the correct label text when demographics are available', function(){
@@ -387,7 +387,10 @@ describe("FlightObj",function(){
             it("computes the correct Label display condition", function () {
                 expect<boolean>(flightObj.shouldLabelDisplay).toBeFalsy();
                 flightStore.updateDetailedFlights(new Map([[FlightAPosition1.body.geohash,true]]));
-                expect<boolean>(flightObj.shouldLabelDisplay).toBeTruthy();
+                expect<boolean>(flightObj.shouldLabelDisplay).toBeTruthy(); //detail selected
+                flightStore.updateFilteredFlights(newICAOMap(['zzz']));
+                flightStore.updateIsFiltered(true);
+                expect<boolean>(flightObj.shouldLabelDisplay).toBeFalsy(); // filtered out
             });
         })
 
