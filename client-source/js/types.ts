@@ -41,25 +41,24 @@ export interface UpdateRequest {
     lastReceivedTimestamp: number
 }
 
-export interface PointDisplayOptions {
+interface ElementDisplayOptions {
     color: string
     size: number
+}
+
+export interface PointDisplayOptions extends ElementDisplayOptions {
     outlineColor: string
     outlineSize: number
 }
 
 export type PointDisplayOptionsUpdate = Partial<PointDisplayOptions>
 
-export interface TrailDisplayOptions {
-    color: string
-    size: number
+export interface TrailDisplayOptions extends ElementDisplayOptions {
 }
 
 export type TrailDisplayOptionsUpdate = Partial<TrailDisplayOptions>
 
-export interface LabelDisplayOptions {
-    color: string
-    size: number
+export interface LabelDisplayOptions extends ElementDisplayOptions  {
 }
 
 export type LabelDisplayOptionsUpdate = Partial<LabelDisplayOptions>
