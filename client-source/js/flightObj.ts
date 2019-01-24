@@ -151,7 +151,7 @@ export class FlightObj {
                 show: visibility,
             });
         }
-        this.point.color = Cesium.Color.fromCssColorString(displayOptions.color);
+        this.point.color = displayOptions.cesiumColor;
         this.point.pixelSize = displayOptions.size;
         this.point.outlineColor = Cesium.Color.fromCssColorString(displayOptions.outlineColor);
         this.point.outlineWidth = displayOptions.outlineSize;

@@ -27,6 +27,7 @@ configure({
 
 export const PointDisplayOptionDefaults:PointDisplayOptions = {
     color: '#3399ff',
+    cesiumColor: Cesium.Color.fromCssColorString('#3399ff'),
     size: 4,
     outlineColor: '#FFF',
     outlineSize: 1,
@@ -172,6 +173,9 @@ export class FlightStore {
 
     @action('updatePointDisplay')
     updatePointDisplay(newOptions: PointDisplayOptionsUpdate){
+        if(newOptions.color){
+            newOptions.cesiumColor = Cesium.Color.fromCssColorString(newOptions.color);
+        }
         merge<PointDisplayOptions,PointDisplayOptionsUpdate>(this.pointDisplayOptions, newOptions);
     }
 

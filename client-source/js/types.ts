@@ -1,3 +1,5 @@
+import * as Cesium from "cesium";
+
 export interface FlightDemographics {
     icao?: string
     origin: string
@@ -47,6 +49,7 @@ interface ElementDisplayOptions {
 }
 
 export interface PointDisplayOptions extends ElementDisplayOptions {
+    cesiumColor: Cesium.Color
     outlineColor: string
     outlineSize: number
 }

@@ -144,13 +144,14 @@ describe("FlightStore", function() {
         describe('for points', function () {
             it('should update the point display options', function () {
                 expect(flightStore.pointDisplayOptions).toEqual(PointDisplayOptionDefaults);
-                const newColor = {
+                const newOptions = {
                     color: '#ff6699',
                 };
-                flightStore.updatePointDisplay(newColor);
+                flightStore.updatePointDisplay(newOptions);
                 const finalResult = cloneDeep(PointDisplayOptionDefaults)
-                merge<PointDisplayOptions,PointDisplayOptionsUpdate>(finalResult, newColor)
+                merge<PointDisplayOptions,PointDisplayOptionsUpdate>(finalResult, newOptions)
                 expect(flightStore.pointDisplayOptions).toEqual(finalResult);
+                expect(flightStore.pointDisplayOptions.cesiumColor.equals(Cesium.Color.fromCssColorString(newOptions.color))).toBeTruthy()
             });
         });
     })
