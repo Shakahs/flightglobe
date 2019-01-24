@@ -6,7 +6,7 @@ import * as Cesium from "cesium";
 import {FlightObj} from "../flightObj";
 import {PointPrimitive, Polyline} from "cesium";
 import {get} from 'lodash-es';
-import {TrailDisplayOptionDefaults} from "../flightStore";
+import {LabelDisplayOptionDefaults, TrailDisplayOptionDefaults} from "../flightStore";
 
 describe("FlightObj",function(){
     it("stores the correct FlightRecord", function() {
@@ -326,51 +326,67 @@ describe("FlightObj",function(){
     });
 
     describe('handles Labels', function () {
-        it("computes the correct Label display condition", function () {
-            expect<boolean>(flightObj.shouldLabelDisplay).toBeFalsy();
-            flightStore.updateDetailedFlights(new Map([[FlightAPosition1.body.geohash,true]]));
-            expect<boolean>(flightObj.shouldLabelDisplay).toBeTruthy();
-        });
 
-        it('by computing the correct label text when demographics are available', function(){
-            flightStore.addDemographics(FlightADemographic);
-            expect(flightObj.labelText.length).toBeGreaterThan(0);
-            expect(flightObj.labelText.indexOf("Tokyo")).toBeGreaterThan(0);
-        });
-
-        it('creates, displays, and destroys the Label', function () {
-            flightStore.updateDetailedFlights(new Map([[FlightAPosition1.body.geohash,true]]));
-            const flight = flightStore.flights.get(FlightAPosition1.icao);
-            if(flight && flight.label){
-                expect(flight.geoCollection.labels.contains(flight.label)).toBeTruthy();
-                expect(flight.label.position).toEqual(Cesium.Cartesian3.fromDegrees(
-                    FlightAPosition1.body.longitude,
-                    FlightAPosition1.body.latitude,
-                    FlightAPosition1.body.altitude,
-                ));
+        describe('basics',()=>{
+            it('by computing the correct label text when demographics are available', function(){
                 flightStore.addDemographics(FlightADemographic);
-                flightStore.updateDetailedFlights(new Map());
-                expect(flight.geoCollection.labels.contains(flight.label)).toBeFalsy();
-                expect(flight.label).toBeNull();
-            } else {
-                fail('flight or label not defined')
-            }
-        });
+                expect(flightObj.labelText.length).toBeGreaterThan(0);
+                expect(flightObj.labelText.indexOf("Tokyo")).toBeGreaterThan(0);
+            });
 
-        it('updates the Label position', function () {
-            flightStore.updateDetailedFlights(new Map([[FlightAPosition1.body.geohash,true]]));
-            flightStore.addOrUpdateFlight(FlightAPosition2);
-            flightStore.updateDetailedFlights(new Map([[FlightAPosition2.body.geohash,true]]));
-            const flight = flightStore.flights.get(FlightAPosition1.icao);
-            if(flight && flight.label){
-                expect(flight.label.position).toEqual(Cesium.Cartesian3.fromDegrees(
-                    FlightAPosition2.body.longitude,
-                    FlightAPosition2.body.latitude,
-                    FlightAPosition2.body.altitude,
-                ))
-            } else {
-                fail('flight or label not defined')
-            }
+            it('creates, displays, and destroys the Label', function () {
+                flightStore.updateDetailedFlights(new Map([[FlightAPosition1.body.geohash,true]]));
+                const flight = flightStore.flights.get(FlightAPosition1.icao);
+                if(flight && flight.label){
+                    expect(flight.geoCollection.labels.contains(flight.label)).toBeTruthy();
+                    expect(flight.label.position).toEqual(Cesium.Cartesian3.fromDegrees(
+                        FlightAPosition1.body.longitude,
+                        FlightAPosition1.body.latitude,
+                        FlightAPosition1.body.altitude,
+                    ));
+                    flightStore.addDemographics(FlightADemographic);
+                    flightStore.updateDetailedFlights(new Map());
+                    expect(flight.geoCollection.labels.contains(flight.label)).toBeFalsy();
+                    expect(flight.label).toBeNull();
+                } else {
+                    fail('flight or label not defined')
+                }
+            });
+
+            it('updates the Label position', function () {
+                flightStore.updateDetailedFlights(new Map([[FlightAPosition1.body.geohash,true]]));
+                flightStore.addOrUpdateFlight(FlightAPosition2);
+                flightStore.updateDetailedFlights(new Map([[FlightAPosition2.body.geohash,true]]));
+                const flight = flightStore.flights.get(FlightAPosition1.icao);
+                if(flight && flight.label){
+                    expect(flight.label.position).toEqual(Cesium.Cartesian3.fromDegrees(
+                        FlightAPosition2.body.longitude,
+                        FlightAPosition2.body.latitude,
+                        FlightAPosition2.body.altitude,
+                    ))
+                } else {
+                    fail('flight or label not defined')
+                }
+            })
+        })
+
+        describe('visibility',()=>{
+            it("computes the correct Label display condition", function () {
+                expect<boolean>(flightObj.shouldLabelDisplay).toBeFalsy();
+                flightStore.updateDetailedFlights(new Map([[FlightAPosition1.body.geohash,true]]));
+                expect<boolean>(flightObj.shouldLabelDisplay).toBeTruthy();
+            });
+        })
+
+        describe('display options', function(){
+            it('updates the label color', function(){
+                flightStore.updateDetailedFlights(new Map([[FlightAPosition1.body.geohash,true]]));
+                const label = flightObj.label as Cesium.Label;
+                expect(label.fillColor.equals(Cesium.Color.fromCssColorString(LabelDisplayOptionDefaults.color))).toBeTruthy();
+                const newColor = '#ff5b43';
+                flightStore.updateLabelDisplay({color:newColor});
+                expect(label.fillColor.equals(Cesium.Color.fromCssColorString(newColor))).toBeTruthy()
+            })
         })
 
     })
