@@ -1,10 +1,10 @@
 import * as React from 'react';
-import {FlightDemographics, FlightRecord, Icao} from "../types";
+import { FlightRecord} from "../types";
 import { observer } from "mobx-react"
-import {AgGridReact, AgGridColumn, AgGridColumnProps} from 'ag-grid-react';
-import {GridApi,AgGridEvent,FilterChangedEvent} from 'ag-grid-community'
+import {AgGridReact} from 'ag-grid-react';
+import {FilterChangedEvent} from 'ag-grid-community'
 import {FlightStore} from "../flightStore";
-import {GridReadyEvent} from "ag-grid-community/dist/lib/events";
+import {GridReadyEvent,SelectionChangedEvent} from "ag-grid-community/dist/lib/events";
 
 interface FlightTableProps {
     store: FlightStore
@@ -38,8 +38,9 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
                 }
             ]
         };
-        this.gridReady=this.gridReady.bind(this)
-        this.filterChanged=this.filterChanged.bind(this)
+        this.gridReady=this.gridReady.bind(this);
+        this.filterChanged=this.filterChanged.bind(this);
+        this.selectionChanged=this.selectionChanged.bind(this);
     }
 
     gridReady(event: GridReadyEvent){
@@ -78,6 +79,17 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
         this.props.store.updateFilteredFlights(resultMap);
     }
 
+    selectionChanged(event: SelectionChangedEvent){
+        if(event.api){
+            const selectedRows = event.api.getSelectedRows() as FlightRecord[];
+            const newSelectedMap = new Map<string,boolean>();
+            selectedRows.forEach((r)=>{
+                newSelectedMap.set(r.icao,true)
+            })
+            this.props.store.updateSelectedFlight(newSelectedMap)
+        }
+    }
+
     render() {
         return(
             <React.Fragment>
@@ -98,6 +110,7 @@ class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
                         }}
                         onFilterChanged={this.filterChanged}
                         onGridReady={this.gridReady}
+                        onSelectionChanged={this.selectionChanged}
                         enableSorting
                         enableFilter
                         rowSelection={'multiple'}

@@ -153,16 +153,16 @@ describe("FlightStore", function() {
 
     describe('handles display setting updates', function(){
         describe('for points', function () {
-            it('should update the point display options', function () {
+            it('should update the point display colors', function () {
                 expect(flightStore.pointDisplayOptions).toEqual(PointDisplayOptionDefaults);
-                const newOptions = {
+                const newOptions:PointDisplayOptionsUpdate = {
                     color: '#ff6699',
                 };
                 flightStore.updatePointDisplay(newOptions);
                 const finalResult = cloneDeep(PointDisplayOptionDefaults)
                 merge<PointDisplayOptions,PointDisplayOptionsUpdate>(finalResult, newOptions)
                 expect(flightStore.pointDisplayOptions).toEqual(finalResult);
-                expect(flightStore.pointDisplayOptions.cesiumColor.equals(Cesium.Color.fromCssColorString(newOptions.color))).toBeTruthy()
+                expect(flightStore.pointDisplayOptions.cesiumColor.equals(Cesium.Color.fromCssColorString(newOptions.color as string))).toBeTruthy()
             });
         });
 

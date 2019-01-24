@@ -43,7 +43,7 @@ export class FlightObj {
         const pointUpdater = autorun(() => {
             const newPosition = this.cartesianPosition;
             const shouldDisplay = this.shouldDisplay;
-            const displayOptions = this.flightStore.pointDisplayOptions;
+            const displayOptions = this.pointDisplayOptions;
             if (newPosition) {
                 this.renderPoint(newPosition, shouldDisplay, displayOptions)
             }
@@ -75,7 +75,7 @@ export class FlightObj {
         this.disposers = [pointVisibilityUpdater, pointUpdater, trailUpdater, labelUpdater];
     }
 
-    // essential data
+    // essential data - selection status
 
     @computed get isSelected(): boolean {
         return this.flightStore.selectedFlights.has(this.icao);
@@ -91,6 +91,8 @@ export class FlightObj {
     @computed get isFilterSelected(): boolean {
         return this.flightStore.filteredFlights.has(this.icao); // filter active, check the filter result
     }
+
+    // essential data - visibility
 
     @computed get shouldDisplay(): boolean {
         if(this.isSelected){ return true; }
@@ -140,6 +142,10 @@ export class FlightObj {
     }
 
     // points
+
+    @computed get pointDisplayOptions(): PointDisplayOptions {
+        return this.isSelected ? this.flightStore.selectedPointDisplayOptions : this.flightStore.pointDisplayOptions;
+    }
 
     renderPoint(pos: Cartesian3, visibility: boolean, displayOptions: PointDisplayOptions) {
         if (this.point) {

@@ -6,7 +6,7 @@ import * as Cesium from "cesium";
 import {FlightObj} from "../flightObj";
 import {PointPrimitive, Polyline} from "cesium";
 import {get} from 'lodash-es';
-import {LabelDisplayOptionDefaults, TrailDisplayOptionDefaults} from "../flightStore";
+import {LabelDisplayOptionDefaults, PointDisplayOptionDefaults, TrailDisplayOptionDefaults} from "../flightStore";
 
 describe("FlightObj",function(){
     it("stores the correct FlightRecord", function() {
@@ -20,7 +20,7 @@ describe("FlightObj",function(){
 
     describe('computes essential data', function(){
 
-        describe('by computing', function(){
+        describe('by computing selection status', function(){
             it('if a flight is selected', function(){
                 expect(flightObj.isSelected).toEqual(false);
                 flightStore.updateSelectedFlight(new Map<string,boolean>([[FlightAPosition1.icao,true]]));
@@ -42,7 +42,7 @@ describe("FlightObj",function(){
             });
         })
 
-        describe('by determining if a flight should display', function () {
+        describe('by determining visibility', function () {
             it('when there are no filters or selection', function(){
                 expect(flightObj.shouldDisplay).toBeTruthy();
             });
@@ -128,7 +128,7 @@ describe("FlightObj",function(){
         });
     })
 
-    describe('handles Points', function () {
+    describe('handles Point', function () {
 
         // xit("computes the correct Point display condition", function () {
         //     expect<boolean>(flightObj.shouldPointDisplay).toBeTruthy()
@@ -221,12 +221,25 @@ describe("FlightObj",function(){
         })
 
         describe('display options', function(){
-            it('updates the point color', function(){
+            it('by using an updated the color', function(){
                 const point = flightObj.point as PointPrimitive;
                 expect(point.color.equals(Cesium.Color.fromCssColorString('#3399ff'))).toBeTruthy();
                 const newColor = '#ff5b43';
                 flightStore.updatePointDisplay({color: newColor});
                 expect(point.color.equals(Cesium.Color.fromCssColorString(newColor))).toBeTruthy()
+            });
+
+            it('by deriving the correct color when the point is selected', ()=>{
+                expect(flightObj.pointDisplayOptions).toEqual(flightStore.pointDisplayOptions);
+                flightStore.updateSelectedFlight(newICAOMap([FlightAPosition1.icao]));
+                expect(flightObj.pointDisplayOptions).toEqual(flightStore.selectedPointDisplayOptions);
+            });
+
+            it('by using the correct color when the point is selected', ()=>{
+                const point = flightObj.point as PointPrimitive;
+                expect(point.color.equals(flightStore.pointDisplayOptions.cesiumColor)).toBeTruthy();
+                flightStore.updateSelectedFlight(newICAOMap([FlightAPosition1.icao]));
+                expect(point.color.equals(flightStore.selectedPointDisplayOptions.cesiumColor)).toBeTruthy();
             })
         })
 

@@ -33,6 +33,14 @@ export const PointDisplayOptionDefaults:PointDisplayOptions = {
     outlineSize: 1,
 };
 
+export const SelectedPointDisplayOptionDefaults:PointDisplayOptions = {
+    color: '#ff3426',
+    cesiumColor: Cesium.Color.fromCssColorString('#ff3426'),
+    size: 4,
+    outlineColor: '#FFF',
+    outlineSize: 1,
+};
+
 export const TrailDisplayOptionDefaults:TrailDisplayOptions = {
     color: '#3399ff',
     cesiumColor: Cesium.Color.fromCssColorString('#3399ff'),
@@ -56,6 +64,7 @@ export class FlightStore {
     viewer:Cesium.Viewer;
     cameraEventDisposer:Cesium.Event.RemoveCallback;
     @observable pointDisplayOptions:PointDisplayOptions = PointDisplayOptionDefaults;
+    @observable selectedPointDisplayOptions:PointDisplayOptions = SelectedPointDisplayOptionDefaults;
     @observable trailDisplayOptions:TrailDisplayOptions = TrailDisplayOptionDefaults;
     @observable labelDisplayOptions:LabelDisplayOptions = LabelDisplayOptionDefaults;
     @observable isFiltered:boolean = false;
