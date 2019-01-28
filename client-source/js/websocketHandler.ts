@@ -13,8 +13,10 @@ export default class WebsocketHandler {
     wsAutorunDisposer: IReactionDisposer;
     wsCallbackReactionDisposer: IReactionDisposer;
 
-    constructor(wsCallback: (msg: Message[])=>void = noop, url: string = `ws://${ window.location.host }/sub`, shouldSubscribe: boolean = true) {
-        this.url = url;
+    constructor(wsCallback: (msg: Message[])=>void = noop, providedUrl: string = '', shouldSubscribe: boolean = true) {
+
+        const wsProtocol = (window.location.protocol.toLowerCase() === 'https:') ? 'wss' : 'ws';
+        this.url = (providedUrl!=='') ? providedUrl : `${wsProtocol}://${ window.location.host }/sub`;
         this.shouldSubscribe = shouldSubscribe;
         this.wsCallback = wsCallback;
 
