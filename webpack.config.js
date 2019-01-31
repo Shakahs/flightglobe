@@ -63,12 +63,12 @@ module.exports = {
       favicon: 'client-source/favicon.png',
     }),
     // Copy Cesium Assets, Widgets, and Workers to a static directory
-    new CopyWebpackPlugin([{ from: path.join(cesiumSource, cesiumWorkers), to: 'Workers' }]),
-    new CopyWebpackPlugin([{ from: path.join(cesiumSource, 'Assets'), to: 'Assets' }]),
-    new CopyWebpackPlugin([{ from: path.join(cesiumSource, 'Widgets'), to: 'Widgets' }]),
+    new CopyWebpackPlugin([{ from: path.join(cesiumSource, cesiumWorkers), to: 'cesium/Workers/' }]),
+    new CopyWebpackPlugin([{ from: path.join(cesiumSource, 'Assets'), to: 'cesium/Assets/' }]),
+    new CopyWebpackPlugin([{ from: path.join(cesiumSource, 'Widgets'), to: 'cesium/Widgets/' }]),
     new webpack.DefinePlugin({
       // Define relative base path in cesium for loading assets
-      CESIUM_BASE_URL: JSON.stringify(''),
+      CESIUM_BASE_URL: JSON.stringify('/cesium'),
       MAPTILER_KEY: JSON.stringify(process.env.MAPTILER_KEY),
     }),
 
@@ -81,7 +81,7 @@ module.exports = {
     disableHostCheck: true,
     proxy: [
       {
-        context: ['/api', '/cesium', '/data', '/updates', '/sub', '/track'],
+        context: ['/sub', '/track'],
         target: `http://localhost:${ process.env.PORT }`,
         ws: true,
       },

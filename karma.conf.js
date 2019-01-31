@@ -11,8 +11,17 @@ module.exports = function (config) {
     files: [
       { pattern: 'client-source/**/*.test.ts' },
       { pattern: 'client-source/**/*.test.tsx' },
+      {
+        pattern: 'node_modules/cesium/Source/**/*.*',
+        included: false,
+        served: true,
+        watched: false,
+      },
       // 'client-source/js/spec/index.ts',
     ],
+    proxies: {
+      '/cesium/': 'base/node_modules/cesium/Source/',
+    },
     browsers: ['ChromeHeadless'],
     webpack: webpackConfig,
     autoWatchBatchDelay: 1000,
