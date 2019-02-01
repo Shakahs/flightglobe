@@ -33,7 +33,7 @@ describe("FlightStore", function() {
             expect(viewer.camera.changed.numberOfListeners).toBeGreaterThanOrEqual(2)
         });
 
-        it('by responding to camera changes', function(done){
+        xit('by responding to camera changes', function(done){
             const originalGeo = flightStore.detailedFlights.toJS();
             expect(flightStore.detailedFlights.has(FlightAPosition1.body.geohash)).toBeFalsy();
 

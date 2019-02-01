@@ -117,20 +117,21 @@ describe('websocketHandler handles connection housekeeping',()=>{
     });
 
     it('send update requests',(done)=>{
+
         const updateRequest: UpdateRequest = {lastReceivedTimestamp: 22222};
 
         mockServer.on('connection', socket => {
-            wsh.send(updateRequest);
-
             //@ts-ignore
             socket.on('message', data =>{
                 expect(JSON.parse(data)).toEqual(updateRequest);
                 done()
             })
+
+            wsh.send(updateRequest);
         });
 
         const wsh = new WebsocketHandler(undefined,testServerURL);
-    })
+    }, 20000)
 
     xit('gives a message to the callback',(done)=>{
         mockServer.on('connection', socket => {

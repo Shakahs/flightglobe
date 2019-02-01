@@ -41,8 +41,8 @@ export class Globe {
     }
 
     updateImagery(newImagery: ImageryProvider){
-        var layers = this.viewer.imageryLayers;
-        var currentLayer = layers.get(0);
+        const layers = this.viewer.imageryLayers;
+        const currentLayer = layers.get(0);
         layers.remove(currentLayer);
         layers.addImageryProvider(newImagery)
     }
