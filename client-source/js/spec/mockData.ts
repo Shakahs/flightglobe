@@ -7,7 +7,7 @@ export const FlightAPosition1: PositionUpdate = {
         latitude: 55,
         longitude: 33,
         heading: 100,
-        geohash: "abc"
+        geohash: "u9z"
     },
     type: "positionUpdate",
     icao: "ABCDEF"
@@ -19,7 +19,7 @@ export const FlightAPosition2: PositionUpdate = {
         latitude: 1,
         longitude: 1,
         heading: 101,
-        geohash: "abc"
+        geohash: "s00"
     },
     type: "positionUpdate",
     icao: "ABCDEF"
@@ -40,7 +40,7 @@ export const FlightBPosition1: PositionUpdate = {
         latitude: 55,
         longitude: 33,
         heading: 100,
-        geohash: "bcd"
+        geohash: "u9z"
     },
     type: "positionUpdate",
     icao: "BCDEF"
@@ -52,7 +52,7 @@ export const FlightCPosition1: PositionUpdate = {
         latitude: 55,
         longitude: 33,
         heading: 100,
-        geohash: "abc"
+        geohash: "u9z"
     },
     type: "positionUpdate",
     icao: "ZZZF"

@@ -33,13 +33,13 @@ describe("FlightStore", function() {
             expect(viewer.camera.changed.numberOfListeners).toBeGreaterThanOrEqual(2)
         });
 
-        xit('by responding to camera changes', function(done){
-            // spyOn(flightStore,'updateDetailedFlights');
-            expect(flightObj.shouldDisplayDetailed).toBeFalsy();
+        it('by responding to camera changes', function(done){
+            const originalGeo = flightStore.detailedFlights.toJS();
+            expect(flightStore.detailedFlights.has(FlightAPosition1.body.geohash)).toBeFalsy();
 
             const test = ()=>{
-                // expect(flightStore.updateDetailedFlights).toHaveBeenCalled();
-                expect(flightObj.shouldDisplayDetailed).toBeTruthy();
+                expect(flightStore.detailedFlights.toJS()).not.toEqual(originalGeo);
+                expect(flightStore.detailedFlights.has(FlightAPosition1.body.geohash)).toBeTruthy();
                 done()
             };
 

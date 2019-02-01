@@ -71,18 +71,24 @@ export class FlightStore {
 
     constructor(viewer: Cesium.Viewer){
         this.viewer = viewer;
-        this.cameraEventDisposer = viewer.camera.changed.addEventListener(() => {
-          const ellipsoid = this.viewer.scene.globe.ellipsoid;
-          const cameraPosition = ellipsoid.cartesianToCartographic(this.viewer.camera.position);
-          const focusGeo = Geohash.encode(cameraPosition.latitude*180/Math.PI,
-              cameraPosition.longitude*180/Math.PI, 3);
-          const newGeoResult=new Map<string,boolean>();
-          newGeoResult.set(focusGeo,true);
-          forEach(Geohash.neighbours(focusGeo), (neighbor)=>{
-                newGeoResult.set(neighbor,true);
-          })
-          this.updateDetailedFlights(newGeoResult);
+        this.cameraEventDisposer = viewer.camera.changed.addEventListener(this.handleCameraChange.bind(this));
+    }
+
+    getCameraPositionGeohash():string{
+        const ellipsoid = this.viewer.scene.globe.ellipsoid;
+        const cameraPosition = ellipsoid.cartesianToCartographic(this.viewer.camera.position);
+        return Geohash.encode(cameraPosition.latitude*180/Math.PI,
+            cameraPosition.longitude*180/Math.PI, 3);
+    }
+
+    handleCameraChange(){
+        const focusGeo = this.getCameraPositionGeohash();
+        const newGeoResult=new Map<string,boolean>();
+        newGeoResult.set(focusGeo,true);
+        forEach(Geohash.neighbours(focusGeo), (neighbor)=>{
+            newGeoResult.set(neighbor,true);
         });
+        this.updateDetailedFlights(newGeoResult);
     }
 
     getOrCreateGeoCollection(id: string):GeoCollection{
@@ -222,7 +228,7 @@ export class FlightStore {
     destroy(){
         this.flights.forEach((f)=>f.destroy());
         this.geoAreas.forEach((f)=>f.destroy());
-        // this.cameraEventDisposer();
+        this.cameraEventDisposer();
     }
 }
 
