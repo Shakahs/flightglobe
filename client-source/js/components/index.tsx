@@ -23,7 +23,7 @@ pollInterval.subscribe(()=>{
 
 ReactDOM.render(
     <App
-        viewer={globe.viewer}
+        globe={globe}
         flightStore={flightStore}
     />,
     document.getElementById('reactApp'));

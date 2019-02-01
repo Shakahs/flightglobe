@@ -6,17 +6,19 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import {faCog} from '@fortawesome/free-solid-svg-icons/faCog'
 import {faFilter} from '@fortawesome/free-solid-svg-icons/faFilter'
 import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch'
+import {faGlobeAmericas} from '@fortawesome/free-solid-svg-icons/faGlobeAmericas'
 import {FlightStore} from "../flightStore";
 import LoadingScreen from "./LoadingScreen/LoadingScreen";
 import classnames from 'classnames';
 import { hot } from 'react-hot-loader/root'
 import Settings from "./Settings/Settings";
+import {Globe} from "../globe/globe";
 
-library.add(faCog,faFilter,faCircleNotch);
+library.add(faCog,faFilter,faCircleNotch,faGlobeAmericas);
 
 interface AppProps {
     flightStore: FlightStore
-    viewer: Cesium.Viewer
+    globe: Globe
 }
 
 interface AppState {
@@ -51,7 +53,7 @@ class App extends React.Component<AppProps, AppState> {
     render() {
         return (
             <React.Fragment>
-                <LoadingScreen viewer={this.props.viewer}/>
+                <LoadingScreen viewer={this.props.globe.viewer}/>
                 <Settings
                     showModal={this.state.showInfoModal}
                     toggleModal={this.toggleSettingsModal}
@@ -60,6 +62,7 @@ class App extends React.Component<AppProps, AppState> {
                 <Menu
                     toggleShowFlightTable={this.toggleShowFlightTable}
                     toggleShowInfoModal={this.toggleSettingsModal}
+                    globe={this.props.globe}
                 />
                 <div
                     className={classnames('px-2', 'pb-2', 'flightTable', {'fixed-bottom':this.state.showFlightTable})}

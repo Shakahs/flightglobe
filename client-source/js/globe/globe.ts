@@ -44,9 +44,13 @@ export class Globe {
     @action
     selectImagery(selection: GlobeImageryTypes){
         let newImagery:UrlTemplateImageryProvider|undefined;
-        if(selection===GlobeImageryTypes.satellite){
+        if(selection===GlobeImageryTypes.satellite && this.selectedImagery !== GlobeImageryTypes.satellite){
             this.selectedImagery = GlobeImageryTypes.satellite;
             newImagery = this.provideMapTilerSatellite()
+        }
+        if(selection===GlobeImageryTypes.topographic && this.selectedImagery !== GlobeImageryTypes.topographic){
+            this.selectedImagery = GlobeImageryTypes.topographic;
+            newImagery = this.provideMapTilerTopo()
         }
         if(newImagery){
             this.viewer.imageryLayers.removeAll();
@@ -65,7 +69,7 @@ export class Globe {
     provideMapTilerSatellite():UrlTemplateImageryProvider {
         return new Cesium.UrlTemplateImageryProvider({
             //@ts-ignore
-            url: `https://maps.tilehosting.com/styles/hybrid/{z}/{x}/{y}.png?key=${MAPTILER_KEY}`,
+            url: `https://maps.tilehosting.com/styles/hybrid/{z}/{x}/{y}.jpg?key=${MAPTILER_KEY}`,
             maximumLevel: this.maxZoom
         })
     }

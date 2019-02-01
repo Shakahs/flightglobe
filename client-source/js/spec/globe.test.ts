@@ -17,10 +17,18 @@ describe("the Globe class", ()=>{
             expect(globe.selectedImagery).toEqual(GlobeImageryTypes.topographic);
         });
 
+        it('switches to the topo imagery when asked', ()=>{
+            globe.selectImagery(GlobeImageryTypes.satellite);
+            globe.selectImagery(GlobeImageryTypes.topographic);
+            const activeProvider = globe.viewer.imageryLayers.get(0).imageryProvider as UrlTemplateImageryProvider;
+            expect(activeProvider.url.indexOf('https://maps.tilehosting.com/styles/topo/{z}/{x}/{y}.png?')).toEqual(0)
+            expect(globe.selectedImagery).toEqual(GlobeImageryTypes.topographic);
+        });
+
         it('switches to the satellite imagery when asked', ()=>{
             globe.selectImagery(GlobeImageryTypes.satellite);
             const activeProvider = globe.viewer.imageryLayers.get(0).imageryProvider as UrlTemplateImageryProvider;
-            expect(activeProvider.url.indexOf('https://maps.tilehosting.com/styles/hybrid/{z}/{x}/{y}.png?')).toEqual(0)
+            expect(activeProvider.url.indexOf('https://maps.tilehosting.com/styles/hybrid/{z}/{x}/{y}.jpg?')).toEqual(0)
             expect(globe.selectedImagery).toEqual(GlobeImageryTypes.satellite);
         });
     })
