@@ -1,11 +1,12 @@
 import * as Cesium from 'cesium';
-import axios from 'axios';
-import {UrlTemplateImageryProvider} from "cesium";
-import {ImageryProvider} from "cesium";
+import {UrlTemplateImageryProvider} from 'cesium';
+import {action, observable} from "mobx";
+import {GlobeImageryTypes} from "../types";
 
 export class Globe {
     viewer: Cesium.Viewer;
     maxZoom: number = 13;
+    @observable selectedImagery: GlobeImageryTypes = GlobeImageryTypes.topographic;
 
     constructor(container: Element | string){
         this.viewer = new Cesium.Viewer(container, {
@@ -40,11 +41,17 @@ export class Globe {
         this.viewer.camera.percentageChanged = 0.3;
     }
 
-    updateImagery(newImagery: ImageryProvider){
-        const layers = this.viewer.imageryLayers;
-        const currentLayer = layers.get(0);
-        layers.remove(currentLayer);
-        layers.addImageryProvider(newImagery)
+    @action
+    selectImagery(selection: GlobeImageryTypes){
+        let newImagery:UrlTemplateImageryProvider|undefined;
+        if(selection===GlobeImageryTypes.satellite){
+            this.selectedImagery = GlobeImageryTypes.satellite;
+            newImagery = this.provideMapTilerSatellite()
+        }
+        if(newImagery){
+            this.viewer.imageryLayers.removeAll();
+            this.viewer.imageryLayers.addImageryProvider(newImagery)
+        }
     }
 
     provideMapTilerTopo():UrlTemplateImageryProvider {

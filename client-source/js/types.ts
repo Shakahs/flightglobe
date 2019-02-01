@@ -71,3 +71,8 @@ export interface AircraftModelData  {
         name: string
     }
 }
+
+export enum GlobeImageryTypes {
+    satellite='satellite',
+    topographic='topographic'
+}
