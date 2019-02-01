@@ -1,18 +1,19 @@
 import "@babel/polyfill";
 import 'cesiumSource/Widgets/widgets.css';
-import {viewer} from '../globe/globe';
 import {interval} from 'rxjs';
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import {FlightStore} from '../flightStore'
-import applyClickHandler from "../globe/clickHandler";
+// import applyClickHandler from "../globe/clickHandler";
 import App from "./app";
 import WebsocketHandler from "../websocketHandler";
 import '../styles.scss'
+import {Globe} from "../globe/globe";
 
-const flightStore = new FlightStore(viewer);
+const globe = new Globe('cesiumContainer');
+const flightStore = new FlightStore(globe.viewer);
 const wsh = new WebsocketHandler(flightStore.routeUpdate.bind(flightStore));
-applyClickHandler(viewer, flightStore)
+// applyClickHandler(viewer, flightStore)
 
 const pollInterval = interval(5000);
 pollInterval.subscribe(()=>{
@@ -22,7 +23,7 @@ pollInterval.subscribe(()=>{
 
 ReactDOM.render(
     <App
-        viewer={viewer}
+        viewer={globe.viewer}
         flightStore={flightStore}
     />,
     document.getElementById('reactApp'));

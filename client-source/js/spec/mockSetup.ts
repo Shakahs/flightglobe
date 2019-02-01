@@ -2,16 +2,19 @@ import * as Cesium from "cesium";
 import {FlightStore} from "../flightStore";
 import {FlightAPosition1, FlightBPosition1} from "./mockData";
 import {FlightObj} from "../flightObj";
+import {Globe} from "../globe/globe";
 
 
 export let viewer: Cesium.Viewer;
+export let globe: Globe;
 export let flightStore: FlightStore;
 export let flightObj: FlightObj;
 
 beforeAll(function() {
     const cesiumDiv = document.createElement('div');
     document.body.appendChild(cesiumDiv);
-    viewer = new Cesium.Viewer(cesiumDiv);
+    globe = new Globe(cesiumDiv);
+    viewer = globe.viewer;
 });
 
 beforeEach(function() {
