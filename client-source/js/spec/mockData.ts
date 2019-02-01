@@ -16,10 +16,10 @@ export const FlightAPosition2: PositionUpdate = {
     body: {
         timestamp: Date.now(),
         altitude: 10000,
-        latitude: 1,
-        longitude: 1,
+        latitude: 55,
+        longitude: 34,
         heading: 101,
-        geohash: "s00"
+        geohash: "ucb"
     },
     type: "positionUpdate",
     icao: "ABCDEF"
@@ -37,10 +37,10 @@ export const FlightBPosition1: PositionUpdate = {
     body: {
         timestamp: Date.now(),
         altitude: 9000,
-        latitude: 55,
-        longitude: 33,
+        latitude: 22,
+        longitude: -33,
         heading: 100,
-        geohash: "u9z"
+        geohash: "e7b"
     },
     type: "positionUpdate",
     icao: "BCDEF"
@@ -49,10 +49,10 @@ export const FlightCPosition1: PositionUpdate = {
     body: {
         timestamp: Date.now(),
         altitude: 9000,
-        latitude: 55,
-        longitude: 33,
+        latitude: 11,
+        longitude: 11,
         heading: 100,
-        geohash: "u9z"
+        geohash: "s1z"
     },
     type: "positionUpdate",
     icao: "ZZZF"

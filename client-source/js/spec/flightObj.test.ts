@@ -150,7 +150,7 @@ describe("FlightObj",function(){
                 }
             });
 
-            it("by updating the Point Primitive location reactively", function () {
+            it("by updating the Point Primitive location reactively inside the same geohash boundary", function () {
                 expect(flightObj.point).not.toBeNull();
                 const point = flightObj.point;
                 if(point){
@@ -293,7 +293,7 @@ describe("FlightObj",function(){
             it('when LOD increases', function(){
                 expect<boolean>(flightObj.shouldTrailDisplay).toBeFalsy();
                 flightStore.addOrUpdateFlight(FlightAPosition2);
-                flightStore.updateDetailedFlights(new Map([[FlightAPosition1.body.geohash,true]]));
+                flightStore.updateDetailedFlights(new Map([[FlightAPosition2.body.geohash,true]]));
                 expect<boolean>(flightObj.shouldTrailDisplay).toBeTruthy();
             })
 

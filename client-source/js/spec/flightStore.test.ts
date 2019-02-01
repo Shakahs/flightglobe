@@ -118,8 +118,8 @@ describe("FlightStore", function() {
 
         it("by creating Geo resources", function() {
             expect(flightStore.numberGeos()).toEqual(2);
-            expect(flightStore.geoAreas.has("a")).toBeTruthy();
-            expect(flightStore.geoAreas.has("b")).toBeTruthy();
+            expect(flightStore.geoAreas.has("u")).toBeTruthy();
+            expect(flightStore.geoAreas.has("e")).toBeTruthy();
             expect(flightStore.geoAreas.has("c")).toBeFalsy();
         });
 
