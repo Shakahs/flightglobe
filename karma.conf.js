@@ -26,6 +26,6 @@ module.exports = function (config) {
     webpack: webpackConfig,
     autoWatchBatchDelay: 1000,
     restartOnFileChange: true,
-    captureTimeout: 5000,
+    captureTimeout: 10000,
   });
 };
