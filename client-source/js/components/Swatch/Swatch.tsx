@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Collapse from "reactstrap/lib/Collapse";
 import Container from "../Settings/PointSettings";
-import {Color, ColorResult, GithubPicker} from "react-color";
+import {Color, ColorState, GithubPicker} from "react-color";
 
 interface SwatchProps {
     color: string,
@@ -37,7 +37,7 @@ class Swatch extends React.Component<SwatchProps, SwatchState> {
                 <Collapse isOpen={this.state.pickerOpen}>
                     <GithubPicker
                         color={this.props.color}
-                        onChangeComplete={(color:ColorResult)=>this.props.onChange(color.hex)}
+                        onChangeComplete={(color:ColorState)=>this.props.onChange(color.hex)}
                     />
                 </Collapse>
             </React.Fragment>

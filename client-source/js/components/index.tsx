@@ -1,4 +1,5 @@
-import "@babel/polyfill";
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 import 'cesiumSource/Widgets/widgets.css';
 import {interval} from 'rxjs';
 import * as React from 'react';
