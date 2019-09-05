@@ -123,6 +123,7 @@ describe('websocketHandler handles connection housekeeping',()=>{
         mockServer.on('connection', socket => {
             //@ts-ignore
             socket.on('message', data =>{
+                //@ts-ignore
                 expect(JSON.parse(data)).toEqual(updateRequest);
                 done()
             })
