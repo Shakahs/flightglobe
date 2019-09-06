@@ -65,16 +65,19 @@ class LoadingScreen extends React.Component<LoadingScreenProps, LoadingScreenSta
                         Flight Globe
                 </ModalHeader>
                 <ModalBody>
-                    <p>Welcome to Flight Globe, a real-time map of worldwide air traffic. Every dot you see is the live location of an  aircraft in transit right now.</p>
+                    <p>Welcome to Flight Globe, a real-time map of worldwide air traffic. Every point you see is an aircraft.</p>
                 </ModalBody>
                 <ModalFooter>
+                    {!this.state.cesiumReady &&
+                        <FontAwesome icon='circle-notch' spin/>
+                    }
                     <Button
                         disabled={!this.state.cesiumReady}
                         className={'bg-white text-dark'}
                         onClick={this.toggle}>
                         {this.state.cesiumReady
                             ? <span>Continue</span> :
-                            <FontAwesome icon='circle-notch' spin />
+                            <span>Loading</span>
                         }
                     </Button>
                 </ModalFooter>
