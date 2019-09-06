@@ -1,26 +1,24 @@
 ## FlightGlobe
 
-FlightGlobe is an application to visualize global air traffic in a useful way.
+FlightGlobe is a tool for visualizing global air traffic in a useful way.
 
-It is a fullstack application consisting of multiple backend services and a JavaScript SPA client. 
+[Demo here](https://www.flight.earth)
+ 
+It projects near real-time flight positions with accurate latitude, longitude, and altitude over a 3D globe. Users can also view a table of flight data and filter visible flights by various parameters. FlightGlobe is meant to be an alternative to other visualization tools that project flight data over 2D maps.  
 
-##### Project Structure
+FlightGlobe consists of a web-based client to display flight positions and backend services to obtain and serve the flight position data.  
 
-./dataserver contains the backend components, primarily fr-collector, redis-point-persistor, and fg-server. 
+##### Backend
 
-./client-source is the frontend application.
+The backend consists of containerized Collector, Persistor, and Server services written in Golang, deployed to Kubernetes, and communicating via Redis Pub/Sub.
 
-##### Backend Design
+Collectors load flight position updates from upstream APIs, filter invalid data, transform accepted data into a standardized format, and publish it to Redis Pub/Sub. 
 
-The backend consists of Collector, Persistor, and Server services written in Golang and communicating via Redis Pub/Sub.
+Persistors subscribe to the collector data, further transform it, and save it to a datastore or publish it to a Pub/Sub channel.
 
-Collectors load flight position updates from one of several upstream APIs, filter bad data, transform good data into a standardized format, and publish it to Redis Pub/Sub. 
+Servers subscribe to the persisted data and serve it to clients via WebSocket connections, in addition to serving the static files that make up the frontend application.  
 
-Persistors subscribe to the collector data and save it to a datastore. Persistors enforce rules like preventing duplicate position updates or too frequent position updates.
-
-Servers accept client connections and serve both the frontend application files and the position update.  
-
-##### Frontend Design
+##### Frontend
 
 The frontend is a TypeScript application that utilizes MobX for reactive state, CesiumJS for the 3D globe, and React for the settings and data filtering UI. 
 
