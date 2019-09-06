@@ -52,3 +52,7 @@ html, body, #cesiumContainer {
 .ag-theme-balham-dark .ag-header {
  background-color: lighten(#1c1f20, 20%);
 }
+
+.cesium-viewer-toolbar {
+    z-index: 1000;
+}

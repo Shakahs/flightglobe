@@ -35,6 +35,9 @@ class Menu extends React.Component<MenuProps, MenuState> {
         return (
             <div
             className={'fixed-top p-2'}
+            style={{
+                zIndex: 10
+            }}
             >
                 <Button
                     className={'mr-1'}

@@ -18,7 +18,7 @@ export class Globe {
             sceneModePicker: false,
             selectionIndicator: true,
             timeline: false,
-            navigationHelpButton: false,
+            navigationHelpButton: true,
             scene3DOnly: true,
             requestRenderMode: true,
             maximumRenderTimeChange : Infinity,
