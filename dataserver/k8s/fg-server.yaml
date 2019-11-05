@@ -1,29 +1,29 @@
 apiVersion: apps/v1
 kind: "Deployment"
 metadata:
-  name: "fg-server"
-  labels:
-    app: fg-server
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
+   name: "fg-server"
+   labels:
       app: fg-server
-  template:
-    metadata:
-      labels:
-        app: fg-server
-    spec:
-      containers:
-      - name: fg-server
-        image: gcr.io/flight-globe/fg-server
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 8081
-        env:
-        - name: REDIS_ADDRESS
-          value: redis-service
-        - name: REDIS_PORT
-          value: "6379"
-        - name: REDIS_SUB_CHANNEL
-          value: positions_clean
+spec:
+   replicas: 1
+   selector:
+      matchLabels:
+         app: fg-server
+   template:
+      metadata:
+         labels:
+            app: fg-server
+      spec:
+         containers:
+            - name: fg-server
+              image: gcr.io/flight-globe/fg-server
+              imagePullPolicy: Always
+              ports:
+                 - containerPort: 8081
+              env:
+                 - name: REDIS_ADDRESS
+                   value: redis-service
+                 - name: REDIS_PORT
+                   value: "6379"
+                 - name: REDIS_SUB_CHANNEL
+                   value: positions_clean

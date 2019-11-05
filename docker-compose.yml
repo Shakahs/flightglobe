@@ -1,56 +1,56 @@
-version: '2'
+version: "2"
 services:
-  redis:
-    image: redis
-    ports:
-      -  "6379:6379"
-  benthos:
-    image: jeffail/benthos
-    ports:
-      -  "4195:4195"
-    links:
-      - redis
-    environment:
-      INPUT_TYPE: redis_pubsub
-      INPUT_REDIS_PUBSUB_URL: tcp://redis:6379
-      INPUT_REDIS_PUBSUB_CHANNELS: new_data
-      OUTPUT_TYPE: redis_pubsub
-      OUTPUT_REDIS_PUBSUB_URL: tcp://redis:6379
-      OUTPUT_REDIS_PUBSUB_CHANNEL: persist_data
-  db:
-    image: pipelinedb/pipelinedb
-    ports:
-      - 5432:5432
-  fr-collector:
-    image: fr-collector
-    links:
-    - redis
-    depends_on:
-    - redis-point-persistor
-    environment:
-      REDIS_ADDRESS: redis
-      REDIS_PORT: 6379
-      REDIS_PUB_CHANNEL: new_data
-      REDIS_DATA_KEY: flight_positions
-  redis-point-persistor:
-    image: redis-point-persistor
-    links:
-    - redis
-    environment:
-      REDIS_ADDRESS: redis
-      REDIS_PORT: 6379
-      REDIS_SUB_CHANNEL: new_data
-      REDIS_DATA_KEY: flight_positions
-  fg-server:
-    image: fg-server
-    links:
-    - redis
-    ports:
-      - 5000:8080
-    environment:
-      REDIS_ADDRESS: redis
-      REDIS_PORT: 6379
-      REDIS_DATA_KEY: flight_positions
+   redis:
+      image: redis
+      ports:
+         - "6379:6379"
+   benthos:
+      image: jeffail/benthos
+      ports:
+         - "4195:4195"
+      links:
+         - redis
+      environment:
+         INPUT_TYPE: redis_pubsub
+         INPUT_REDIS_PUBSUB_URL: tcp://redis:6379
+         INPUT_REDIS_PUBSUB_CHANNELS: new_data
+         OUTPUT_TYPE: redis_pubsub
+         OUTPUT_REDIS_PUBSUB_URL: tcp://redis:6379
+         OUTPUT_REDIS_PUBSUB_CHANNEL: persist_data
+   db:
+      image: pipelinedb/pipelinedb
+      ports:
+         - 5432:5432
+   fr-collector:
+      image: fr-collector
+      links:
+         - redis
+      depends_on:
+         - redis-point-persistor
+      environment:
+         REDIS_ADDRESS: redis
+         REDIS_PORT: 6379
+         REDIS_PUB_CHANNEL: new_data
+         REDIS_DATA_KEY: flight_positions
+   redis-point-persistor:
+      image: redis-point-persistor
+      links:
+         - redis
+      environment:
+         REDIS_ADDRESS: redis
+         REDIS_PORT: 6379
+         REDIS_SUB_CHANNEL: new_data
+         REDIS_DATA_KEY: flight_positions
+   fg-server:
+      image: fg-server
+      links:
+         - redis
+      ports:
+         - 5000:8080
+      environment:
+         REDIS_ADDRESS: redis
+         REDIS_PORT: 6379
+         REDIS_DATA_KEY: flight_positions
 #  static:
 #    image: gcr.io/flight-globe/static
 #    ports:

@@ -1,126 +1,127 @@
-import * as React from 'react';
-import { FlightRecord} from "../../types";
-import { observer } from "mobx-react"
-import {AgGridReact} from 'ag-grid-react';
-import {FilterChangedEvent} from 'ag-grid-community'
-import {FlightStore} from "../../flightStore";
-import {GridReadyEvent,SelectionChangedEvent} from "ag-grid-community/dist/lib/events";
+import * as React from "react";
+import { FlightRecord } from "../../types";
+import { observer } from "mobx-react";
+import { AgGridReact } from "ag-grid-react";
+import { FilterChangedEvent } from "ag-grid-community";
+import { FlightStore } from "../../flightStore";
+import {
+   GridReadyEvent,
+   SelectionChangedEvent
+} from "ag-grid-community/dist/lib/events";
 
 interface FlightTableProps {
-    store: FlightStore
+   store: FlightStore;
 }
 
 interface FlightTableState {
-    columnDefs: any,
+   columnDefs: any;
 }
 
 @observer
-class FlightTable extends React.Component<FlightTableProps,FlightTableState> {
-    constructor(props){
-        super(props);
-        this.state = {
-            columnDefs: [
-                {field:"icao"},
-                {
-                    field:"demographic.origin",
-                    headerName: "Origin",
-                    filter:'agTextColumnFilter'
-                },
-                {
-                    field:"demographic.destination",
-                    headerName: "Destination",
-                    filter:'agTextColumnFilter'
-                },
-                {
-                    field:"demographic.model",
-                    headerName: "Plane",
-                    filter:'agTextColumnFilter'
-                }
-            ]
-        };
-        this.gridReady=this.gridReady.bind(this);
-        this.filterChanged=this.filterChanged.bind(this);
-        this.selectionChanged=this.selectionChanged.bind(this);
-    }
-
-    gridReady(event: GridReadyEvent){
-            //initial load
-            const initialLoad: FlightRecord[] = [];
-            this.props.store.flightData.forEach((f)=>{
-                initialLoad.push(f)
-            });
-            if(event.api){
-                event.api.setRowData(initialLoad)
+class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
+   constructor(props) {
+      super(props);
+      this.state = {
+         columnDefs: [
+            { field: "icao" },
+            {
+               field: "demographic.origin",
+               headerName: "Origin",
+               filter: "agTextColumnFilter"
+            },
+            {
+               field: "demographic.destination",
+               headerName: "Destination",
+               filter: "agTextColumnFilter"
+            },
+            {
+               field: "demographic.model",
+               headerName: "Plane",
+               filter: "agTextColumnFilter"
             }
+         ]
+      };
+      this.gridReady = this.gridReady.bind(this);
+      this.filterChanged = this.filterChanged.bind(this);
+      this.selectionChanged = this.selectionChanged.bind(this);
+   }
 
-            //continuous updates
-            const disposer = this.props.store.flightData.observe((change)=>{
-                if(change.type==='add' && event.api){
-                    event.api.batchUpdateRowData({
-                        add:[change.newValue]
-                    })
-                }
-                else if(change.type==='update' && event.api){
-                    event.api.batchUpdateRowData({
-                        update:[change.newValue]
-                    })
-                }
-            })
-    }
+   gridReady(event: GridReadyEvent) {
+      //initial load
+      const initialLoad: FlightRecord[] = [];
+      this.props.store.flightData.forEach((f) => {
+         initialLoad.push(f);
+      });
+      if (event.api) {
+         event.api.setRowData(initialLoad);
+      }
 
-    filterChanged(data:FilterChangedEvent){
-        const resultMap = new Map<string,boolean>();
-        if(data.api){
-            data.api.forEachNodeAfterFilter((node)=>{
-              resultMap.set(node.data.icao,true)
+      //continuous updates
+      const disposer = this.props.store.flightData.observe((change) => {
+         if (change.type === "add" && event.api) {
+            event.api.batchUpdateRowData({
+               add: [change.newValue]
             });
-            this.props.store.updateIsFiltered(data.api.isAnyFilterPresent())
-        }
-        this.props.store.updateFilteredFlights(resultMap);
-    }
+         } else if (change.type === "update" && event.api) {
+            event.api.batchUpdateRowData({
+               update: [change.newValue]
+            });
+         }
+      });
+   }
 
-    selectionChanged(event: SelectionChangedEvent){
-        if(event.api){
-            const selectedRows = event.api.getSelectedRows() as FlightRecord[];
-            const newSelectedMap = new Map<string,boolean>();
-            selectedRows.forEach((r)=>{
-                newSelectedMap.set(r.icao,true)
-            })
-            this.props.store.updateSelectedFlight(newSelectedMap)
-        }
-    }
+   filterChanged(data: FilterChangedEvent) {
+      const resultMap = new Map<string, boolean>();
+      if (data.api) {
+         data.api.forEachNodeAfterFilter((node) => {
+            resultMap.set(node.data.icao, true);
+         });
+         this.props.store.updateIsFiltered(data.api.isAnyFilterPresent());
+      }
+      this.props.store.updateFilteredFlights(resultMap);
+   }
 
-    render() {
-        return(
-            <React.Fragment>
-                <div>
-                    <span>Total Flights: {this.props.store.flightData.size}</span>
-                    {this.props.store.isFiltered &&
-                        <span> - Filtered Flights: {this.props.store.filteredFlights.size}</span>
-                    }
+   selectionChanged(event: SelectionChangedEvent) {
+      if (event.api) {
+         const selectedRows = event.api.getSelectedRows() as FlightRecord[];
+         const newSelectedMap = new Map<string, boolean>();
+         selectedRows.forEach((r) => {
+            newSelectedMap.set(r.icao, true);
+         });
+         this.props.store.updateSelectedFlight(newSelectedMap);
+      }
+   }
 
-                </div>
-                <div
-                    className="ag-theme-balham-dark w-100 h-100"
-                >
-                    <AgGridReact
-                        columnDefs={this.state.columnDefs}
-                        getRowNodeId={(data) => {
-                            return data.icao
-                        }}
-                        onFilterChanged={this.filterChanged}
-                        onGridReady={this.gridReady}
-                        onSelectionChanged={this.selectionChanged}
-                        enableSorting
-                        enableFilter
-                        rowSelection={'multiple'}
-                        floatingFilter
-                    >
-                    </AgGridReact>
-                </div>
-            </React.Fragment>
-        )
-    }
+   render() {
+      return (
+         <React.Fragment>
+            <div>
+               <span>Total Flights: {this.props.store.flightData.size}</span>
+               {this.props.store.isFiltered && (
+                  <span>
+                     {" "}
+                     - Filtered Flights: {this.props.store.filteredFlights.size}
+                  </span>
+               )}
+            </div>
+            <div className="ag-theme-balham-dark w-100 h-100">
+               <AgGridReact
+                  columnDefs={this.state.columnDefs}
+                  getRowNodeId={(data) => {
+                     return data.icao;
+                  }}
+                  onFilterChanged={this.filterChanged}
+                  onGridReady={this.gridReady}
+                  onSelectionChanged={this.selectionChanged}
+                  enableSorting
+                  enableFilter
+                  rowSelection={"multiple"}
+                  floatingFilter
+               ></AgGridReact>
+            </div>
+         </React.Fragment>
+      );
+   }
 }
 
-export default FlightTable
+export default FlightTable;

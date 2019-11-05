@@ -1,30 +1,29 @@
 apiVersion: apps/v1
 kind: "Deployment"
 metadata:
-  name: "fr-collector-deployment"
-  labels:
-    app: "fr-collector"
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
+   name: "fr-collector-deployment"
+   labels:
       app: "fr-collector"
-  template:
-    metadata:
-      labels:
-        app: "fr-collector"
-    spec:
-      containers:
-      - name: "fr-collector"
-        image: gcr.io/flight-globe/fr-collector
-        imagePullPolicy: Always
-        env:
-        - name: REDIS_ADDRESS
-          value: redis-service
-        - name: REDIS_PORT
-          value: "6379"
-        - name: REDIS_PUB_CHANNEL
-          value: positions_raw
-        - name: REDIS_SUB_CHANNEL
-          value: positions_clean
-
+spec:
+   replicas: 1
+   selector:
+      matchLabels:
+         app: "fr-collector"
+   template:
+      metadata:
+         labels:
+            app: "fr-collector"
+      spec:
+         containers:
+            - name: "fr-collector"
+              image: gcr.io/flight-globe/fr-collector
+              imagePullPolicy: Always
+              env:
+                 - name: REDIS_ADDRESS
+                   value: redis-service
+                 - name: REDIS_PORT
+                   value: "6379"
+                 - name: REDIS_PUB_CHANNEL
+                   value: positions_raw
+                 - name: REDIS_SUB_CHANNEL
+                   value: positions_clean

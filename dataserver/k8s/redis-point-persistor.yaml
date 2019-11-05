@@ -1,29 +1,29 @@
 apiVersion: apps/v1
 kind: "Deployment"
 metadata:
-  name: "redis-point-persistor"
-  labels:
-    app: redis-point-persistor
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
+   name: "redis-point-persistor"
+   labels:
       app: redis-point-persistor
-  template:
-    metadata:
-      labels:
-        app: redis-point-persistor
-    spec:
-      containers:
-      - name: redis-point-persistor
-        image: gcr.io/flight-globe/redis-point-persistor
-        imagePullPolicy: Always
-        env:
-        - name: REDIS_ADDRESS
-          value: redis-service
-        - name: REDIS_PORT
-          value: "6379"
-        - name: REDIS_SUB_CHANNEL
-          value: positions_raw
-        - name: REDIS_PUB_CHANNEL
-          value: positions_clean
+spec:
+   replicas: 1
+   selector:
+      matchLabels:
+         app: redis-point-persistor
+   template:
+      metadata:
+         labels:
+            app: redis-point-persistor
+      spec:
+         containers:
+            - name: redis-point-persistor
+              image: gcr.io/flight-globe/redis-point-persistor
+              imagePullPolicy: Always
+              env:
+                 - name: REDIS_ADDRESS
+                   value: redis-service
+                 - name: REDIS_PORT
+                   value: "6379"
+                 - name: REDIS_SUB_CHANNEL
+                   value: positions_raw
+                 - name: REDIS_PUB_CHANNEL
+                   value: positions_clean
