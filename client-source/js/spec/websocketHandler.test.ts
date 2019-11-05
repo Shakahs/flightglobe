@@ -3,7 +3,6 @@ import WebsocketHandler from "../websocketHandler";
 import { FlightAPosition1, FlightAPosition2 } from "./mockData";
 import { Message, UpdateRequest } from "../types";
 import { noop } from "lodash-es";
-const differenceInMilliseconds = require("date-fns/difference_in_milliseconds");
 
 describe("websocketHandler handles connection housekeeping", () => {
    const testServerURL = "ws://localhost:32000";

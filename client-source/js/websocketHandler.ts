@@ -10,7 +10,7 @@ import {
 } from "mobx";
 import { Message, UpdateRequest } from "./types";
 import { forEach, noop } from "lodash-es";
-const differenceInMilliseconds = require("date-fns/difference_in_milliseconds");
+import { differenceInMilliseconds } from 'date-fns'
 
 export default class WebsocketHandler {
    @observable ws: WebSocket | null = null;
