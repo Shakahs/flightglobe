@@ -3,6 +3,8 @@ const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require("path");
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
+const WebpackBar = require("webpackbar");
 
 const cesiumSource = "node_modules/cesium/Source";
 const cesiumWorkers = "../Build/Cesium/Workers";
@@ -16,7 +18,13 @@ module.exports = {
       rules: [
          {
             test: /\.tsx?$/,
-            use: "babel-loader",
+            use: [
+               "babel-loader",
+               {
+                  loader: "ts-loader",
+                  options: { transpileOnly: true }
+               }
+            ],
             exclude: /node_modules/
          },
          {
@@ -70,7 +78,9 @@ module.exports = {
          // Define relative base path in cesium for loading assets
          CESIUM_BASE_URL: JSON.stringify("/cesium"),
          MAPTILER_KEY: JSON.stringify(process.env.MAPTILER_KEY)
-      })
+      }),
+      new ForkTsCheckerWebpackPlugin(),
+      new WebpackBar({ profile: true, fancy: true, basic: false })
    ],
    devServer: {
       port: 3000,
