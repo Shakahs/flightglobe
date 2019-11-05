@@ -11,7 +11,7 @@ spec:
   - protocol: TCP
     port: 6379
 ---
-apiVersion: "extensions/v1beta1"
+apiVersion: apps/v1
 kind: "Deployment"
 metadata:
   name: "redis-deployment"
