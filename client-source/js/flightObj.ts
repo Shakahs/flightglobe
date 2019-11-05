@@ -7,14 +7,21 @@ import {
    PointDisplayOptions,
    TrailDisplayOptions
 } from "./types";
-import { Cartesian3, Label, PointPrimitive, Polyline } from "cesium";
+import {
+   Cartesian2,
+   Cartesian3,
+   Color,
+   Label,
+   Material,
+   PointPrimitive,
+   Polyline
+} from "cesium";
 import { autorun, computed, IReactionDisposer } from "mobx";
 import { convertPositionToCartesian } from "./utility";
 import { FlightStore } from "./flightStore";
-import * as Cesium from "cesium";
 import { GeoCollection } from "./geoCollection";
 
-const labelOffset = new Cesium.Cartesian2(10, 20);
+const labelOffset = new Cartesian2(10, 20);
 
 export class FlightObj {
    flightStore: FlightStore;
@@ -188,7 +195,7 @@ export class FlightObj {
       }
       this.point.color = displayOptions.cesiumColor;
       this.point.pixelSize = displayOptions.size;
-      this.point.outlineColor = Cesium.Color.fromCssColorString(
+      this.point.outlineColor = Color.fromCssColorString(
          displayOptions.outlineColor
       );
       this.point.outlineWidth = displayOptions.outlineSize;
@@ -223,7 +230,7 @@ export class FlightObj {
       }
       if (this.trail) {
          this.trail.width = displayOptions.size;
-         this.trail.material = Cesium.Material.fromType("Color");
+         this.trail.material = Material.fromType("Color");
          this.trail.material.uniforms.color = displayOptions.cesiumColor;
       }
    }

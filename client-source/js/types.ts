@@ -1,5 +1,3 @@
-import * as Cesium from "cesium";
-
 export interface FlightDemographics {
    icao?: string;
    origin: string;

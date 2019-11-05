@@ -20,11 +20,11 @@ import {
    LabelDisplayOptionsUpdate,
    AircraftModelData
 } from "./types";
-import * as Cesium from "cesium";
 import { newFlightRecord } from "./utility";
 import { forEach, has, merge } from "lodash-es";
 import { FlightObj } from "./flightObj";
 import { GeoCollection } from "./geoCollection";
+import { Color, Event, Viewer } from "cesium";
 const aircraftModels: AircraftModelData = require("../resources/aircraft.json");
 
 const Geohash = require("latlon-geohash");
@@ -35,7 +35,7 @@ configure({
 
 export const PointDisplayOptionDefaults: PointDisplayOptions = {
    color: "#3399ff",
-   cesiumColor: Cesium.Color.fromCssColorString("#3399ff"),
+   cesiumColor: Color.fromCssColorString("#3399ff"),
    size: 4,
    outlineColor: "#FFF",
    outlineSize: 1
@@ -43,7 +43,7 @@ export const PointDisplayOptionDefaults: PointDisplayOptions = {
 
 export const SelectedPointDisplayOptionDefaults: PointDisplayOptions = {
    color: "#ff3426",
-   cesiumColor: Cesium.Color.fromCssColorString("#ff3426"),
+   cesiumColor: Color.fromCssColorString("#ff3426"),
    size: 4,
    outlineColor: "#FFF",
    outlineSize: 1
@@ -51,13 +51,13 @@ export const SelectedPointDisplayOptionDefaults: PointDisplayOptions = {
 
 export const TrailDisplayOptionDefaults: TrailDisplayOptions = {
    color: "#3399ff",
-   cesiumColor: Cesium.Color.fromCssColorString("#3399ff"),
+   cesiumColor: Color.fromCssColorString("#3399ff"),
    size: 4
 };
 
 export const LabelDisplayOptionDefaults: LabelDisplayOptions = {
    color: "#3399ff",
-   cesiumColor: Cesium.Color.fromCssColorString("#3399ff"),
+   cesiumColor: Color.fromCssColorString("#3399ff"),
    size: 12
 };
 
@@ -85,8 +85,8 @@ export class FlightStore {
    geoAreas = new Map<Icao, GeoCollection>();
    flights = new Map<Icao, FlightObj>();
    @observable newestPositionTimestamp = 0;
-   viewer: Cesium.Viewer;
-   cameraEventDisposer: Cesium.Event.RemoveCallback;
+   viewer: Viewer;
+   cameraEventDisposer: Event.RemoveCallback;
    @observable
    pointDisplayOptions: PointDisplayOptions = PointDisplayOptionDefaults;
    @observable
@@ -97,7 +97,7 @@ export class FlightStore {
    labelDisplayOptions: LabelDisplayOptions = LabelDisplayOptionDefaults;
    @observable isFiltered: boolean = false;
 
-   constructor(viewer: Cesium.Viewer) {
+   constructor(viewer: Viewer) {
       this.viewer = viewer;
       this.cameraEventDisposer = viewer.camera.changed.addEventListener(
          this.handleCameraChange.bind(this)
@@ -231,9 +231,7 @@ export class FlightStore {
    @action("updatePointDisplay")
    updatePointDisplay(newOptions: PointDisplayOptionsUpdate) {
       if (newOptions.color) {
-         newOptions.cesiumColor = Cesium.Color.fromCssColorString(
-            newOptions.color
-         );
+         newOptions.cesiumColor = Color.fromCssColorString(newOptions.color);
       }
       merge<PointDisplayOptions, PointDisplayOptionsUpdate>(
          this.pointDisplayOptions,
@@ -244,9 +242,7 @@ export class FlightStore {
    @action("updateTrailDisplay")
    updateTrailDisplay(newOptions: TrailDisplayOptionsUpdate) {
       if (newOptions.color) {
-         newOptions.cesiumColor = Cesium.Color.fromCssColorString(
-            newOptions.color
-         );
+         newOptions.cesiumColor = Color.fromCssColorString(newOptions.color);
       }
       merge<TrailDisplayOptions, TrailDisplayOptionsUpdate>(
          this.trailDisplayOptions,
@@ -257,9 +253,7 @@ export class FlightStore {
    @action("updateLabelDisplay")
    updateLabelDisplay(newOptions: LabelDisplayOptionsUpdate) {
       if (newOptions.color) {
-         newOptions.cesiumColor = Cesium.Color.fromCssColorString(
-            newOptions.color
-         );
+         newOptions.cesiumColor = Color.fromCssColorString(newOptions.color);
       }
       merge<LabelDisplayOptions, LabelDisplayOptionsUpdate>(
          this.labelDisplayOptions,

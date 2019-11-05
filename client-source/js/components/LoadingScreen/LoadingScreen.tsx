@@ -5,9 +5,10 @@ import ModalBody from "reactstrap/lib/ModalBody";
 import ModalFooter from "reactstrap/lib/ModalFooter";
 import Button from "reactstrap/lib/Button";
 import { FontAwesomeIcon as FontAwesome } from "@fortawesome/react-fontawesome";
+import { Viewer } from "cesium";
 
 interface LoadingScreenProps {
-   viewer: Cesium.Viewer;
+   viewer: Viewer;
 }
 
 interface LoadingScreenState {

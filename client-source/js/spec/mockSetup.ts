@@ -1,10 +1,10 @@
-import * as Cesium from "cesium";
 import { FlightStore } from "../flightStore";
 import { FlightAPosition1, FlightBPosition1 } from "./mockData";
 import { FlightObj } from "../flightObj";
 import { Globe } from "../globe/globe";
+import { Viewer } from "cesium";
 
-export let viewer: Cesium.Viewer;
+export let viewer: Viewer;
 export let globe: Globe;
 export let flightStore: FlightStore;
 export let flightObj: FlightObj;

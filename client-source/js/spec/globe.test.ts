@@ -1,12 +1,11 @@
 import { globe } from "./mockSetup";
-import * as Cesium from "cesium";
-import { UrlTemplateImageryProvider } from "cesium";
+import { UrlTemplateImageryProvider, Viewer } from "cesium";
 import { GlobeImageryTypes } from "../types";
 
 describe("the Globe class", () => {
    it("creates a globe", () => {
       expect(globe.viewer).not.toBeNull();
-      expect(globe.viewer).toEqual(jasmine.any(Cesium.Viewer));
+      expect(globe.viewer).toEqual(jasmine.any(Viewer));
    });
 
    describe("imagery layers", () => {

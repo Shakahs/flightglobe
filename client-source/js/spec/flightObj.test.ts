@@ -7,9 +7,8 @@ import {
 } from "./mockData";
 import { FlightPosition, FlightRecord } from "../types";
 import { newICAOMap } from "../utility";
-import * as Cesium from "cesium";
 import { FlightObj } from "../flightObj";
-import { PointPrimitive, Polyline } from "cesium";
+import { Cartesian3, Color, Label, PointPrimitive, Polyline } from "cesium";
 import { get } from "lodash-es";
 import {
    LabelDisplayOptionDefaults,
@@ -146,20 +145,16 @@ describe("FlightObj", function() {
       });
 
       it("by computing the correct Cartesian Position", function() {
-         expect<Cesium.Cartesian3>(
-            flightObj.cartesianPosition as Cesium.Cartesian3
-         ).toEqual(
-            Cesium.Cartesian3.fromDegrees(
+         expect<Cartesian3>(flightObj.cartesianPosition as Cartesian3).toEqual(
+            Cartesian3.fromDegrees(
                FlightAPosition1.body.longitude,
                FlightAPosition1.body.latitude,
                FlightAPosition1.body.altitude
             )
          );
          flightStore.addOrUpdateFlight(FlightAPosition2);
-         expect<Cesium.Cartesian3>(
-            flightObj.cartesianPosition as Cesium.Cartesian3
-         ).toEqual(
-            Cesium.Cartesian3.fromDegrees(
+         expect<Cartesian3>(flightObj.cartesianPosition as Cartesian3).toEqual(
+            Cartesian3.fromDegrees(
                FlightAPosition2.body.longitude,
                FlightAPosition2.body.latitude,
                FlightAPosition2.body.altitude
@@ -179,7 +174,7 @@ describe("FlightObj", function() {
             const point = flightObj.point;
             if (point) {
                expect(point.position).toEqual(
-                  Cesium.Cartesian3.fromDegrees(
+                  Cartesian3.fromDegrees(
                      FlightAPosition1.body.longitude,
                      FlightAPosition1.body.latitude,
                      FlightAPosition1.body.altitude
@@ -198,8 +193,8 @@ describe("FlightObj", function() {
             const point = flightObj.point;
             if (point) {
                flightStore.addOrUpdateFlight(FlightAPosition2);
-               expect<Cesium.Cartesian3>(point.position).toEqual(
-                  Cesium.Cartesian3.fromDegrees(
+               expect<Cartesian3>(point.position).toEqual(
+                  Cartesian3.fromDegrees(
                      FlightAPosition2.body.longitude,
                      FlightAPosition2.body.latitude,
                      FlightAPosition2.body.altitude
@@ -215,19 +210,19 @@ describe("FlightObj", function() {
             const point = flightObj.point;
             if (point) {
                expect(point.position).toEqual(
-                  Cesium.Cartesian3.fromDegrees(
+                  Cartesian3.fromDegrees(
                      FlightAPosition1.body.longitude,
                      FlightAPosition1.body.latitude,
                      FlightAPosition1.body.altitude
                   )
                );
-               point.position = Cesium.Cartesian3.fromDegrees(
+               point.position = Cartesian3.fromDegrees(
                   FlightAPosition2.body.longitude,
                   FlightAPosition2.body.latitude,
                   FlightAPosition2.body.altitude
                );
                expect(point.position).toEqual(
-                  Cesium.Cartesian3.fromDegrees(
+                  Cartesian3.fromDegrees(
                      FlightAPosition2.body.longitude,
                      FlightAPosition2.body.latitude,
                      FlightAPosition2.body.altitude
@@ -283,12 +278,12 @@ describe("FlightObj", function() {
          it("by using an updated the color", function() {
             const point = flightObj.point as PointPrimitive;
             expect(
-               point.color.equals(Cesium.Color.fromCssColorString("#3399ff"))
+               point.color.equals(Color.fromCssColorString("#3399ff"))
             ).toBeTruthy();
             const newColor = "#ff5b43";
             flightStore.updatePointDisplay({ color: newColor });
             expect(
-               point.color.equals(Cesium.Color.fromCssColorString(newColor))
+               point.color.equals(Color.fromCssColorString(newColor))
             ).toBeTruthy();
          });
 
@@ -329,12 +324,12 @@ describe("FlightObj", function() {
                new Map([[FlightAPosition2.body.geohash, true]])
             );
             const expectedPositions = [
-               Cesium.Cartesian3.fromDegrees(
+               Cartesian3.fromDegrees(
                   FlightAPosition1.body.longitude,
                   FlightAPosition1.body.latitude,
                   FlightAPosition1.body.altitude
                ),
-               Cesium.Cartesian3.fromDegrees(
+               Cartesian3.fromDegrees(
                   FlightAPosition2.body.longitude,
                   FlightAPosition2.body.latitude,
                   FlightAPosition2.body.altitude
@@ -411,11 +406,8 @@ describe("FlightObj", function() {
             );
             const trail = flightObj.trail as Polyline;
 
-            const currentColor = get(
-               trail,
-               "material.uniforms.color"
-            ) as Cesium.Color;
-            const expectedColor = Cesium.Color.fromCssColorString(
+            const currentColor = get(trail, "material.uniforms.color") as Color;
+            const expectedColor = Color.fromCssColorString(
                TrailDisplayOptionDefaults.color
             );
             expect(expectedColor.equals(currentColor)).toBeTruthy();
@@ -425,8 +417,8 @@ describe("FlightObj", function() {
             const newCurrentColor = get(
                trail,
                "material.uniforms.color"
-            ) as Cesium.Color;
-            const newExpectedColor = Cesium.Color.fromCssColorString(newColor);
+            ) as Color;
+            const newExpectedColor = Color.fromCssColorString(newColor);
             expect(newExpectedColor.equals(newCurrentColor)).toBeTruthy();
          });
       });
@@ -450,7 +442,7 @@ describe("FlightObj", function() {
                   flight.geoCollection.labels.contains(flight.label)
                ).toBeTruthy();
                expect(flight.label.position).toEqual(
-                  Cesium.Cartesian3.fromDegrees(
+                  Cartesian3.fromDegrees(
                      FlightAPosition1.body.longitude,
                      FlightAPosition1.body.latitude,
                      FlightAPosition1.body.altitude
@@ -478,7 +470,7 @@ describe("FlightObj", function() {
             const flight = flightStore.flights.get(FlightAPosition1.icao);
             if (flight && flight.label) {
                expect(flight.label.position).toEqual(
-                  Cesium.Cartesian3.fromDegrees(
+                  Cartesian3.fromDegrees(
                      FlightAPosition2.body.longitude,
                      FlightAPosition2.body.latitude,
                      FlightAPosition2.body.altitude
@@ -508,18 +500,16 @@ describe("FlightObj", function() {
             flightStore.updateDetailedFlights(
                new Map([[FlightAPosition1.body.geohash, true]])
             );
-            const label = flightObj.label as Cesium.Label;
+            const label = flightObj.label as Label;
             expect(
                label.fillColor.equals(
-                  Cesium.Color.fromCssColorString(
-                     LabelDisplayOptionDefaults.color
-                  )
+                  Color.fromCssColorString(LabelDisplayOptionDefaults.color)
                )
             ).toBeTruthy();
             const newColor = "#ff5b43";
             flightStore.updateLabelDisplay({ color: newColor });
             expect(
-               label.fillColor.equals(Cesium.Color.fromCssColorString(newColor))
+               label.fillColor.equals(Color.fromCssColorString(newColor))
             ).toBeTruthy();
          });
       });

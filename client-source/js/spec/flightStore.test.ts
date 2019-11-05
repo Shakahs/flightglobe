@@ -4,8 +4,7 @@ import {
    PointDisplayOptionDefaults,
    TrailDisplayOptionDefaults
 } from "../flightStore";
-import * as Cesium from "cesium";
-import { PointPrimitive } from "cesium";
+import { Color, PointPrimitive } from "cesium";
 import {
    FlightPosition,
    FlightRecord,
@@ -225,7 +224,7 @@ describe("FlightStore", function() {
             expect(flightStore.pointDisplayOptions).toEqual(finalResult);
             expect(
                flightStore.pointDisplayOptions.cesiumColor.equals(
-                  Cesium.Color.fromCssColorString(newOptions.color as string)
+                  Color.fromCssColorString(newOptions.color as string)
                )
             ).toBeTruthy();
          });
@@ -248,7 +247,7 @@ describe("FlightStore", function() {
             expect(flightStore.trailDisplayOptions).toEqual(finalResult);
             expect(
                flightStore.trailDisplayOptions.cesiumColor.equals(
-                  Cesium.Color.fromCssColorString(newOptions.color)
+                  Color.fromCssColorString(newOptions.color)
                )
             ).toBeTruthy();
          });
@@ -271,7 +270,7 @@ describe("FlightStore", function() {
             expect(flightStore.labelDisplayOptions).toEqual(finalResult);
             expect(
                flightStore.labelDisplayOptions.cesiumColor.equals(
-                  Cesium.Color.fromCssColorString(newOptions.color)
+                  Color.fromCssColorString(newOptions.color)
                )
             ).toBeTruthy();
          });

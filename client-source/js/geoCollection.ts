@@ -1,4 +1,3 @@
-import * as Cesium from "cesium";
 import {
    LabelCollection,
    PointPrimitiveCollection,
@@ -13,12 +12,12 @@ export class GeoCollection {
    lines: PolylineCollection;
    viewer: Viewer;
 
-   constructor(id: string, viewer: Cesium.Viewer) {
+   constructor(id: string, viewer: Viewer) {
       this.id = id;
       this.viewer = viewer;
-      this.points = new Cesium.PointPrimitiveCollection();
-      this.labels = new Cesium.LabelCollection();
-      this.lines = new Cesium.PolylineCollection();
+      this.points = new PointPrimitiveCollection();
+      this.labels = new LabelCollection();
+      this.lines = new PolylineCollection();
       viewer.scene.primitives.add(this.points);
       viewer.scene.primitives.add(this.labels);
       viewer.scene.primitives.add(this.lines);
