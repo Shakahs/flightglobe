@@ -2,7 +2,7 @@ import * as React from "react";
 import { FlightRecord } from "../../types";
 import { observer } from "mobx-react";
 import { AgGridReact } from "ag-grid-react";
-import { FilterChangedEvent } from "ag-grid-community";
+import { ColDef, FilterChangedEvent } from "ag-grid-community";
 import { FlightStore } from "../../flightStore";
 import {
    GridReadyEvent,
@@ -14,7 +14,7 @@ interface FlightTableProps {
 }
 
 interface FlightTableState {
-   columnDefs: any;
+   columnDefs: ColDef[];
 }
 
 @observer
@@ -27,17 +27,20 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
             {
                field: "demographic.origin",
                headerName: "Origin",
-               filter: "agTextColumnFilter"
+               filter: "agTextColumnFilter",
+               sortable: true
             },
             {
                field: "demographic.destination",
                headerName: "Destination",
-               filter: "agTextColumnFilter"
+               filter: "agTextColumnFilter",
+               sortable: true
             },
             {
                field: "demographic.model",
                headerName: "Plane",
-               filter: "agTextColumnFilter"
+               filter: "agTextColumnFilter",
+               sortable: true
             }
          ]
       };
@@ -113,8 +116,6 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
                   onFilterChanged={this.filterChanged}
                   onGridReady={this.gridReady}
                   onSelectionChanged={this.selectionChanged}
-                  enableSorting
-                  enableFilter
                   rowSelection={"multiple"}
                   floatingFilter
                ></AgGridReact>
