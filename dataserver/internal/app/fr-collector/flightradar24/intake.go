@@ -42,7 +42,7 @@ func buildQuadTree(allFlightRecords []*pkg.FlightRecord) (*quadtree.Quadtree, in
 	return qt, qtMembers
 }
 
-func retrieve(url string) []byte {
+func Retrieve(url string) []byte {
 	//fmt.Println(url)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -59,7 +59,7 @@ func Scrape(pList []*pkg.FlightRecord, outputChan chan []byte) {
 	delay := 29 / len(urlList)
 	log.Printf("Retrieving %d URLs for %d flights with a delay of %d", len(urlList), count, delay)
 	for _, v := range urlList {
-		data := retrieve(v)
+		data := Retrieve(v)
 		outputChan <- data
 		time.Sleep(time.Duration(delay) * time.Second)
 	}

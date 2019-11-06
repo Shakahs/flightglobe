@@ -1,0 +1,117 @@
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"github.com/Shakahs/flightglobe/dataserver/internal/app/fr-collector/flightradar24"
+	"github.com/ThreeDotsLabs/watermill"
+	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
+	"github.com/ThreeDotsLabs/watermill/message/router/plugin"
+	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
+	"github.com/robfig/cron"
+	"log"
+	"time"
+)
+
+var (
+	// For this example, we're using just a simple logger implementation,
+	// You probably want to ship your own implementation of `watermill.LoggerAdapter`.
+	logger          = watermill.NewStdLogger(false, false)
+	incomingChannel = "fr_raw_data"
+	outgoingChannel = "fg_fr_data"
+	scheduler       = cron.New()
+)
+
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
+func publishMessages(publisher message.Publisher) {
+
+	for {
+		scrapeUrl := fmt.Sprintf(flightradar24.URL_TEMPLATE, 80.0, -80.0, 90.0, -90.0)
+		log.Println("Scraping data from", scrapeUrl)
+		rawData := flightradar24.Retrieve(scrapeUrl)
+
+		msg := message.NewMessage(watermill.NewUUID(), rawData)
+		middleware.SetCorrelationID(watermill.NewUUID(), msg)
+
+		if err := publisher.Publish(incomingChannel, msg); err != nil {
+			panic(err)
+		}
+
+		time.Sleep(time.Second)
+	}
+
+}
+
+func FrHandler(msg *message.Message) ([]*message.Message, error) {
+	rawRecords := flightradar24.DecodeRaw(msg.Payload)
+	unfilteredRecords := flightradar24.Transform(rawRecords)
+	standardizedRecords := flightradar24.Filter(unfilteredRecords)
+
+	var outgoingData []*message.Message
+	count := 0
+
+	for _, r := range standardizedRecords {
+		encoded, err := json.Marshal(r)
+		check(err)
+
+		newMsg := message.NewMessage(watermill.NewUUID(), encoded)
+		middleware.SetCorrelationID(middleware.MessageCorrelationID(msg), newMsg)
+
+		outgoingData = append(outgoingData, newMsg)
+		count++
+	}
+
+	log.Printf("FrHandler processed %d valid records from %d input records", count, len(unfilteredRecords))
+
+	return outgoingData, nil
+}
+
+func main() {
+	router, err := message.NewRouter(message.RouterConfig{}, logger)
+	if err != nil {
+		panic(err)
+	}
+
+	router.AddPlugin(plugin.SignalsHandler)
+	router.AddMiddleware(
+		// CorrelationID will copy the correlation id from the incoming message's metadata to the produced messages
+		middleware.CorrelationID,
+
+		// The handler function is retried if it returns an error.
+		// After MaxRetries, the message is Nacked and it's up to the PubSub to resend it.
+		middleware.Retry{
+			MaxRetries:      3,
+			InitialInterval: time.Millisecond * 100,
+			Logger:          logger,
+		}.Middleware,
+
+		// Recoverer handles panics from handlers.
+		// In this case, it passes them as errors to the Retry middleware.
+		middleware.Recoverer,
+	)
+
+	pubSub := gochannel.NewGoChannel(gochannel.Config{}, logger)
+
+	router.AddHandler(
+		"FlightRadar24_Processing", // handler name, must be unique
+		incomingChannel,            // topic from which we will read events
+		pubSub,
+		outgoingChannel, // topic to which we will publish events
+		pubSub,
+		FrHandler,
+	)
+
+	go publishMessages(pubSub)
+
+	ctx := context.Background()
+	if err := router.Run(ctx); err != nil {
+		panic(err)
+	}
+}

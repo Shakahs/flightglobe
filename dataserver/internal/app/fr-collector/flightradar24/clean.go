@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func decode_raw(data []byte) []Fr_Record {
+func DecodeRaw(data []byte) []Fr_Record {
 	var sData fr_raw
 	err := json.Unmarshal(data, &sData)
 	if err != nil {
@@ -51,7 +51,7 @@ func decode_raw(data []byte) []Fr_Record {
 	return collector
 }
 
-func transform(FrData []Fr_Record) pkg.FlightRecords {
+func Transform(FrData []Fr_Record) pkg.FlightRecords {
 	var collector pkg.FlightRecords
 	for _, v := range FrData {
 		pos := pkg.FlightRecord{
@@ -76,7 +76,7 @@ func transform(FrData []Fr_Record) pkg.FlightRecords {
 	return collector
 }
 
-func filter(data pkg.FlightRecords) pkg.FlightRecords {
+func Filter(data pkg.FlightRecords) pkg.FlightRecords {
 	var collector pkg.FlightRecords
 	for _, v := range data {
 		//remove records with a blank icao
@@ -91,9 +91,9 @@ func Clean(inChan chan []byte, outChan chan pkg.FlightRecords) {
 	for {
 		select {
 		case raw := <-inChan:
-			decoded := decode_raw(raw)
-			transformed := transform(decoded)
-			filtered := filter(transformed)
+			decoded := DecodeRaw(raw)
+			transformed := Transform(decoded)
+			filtered := Filter(transformed)
 			outChan <- filtered
 			//fmt.Println(len(ConvertedData), "records provided")
 		}
