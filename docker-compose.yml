@@ -38,7 +38,7 @@ services:
          REDIS_PUB_CHANNEL: new_data
          REDIS_DATA_KEY: flight_positions
    redis-point-persistor:
-      image: redis-point-persistor
+      image: fg-redis-persistor
       links:
          - redis
       environment:

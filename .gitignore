@@ -11,7 +11,7 @@ coverage/
 /cesium/
 dataserver/cmd/fr-collector/fr-collector
 dataserver/cmd/fr-collector2/fr-collector2
-dataserver/cmd/redis-point-persistor/redis-point-persistor
+dataserver/cmd/fg-redis-persistor/fg-redis-persistor
 dataserver/cmd/fg-server/fg-server
 dataserver/cmd/fg-server/static
 dataserver/cmd/fr-db-persistor/fr-db-persistor

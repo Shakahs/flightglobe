@@ -4,7 +4,7 @@
 k8s_yaml('dataserver/k8s/nats.yaml')
 k8s_resource('nats-deployment',port_forwards=[4222,8222])
 
-docker_build('gcr.io/flight-globe/redis-point-persistor', './dataserver/cmd/redis-point-persistor')
+docker_build('gcr.io/flight-globe/fg-redis-persistor', './dataserver/cmd/fg-redis-persistor')
 k8s_yaml('./dataserver/k8s/redis-point-persistor.yaml')
 
 #docker_build('gcr.io/flight-globe/fr-collector', './dataserver/cmd/fr-collector')

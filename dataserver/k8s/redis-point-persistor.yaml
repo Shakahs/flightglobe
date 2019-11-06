@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: "Deployment"
 metadata:
-   name: "redis-point-persistor"
+   name: "fg-redis-persistor"
    labels:
       app: redis-point-persistor
 spec:
@@ -15,8 +15,8 @@ spec:
             app: redis-point-persistor
       spec:
          containers:
-            - name: redis-point-persistor
-              image: gcr.io/flight-globe/redis-point-persistor
+            - name: fg-redis-persistor
+              image: gcr.io/flight-globe/fg-redis-persistor
               imagePullPolicy: Always
               env:
                  - name: REDIS_ADDRESS
