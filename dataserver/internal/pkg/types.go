@@ -25,6 +25,7 @@ type FlightRecord struct {
 	Position    Position
 	Demographic Demographic
 	Time        time.Time
+	Source      string
 }
 
 func (fr FlightRecord) MarshalBinary() ([]byte, error) {

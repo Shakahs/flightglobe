@@ -25,3 +25,14 @@ func MarshalPosition(pos *FlightRecord) ([]byte, error) {
 	marshaled, err := json.Marshal(pos)
 	return marshaled, err
 }
+
+func Filter(data FlightRecords) FlightRecords {
+	var collector FlightRecords
+	for _, v := range data {
+		//remove records with a blank icao
+		if v.Icao != "" {
+			collector = append(collector, v)
+		}
+	}
+	return collector
+}

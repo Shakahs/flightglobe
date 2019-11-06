@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Shakahs/flightglobe/dataserver/internal/app/fr-collector/flightradar24"
+	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-nats/pkg/nats"
 	"github.com/ThreeDotsLabs/watermill/message"
@@ -54,7 +55,7 @@ func publishMessages(publisher message.Publisher) {
 func FrHandler(msg *message.Message) ([]*message.Message, error) {
 	rawRecords := flightradar24.DecodeRaw(msg.Payload)
 	unfilteredRecords := flightradar24.Transform(rawRecords)
-	standardizedRecords := flightradar24.Filter(unfilteredRecords)
+	standardizedRecords := pkg.Filter(unfilteredRecords)
 
 	var outgoingData []*message.Message
 	count := 0

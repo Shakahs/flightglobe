@@ -70,19 +70,9 @@ func Transform(FrData []Fr_Record) pkg.FlightRecords {
 				Origin:      v.Origin,
 				Destination: v.Destination,
 			},
+			Source: pkg.FLIGHTRADAR24,
 		}
 		collector = append(collector, pos)
-	}
-	return collector
-}
-
-func Filter(data pkg.FlightRecords) pkg.FlightRecords {
-	var collector pkg.FlightRecords
-	for _, v := range data {
-		//remove records with a blank icao
-		if v.Icao != "" {
-			collector = append(collector, v)
-		}
 	}
 	return collector
 }
@@ -93,7 +83,7 @@ func Clean(inChan chan []byte, outChan chan pkg.FlightRecords) {
 		case raw := <-inChan:
 			decoded := DecodeRaw(raw)
 			transformed := Transform(decoded)
-			filtered := Filter(transformed)
+			filtered := pkg.Filter(transformed)
 			outChan <- filtered
 			//fmt.Println(len(ConvertedData), "records provided")
 		}
