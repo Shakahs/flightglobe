@@ -22,8 +22,8 @@ var (
 	// For this example, we're using just a simple logger implementation,
 	// You probably want to ship your own implementation of `watermill.LoggerAdapter`.
 	logger          = watermill.NewStdLogger(false, false)
-	incomingChannel = "fr_raw_data"
-	outgoingChannel = "fg_fr_data"
+	incomingChannel = pkg.FR_RAW_DATA
+	outgoingChannel = pkg.FR_PROCESSED_DATA
 	natsAddress     = os.Getenv("NATS_ADDRESS")
 )
 
