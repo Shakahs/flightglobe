@@ -27,3 +27,5 @@ spec:
                    value: positions_raw
                  - name: REDIS_PUB_CHANNEL
                    value: positions_clean
+                 - name: NATS_ADDRESS
+                   value: nats-service

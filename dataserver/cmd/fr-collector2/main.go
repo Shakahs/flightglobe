@@ -27,10 +27,8 @@ var (
 	natsAddress     = os.Getenv("NATS_ADDRESS")
 )
 
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
+func init() {
+	pkg.CheckEnvVars(natsAddress)
 }
 
 func publishMessages(publisher message.Publisher) {
@@ -62,7 +60,7 @@ func FrHandler(msg *message.Message) ([]*message.Message, error) {
 
 	for _, r := range standardizedRecords {
 		encoded, err := json.Marshal(r)
-		check(err)
+		pkg.Check(err)
 
 		newMsg := message.NewMessage(watermill.NewUUID(), encoded)
 		middleware.SetCorrelationID(middleware.MessageCorrelationID(msg), newMsg)
@@ -84,19 +82,7 @@ func main() {
 
 	router.AddPlugin(plugin.SignalsHandler)
 	router.AddMiddleware(
-		// CorrelationID will copy the correlation id from the incoming message's metadata to the produced messages
 		middleware.CorrelationID,
-
-		// The handler function is retried if it returns an error.
-		// After MaxRetries, the message is Nacked and it's up to the PubSub to resend it.
-		middleware.Retry{
-			MaxRetries:      3,
-			InitialInterval: time.Millisecond * 100,
-			Logger:          logger,
-		}.Middleware,
-
-		// Recoverer handles panics from handlers.
-		// In this case, it passes them as errors to the Retry middleware.
 		middleware.Recoverer,
 	)
 
@@ -116,7 +102,7 @@ func main() {
 		},
 		watermill.NewStdLogger(false, false),
 	)
-	check(err)
+	pkg.Check(err)
 
 	router.AddHandler(
 		"FlightRadar24_Processing", // handler name, must be unique

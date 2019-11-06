@@ -36,3 +36,9 @@ func Filter(data FlightRecords) FlightRecords {
 	}
 	return collector
 }
+
+func Check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}

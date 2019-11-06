@@ -4,6 +4,11 @@ services:
       image: redis
       ports:
          - "6379:6379"
+   nats:
+      image: nats-streaming:latest
+      ports:
+         - "4222:4222"
+         - "8222:8222"
    benthos:
       image: jeffail/benthos
       ports:
