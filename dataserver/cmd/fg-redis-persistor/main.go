@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	fg_redis_persistor "github.com/Shakahs/flightglobe/dataserver/internal/app/fg-redis-persistor"
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-nats/pkg/nats"
@@ -39,7 +41,18 @@ func init() {
 }
 
 func persistor(msg *message.Message) error {
-	log.Println("redis persistor received message", msg.UUID)
+
+	var newPos pkg.FlightRecord
+	err := json.Unmarshal(msg.Payload, &newPos)
+	if err != nil {
+		return err
+	}
+
+	err = fg_redis_persistor.PersistCore(redisClient, &newPos, string(msg.Payload))
+	if err != nil {
+		log.Println("persistor error:", err)
+		return err
+	}
 	return nil
 }
 

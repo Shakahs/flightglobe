@@ -1,4 +1,4 @@
-package redis_point_persistor
+package fg_redis_persistor
 
 import (
 	"encoding/json"
@@ -85,7 +85,7 @@ func persistLatestPosition(c *redis.Client, newPos *pkg.FlightRecord, rawPos *st
 	}
 
 	if err == redis.Nil || shouldSavePosition(oldPos, newPos) { //either it does not exist, or we need to overwrite
-		_, err = c.Set(pkg.GeneratePointKeyName(newPos.Icao), *rawPos, time.Minute*10).Result()
+		_, err = c.Set(pkg.GeneratePointKeyName(newPos.Icao), *rawPos, DEFAULT_REDIS_EXPIRATION).Result()
 		if err != nil {
 			return false, errors.New("Could not save new position:" + err.Error())
 		}
@@ -105,13 +105,27 @@ func persistLatestTrackPosition(c *redis.Client, newPos *pkg.FlightRecord, rawPo
 		if err != nil {
 			return false, errors.New("Could not save new track position:" + err.Error())
 		}
-		boolSet, err := c.Expire(pkg.GenerateTrackKeyName(newPos.Icao), time.Minute*10).Result()
+		boolSet, err := c.Expire(pkg.GenerateTrackKeyName(newPos.Icao), DEFAULT_REDIS_EXPIRATION).Result()
 		if boolSet == false || err != nil {
 			return false, errors.New("Could not set expire for new track position:" + err.Error())
 		}
 	}
 
 	return true, nil
+}
+
+func PersistCore(c *redis.Client, newPos *pkg.FlightRecord, newPosRaw string) error {
+	_, err := persistLatestPosition(c, newPos, &newPosRaw)
+	if err != nil {
+		log.Println("Encountered an error saving a position:", err)
+		return err
+	}
+	_, err = persistLatestTrackPosition(c, newPos, &newPosRaw)
+	if err != nil {
+		log.Println("Encountered an error saving a track:", err)
+		return err
+	}
+	return nil
 }
 
 func Persist(c *redis.Client, redisSubChannel string, redisPubChannel string) {

@@ -1,4 +1,4 @@
-package redis_point_persistor
+package fg_redis_persistor
 
 import (
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
