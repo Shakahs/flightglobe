@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"github.com/Shakahs/flightglobe/dataserver/internal/app/fr-collector/flightradar24"
 	"github.com/ThreeDotsLabs/watermill"
+	"github.com/ThreeDotsLabs/watermill-nats/pkg/nats"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 	"github.com/ThreeDotsLabs/watermill/message/router/plugin"
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
-	"github.com/robfig/cron"
+	"github.com/nats-io/stan.go"
 	"log"
+	"os"
 	"time"
 )
 
@@ -21,7 +23,7 @@ var (
 	logger          = watermill.NewStdLogger(false, false)
 	incomingChannel = "fr_raw_data"
 	outgoingChannel = "fg_fr_data"
-	scheduler       = cron.New()
+	natsAddress     = os.Getenv("NATS_ADDRESS")
 )
 
 func check(e error) {
@@ -44,7 +46,7 @@ func publishMessages(publisher message.Publisher) {
 			panic(err)
 		}
 
-		time.Sleep(time.Second)
+		time.Sleep(time.Second * 15)
 	}
 
 }
@@ -97,18 +99,34 @@ func main() {
 		middleware.Recoverer,
 	)
 
-	pubSub := gochannel.NewGoChannel(gochannel.Config{}, logger)
+	localPubSub := gochannel.NewGoChannel(gochannel.Config{}, logger)
+
+	natsDSN := fmt.Sprintf("nats://%s:4222", natsAddress)
+	log.Println("connecting to NATS at", natsDSN)
+
+	remotePubSub, err := nats.NewStreamingPublisher(
+		nats.StreamingPublisherConfig{
+			ClusterID: "test-cluster",
+			ClientID:  "example-publisher",
+			StanOptions: []stan.Option{
+				stan.NatsURL(natsDSN),
+			},
+			Marshaler: nats.GobMarshaler{},
+		},
+		watermill.NewStdLogger(false, false),
+	)
+	check(err)
 
 	router.AddHandler(
 		"FlightRadar24_Processing", // handler name, must be unique
 		incomingChannel,            // topic from which we will read events
-		pubSub,
+		localPubSub,
 		outgoingChannel, // topic to which we will publish events
-		pubSub,
+		remotePubSub,
 		FrHandler,
 	)
 
-	go publishMessages(pubSub)
+	go publishMessages(localPubSub)
 
 	ctx := context.Background()
 	if err := router.Run(ctx); err != nil {

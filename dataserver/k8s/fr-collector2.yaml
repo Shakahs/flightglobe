@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: "Deployment"
+metadata:
+  name: "fr-collector2-deployment"
+  labels:
+    app: "fr-collector2"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "fr-collector2"
+  template:
+    metadata:
+      labels:
+        app: "fr-collector2"
+    spec:
+      containers:
+        - name: "fr-collector2"
+          image: gcr.io/flight-globe/fr-collector2
+          imagePullPolicy: Always
+          env:
+            - name: NATS_ADDRESS
+              value: nats-service

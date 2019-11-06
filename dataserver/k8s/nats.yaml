@@ -1,0 +1,39 @@
+kind: Service
+apiVersion: v1
+metadata:
+   name: nats-service
+   labels:
+      app: "nats"
+spec:
+   selector:
+      app: nats-app
+   ports:
+      - protocol: TCP
+        port: 4222
+        name: clients
+      - protocol: TCP
+        port: 8222
+        name: admin
+---
+apiVersion: apps/v1
+kind: "Deployment"
+metadata:
+   name: "nats-deployment"
+   labels:
+      app: "nats"
+spec:
+   replicas: 1
+   selector:
+      matchLabels:
+         app: nats-app
+   template:
+      metadata:
+         labels:
+            app: nats-app
+      spec:
+         containers:
+            - name: "nats"
+              image: nats-streaming:latest
+              ports:
+                 - containerPort: 4222
+                 - containerPort: 8222

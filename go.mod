@@ -7,6 +7,7 @@ require (
 	github.com/KromDaniel/rejonson v0.0.0-20180822072824-00b5bcf2b351
 	github.com/NYTimes/gziphandler v1.1.1
 	github.com/ThreeDotsLabs/watermill v1.0.1
+	github.com/ThreeDotsLabs/watermill-nats v1.0.3
 	github.com/bitly/go-simplejson v0.5.0
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/cockroachdb/apd v1.1.0 // indirect
@@ -18,6 +19,7 @@ require (
 	github.com/jackc/pgx v3.6.0+incompatible
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/mmcloughlin/geohash v0.9.0
+	github.com/nats-io/stan.go v0.5.0
 	github.com/onsi/ginkgo v1.10.3 // indirect
 	github.com/onsi/gomega v1.7.1 // indirect
 	github.com/paulbellamy/ratecounter v0.2.0
