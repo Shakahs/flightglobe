@@ -6,6 +6,7 @@ require (
 	github.com/KromDaniel/jonson v0.0.0-20180630143114-d2f9c3c389db // indirect
 	github.com/KromDaniel/rejonson v0.0.0-20180822072824-00b5bcf2b351
 	github.com/NYTimes/gziphandler v1.1.1
+	github.com/ThreeDotsLabs/watermill v1.0.1
 	github.com/bitly/go-simplejson v0.5.0
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/cockroachdb/apd v1.1.0 // indirect
