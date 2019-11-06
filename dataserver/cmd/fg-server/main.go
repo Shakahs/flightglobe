@@ -164,8 +164,7 @@ func init() {
 	}
 	fmt.Printf("Production environment: %t\n", isDeployedProduction)
 
-	redisClient = pkg.ProvideRedisClient(fmt.Sprintf("%s:%s",
-		redisAddress, redisPort))
+	redisClient = pkg.ProvideRedisClient(redisAddress, redisPort)
 
 	positionCache = pkg.CreateCache()
 

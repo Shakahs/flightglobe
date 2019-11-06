@@ -28,8 +28,7 @@ func init() {
 }
 
 func main() {
-	var redisdb = pkg.ProvideRedisClient(fmt.Sprintf("%s:%s",
-		redisAddress, redisPort))
+	var redisdb = pkg.ProvideRedisClient(redisAddress, redisPort)
 
 	go pkg.CachePositions(redisdb, redisSubChannel, positionCache)
 

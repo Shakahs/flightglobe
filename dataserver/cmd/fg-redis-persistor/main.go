@@ -9,6 +9,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 	"github.com/ThreeDotsLabs/watermill/message/router/plugin"
+	"github.com/go-redis/redis"
 	"github.com/nats-io/stan.go"
 	"log"
 	"os"
@@ -20,7 +21,7 @@ var (
 	//redisPubChannel string
 	redisAddress = os.Getenv("REDIS_ADDRESS")
 	redisPort    = os.Getenv("REDIS_PORT")
-	//redisClient     *redis.Client
+	redisClient  *redis.Client
 	// For this example, we're using just a simple logger implementation,
 	// You probably want to ship your own implementation of `watermill.LoggerAdapter`.
 	logger          = watermill.NewStdLogger(false, false)
@@ -34,8 +35,7 @@ func init() {
 	//
 	pkg.CheckEnvVars(redisAddress, redisPort, natsAddress)
 	//
-	//redisClient = pkg.ProvideRedisClient(fmt.Sprintf("%s:%s",
-	//	redisAddress, redisPort))
+	redisClient = pkg.ProvideRedisClient(redisAddress, redisPort)
 }
 
 func persistor(msg *message.Message) error {

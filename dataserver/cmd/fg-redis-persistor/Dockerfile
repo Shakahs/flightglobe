@@ -1,4 +1,4 @@
 FROM centos:7
-COPY redis-point-persistor /var/flightglobe/redis-point-persistor
-CMD ["/var/flightglobe/redis-point-persistor"]
+COPY fg-redis-persistor /var/flightglobe/fg-redis-persistor
+CMD ["/var/flightglobe/fg-redis-persistor"]
 

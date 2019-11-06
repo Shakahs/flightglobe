@@ -10,7 +10,9 @@ import (
 	"time"
 )
 
-func ProvideRedisClient(redisAddress string) *redis.Client {
+func ProvideRedisClient(redisAddress string, redisPort string) *redis.Client {
+	redisAddress = fmt.Sprintf("%s:%s",
+		redisAddress, redisPort)
 	goRedisClient := redis.NewClient(&redis.Options{
 		Addr: redisAddress,
 	})
