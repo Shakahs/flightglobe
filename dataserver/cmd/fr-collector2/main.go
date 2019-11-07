@@ -12,6 +12,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 	"github.com/ThreeDotsLabs/watermill/message/router/plugin"
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
+	"github.com/go-redis/redis"
 	"github.com/nats-io/stan.go"
 	"log"
 	"os"
@@ -25,29 +26,72 @@ var (
 	incomingChannel = pkg.FR_RAW_DATA
 	outgoingChannel = pkg.FR_PROCESSED_DATA
 	natsAddress     = os.Getenv("NATS_ADDRESS")
+	redisAddress    = os.Getenv("REDIS_ADDRESS")
+	redisPort       = os.Getenv("REDIS_PORT")
+	redisClient     *redis.Client
 )
 
 func init() {
 	pkg.CheckEnvVars(natsAddress)
+	pkg.CheckEnvVars(redisAddress, redisPort, natsAddress)
+	redisClient = pkg.ProvideRedisClient(redisAddress, redisPort)
+}
+
+func getPositions() *pkg.LockableRecordMap {
+	var cursor uint64
+	var icaoList []string
+
+	for {
+		var keys []string
+		var err error
+		keys, cursor, err = redisClient.Scan(cursor, "position:*", 10).Result()
+		if err != nil {
+			panic(err)
+		}
+
+		for _, v := range keys {
+			icaoList = append(icaoList, v)
+		}
+
+		if cursor == 0 {
+			break
+		}
+	}
+
+	var rmap = pkg.CreateCache()
+	for _, v := range icaoList {
+		rawPos, err := redisClient.Get(v).Bytes()
+		pkg.Check(err)
+
+		var frecord pkg.FlightRecord
+		err = json.Unmarshal(rawPos, &frecord)
+		pkg.Check(err)
+
+		rmap.SavePosition(&frecord)
+	}
+
+	return rmap
 }
 
 func publishMessages(publisher message.Publisher) {
-
 	for {
-		scrapeUrl := fmt.Sprintf(flightradar24.URL_TEMPLATE, 80.0, -80.0, 90.0, -90.0)
-		log.Println("Scraping data from", scrapeUrl)
-		rawData := flightradar24.Retrieve(scrapeUrl)
+		rmap := getPositions()
+		urlList := flightradar24.BuildUrlList(rmap.GetPositions())
+		log.Println(urlList)
 
-		msg := message.NewMessage(watermill.NewUUID(), rawData)
-		middleware.SetCorrelationID(watermill.NewUUID(), msg)
+		for _, v := range urlList {
+			rawData := flightradar24.Retrieve(v)
 
-		if err := publisher.Publish(incomingChannel, msg); err != nil {
-			panic(err)
+			msg := message.NewMessage(watermill.NewUUID(), rawData)
+			middleware.SetCorrelationID(watermill.NewUUID(), msg)
+
+			if err := publisher.Publish(incomingChannel, msg); err != nil {
+				panic(err)
+			}
 		}
 
 		time.Sleep(time.Second * 15)
 	}
-
 }
 
 func FrHandler(msg *message.Message) ([]*message.Message, error) {
