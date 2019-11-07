@@ -17,6 +17,7 @@ import {
    Icao,
    PositionUpdate
 } from "../types";
+import { Record } from "@deepstream/client/dist/record/record";
 
 const globe = new Globe("cesiumContainer");
 const flightStore = new FlightStore(globe.viewer);
@@ -45,28 +46,46 @@ interface DSFlightRecord {
    Time?: Date;
 }
 
+const subscribers = new Map<string, any>();
+
+class Subber {
+   icao: string;
+   record: Record;
+   routeUpdate: any;
+
+   constructor(icao: string, record, updater) {
+      this.icao = icao;
+      this.record = record;
+      this.routeUpdate = updater;
+
+      this.record.subscribe("Position", (p: FlightPosition) => {
+         const pUpdate: PositionUpdate = {
+            type: "positionUpdate",
+            icao: this.icao,
+            body: {
+               timestamp: p.timestamp,
+               altitude: p.altitude,
+               latitude: p.latitude,
+               longitude: p.longitude,
+               heading: p.heading,
+               geohash: p.geohash
+            }
+         };
+         // console.log(pUpdate);
+         routeUpdate([pUpdate]);
+      });
+   }
+}
+
 const getData = () => {
    const icaoList = ds.record.getList("icaoList");
    icaoList.subscribe((icaoList: Icao[]) => {
-      icaoList.forEach(async (icao) => {
-         const record = ds.record.getRecord(icao);
-         await record.whenReady();
-         const dsf: DSFlightRecord = record.get();
-         // console.log(dsf);
-         const pUpdate: PositionUpdate = {
-            type: "positionUpdate",
-            icao: dsf.Icao,
-            body: {
-               timestamp: dsf.Position.timestamp,
-               altitude: dsf.Position.altitude,
-               latitude: dsf.Position.latitude,
-               longitude: dsf.Position.longitude,
-               heading: dsf.Position.heading,
-               geohash: dsf.Position.geohash
-            }
-         };
-
-         routeUpdate([pUpdate]);
+      icaoList.forEach((icao) => {
+         if (!subscribers.has(icao)) {
+            const record = ds.record.getRecord(icao);
+            subscribers.set(icao, new Subber(icao, record, routeUpdate));
+            // console.log(`Created new subber for ${icao}`);
+         }
       });
    });
 };
