@@ -1,4 +1,5 @@
 import { FlightDemographics, FlightPosition } from "./client-source/js/types";
+const { deepEquals } = require("@deepstream/client/dist/util/utils");
 const { LOCAL_WINS } = require("@deepstream/client/dist/record/merge-strategy");
 const Redis = require("ioredis");
 const { DeepstreamClient } = require("@deepstream/client");
@@ -19,9 +20,13 @@ const init = async () => {
    await ds.login();
 };
 
+const known = new Map();
+
 const loop = () => {
    console.log("looping over points");
    let count = 0;
+   let newCount = 0;
+   let updateCount = 0;
 
    const stream = redis.scanStream({
       match: "position:*",
@@ -35,22 +40,29 @@ const loop = () => {
       // Note that resultKeys may contain 0 keys, and that it will sometimes
       // contain duplicates due to SCAN's implementation in Redis.
       resultKeys.forEach(async (k) => {
+         count++;
          const rawData = await redis.get(k);
          const pos: FlightRecord = JSON.parse(rawData);
          keys.add(pos.Icao);
 
-         try {
+         const record = ds.record.getRecord(pos.Icao);
+         await record.whenReady();
+         if (deepEquals(record.get(), {})) {
+            // new record
             ds.record.setData(pos.Icao, pos);
-         } catch (e) {
-            console.log(pos.Icao, e);
+            newCount++;
+         } else if (!deepEquals(record.get("Position"), pos.Positions)) {
+            //update only position, only if it's changed
+            record.set("Position", pos.Positions);
+            updateCount++;
          }
-
-         count++;
       });
    });
 
    stream.on("end", async function() {
-      console.log(`done looping over ${count} points`);
+      console.log(
+         `done looping over ${count} points, ${newCount} new, ${updateCount} updated`
+      );
       const icaoList = ds.record.getList("icaoList");
       icaoList.setEntries(Array.from(keys));
    });
