@@ -11,7 +11,7 @@ const ds = new DeepstreamClient("localhost:6020", {
 
 interface FlightRecord {
    Icao: string;
-   Positions: FlightPosition;
+   Position: FlightPosition;
    Demographic: FlightDemographics;
    Time?: Date;
 }
@@ -51,9 +51,9 @@ const loop = () => {
             // new record
             ds.record.setData(pos.Icao, pos);
             newCount++;
-         } else if (!deepEquals(record.get("Position"), pos.Positions)) {
+         } else if (!deepEquals(record.get("Position"), pos.Position)) {
             //update only position, only if it's changed
-            record.set("Position", pos.Positions);
+            record.set("Position", pos.Position);
             updateCount++;
          }
       });
