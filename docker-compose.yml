@@ -9,6 +9,10 @@ services:
       ports:
          - "4222:4222"
          - "8222:8222"
+   deepstream:
+      image: deepstreamio/deepstream.io
+      ports:
+         - "6020:6020"
    benthos:
       image: jeffail/benthos
       ports:
