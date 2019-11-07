@@ -21,11 +21,11 @@ type Demographic struct {
 	Destination string `json:"destination"`
 }
 type FlightRecord struct {
-	Icao        string
-	Position    Position
-	Demographic Demographic
-	Time        time.Time
-	Source      string
+	Icao        string      `json:"icao"`
+	Position    Position    `json:"position"`
+	Demographic Demographic `json:"demographic"`
+	Time        time.Time   `json:"time"`
+	Source      string      `json:"source"`
 }
 
 func (fr FlightRecord) MarshalBinary() ([]byte, error) {

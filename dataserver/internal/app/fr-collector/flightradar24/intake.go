@@ -42,6 +42,12 @@ func buildQuadTree(allFlightRecords []*pkg.FlightRecord) (*quadtree.Quadtree, in
 	return qt, qtMembers
 }
 
+func BuildUrlList(pList []*pkg.FlightRecord) []string {
+	qt, _ := buildQuadTree(pList)
+	urlList := buildUrlList(qt)
+	return urlList
+}
+
 func Retrieve(url string) []byte {
 	//fmt.Println(url)
 	resp, err := http.Get(url)
