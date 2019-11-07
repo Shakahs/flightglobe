@@ -78,6 +78,7 @@ func publishMessages(publisher message.Publisher) {
 		rmap := getPositions()
 		urlList := flightradar24.BuildUrlList(rmap.GetPositions())
 		log.Println(urlList)
+		delay := 29 / len(urlList)
 
 		for _, v := range urlList {
 			rawData := flightradar24.Retrieve(v)
@@ -88,9 +89,10 @@ func publishMessages(publisher message.Publisher) {
 			if err := publisher.Publish(incomingChannel, msg); err != nil {
 				panic(err)
 			}
+			time.Sleep(time.Duration(delay) * time.Second)
 		}
 
-		time.Sleep(time.Second * 15)
+		time.Sleep(time.Second * 30)
 	}
 }
 
