@@ -23,6 +23,8 @@ import { BootData } from "../../../deepstream/deepstreamPusher";
 const globe = new Globe("cesiumContainer");
 const flightStore = new FlightStore(globe.viewer);
 const routeUpdate = flightStore.routeUpdate.bind(flightStore);
+import { debounce, forEach, throttle } from "lodash-es";
+import { queue } from "d3-queue";
 // const wsh = new WebsocketHandler(routeUpdate);
 // applyClickHandler(viewer, flightStore)
 
@@ -83,28 +85,54 @@ class Subber {
 }
 
 const getData = async () => {
+   //wait until tiles are loaded
+   await new Promise((resolve) => {
+      const poller = setInterval(() => {
+         //@ts-ignore tilesLoaded is missing from TS definition
+         if (globe.viewer.scene.globe.tilesLoaded) {
+            clearInterval(poller);
+            resolve();
+         }
+      }, 1000);
+   });
+
    // const bootDataUntyped = await ds.record.snapshot("bootData");
    const bootData = ((await ds.record.snapshot(
       "bootData"
    )) as unknown) as BootData;
    // const bootMap = new Map<string, FlightRecord>(Object.entries(bootData));
-   flightStore.updateFlightData(bootData);
-   // forEach(bootData, (bd) => {
-   //    flightStore.addOrUpdateFlight({
-   //       type: "positionUpdate",
-   //       icao: bd.icao,
-   //       body: bd.positions[0]
-   //    });
-   // });
+   // flightStore.updateFlightData(bootData);
 
-   const icaoList = ds.record.getList("icaoList");
-   icaoList.subscribe((icaoList: Icao[]) => {
-      icaoList.forEach((icao) => {
-         if (!subscribers.has(icao)) {
-            const record = ds.record.getRecord(icao);
-            subscribers.set(icao, new Subber(icao, record, routeUpdate));
-            // console.log(`Created new subber for ${icao}`);
-         }
+   const q = queue(500);
+   const debouncedRefresh = throttle(() => {
+      globe.viewer.scene.requestRender();
+   }, 1000);
+
+   forEach(bootData, (bd) => {
+      q.defer((cb) => {
+         flightStore.addOrUpdateFlight({
+            type: "positionUpdate",
+            icao: bd.icao,
+            body: bd.positions[0]
+         });
+         debouncedRefresh();
+         setTimeout(() => {
+            cb();
+         }, 1000);
+      });
+   });
+
+   q.await((err) => {
+      console.log("initial data load finished");
+      const icaoList = ds.record.getList("icaoList");
+      icaoList.subscribe((icaoList: Icao[]) => {
+         icaoList.forEach((icao) => {
+            if (!subscribers.has(icao)) {
+               const record = ds.record.getRecord(icao);
+               subscribers.set(icao, new Subber(icao, record, routeUpdate));
+               // console.log(`Created new subber for ${icao}`);
+            }
+         });
       });
    });
 };
