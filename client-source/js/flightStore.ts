@@ -25,6 +25,7 @@ import { forEach, has, merge } from "lodash-es";
 import { FlightObj } from "./flightObj";
 import { GeoCollection } from "./geoCollection";
 import { Color, Event, Viewer } from "cesium";
+import { BootData } from "../../deepstream/deepstreamPusher";
 const aircraftModels: AircraftModelData = require("../resources/aircraft.json");
 
 const Geohash = require("latlon-geohash");
@@ -164,20 +165,22 @@ export class FlightStore {
          this.flightData.set(pos.icao, flightRecord);
       }
 
-      const geoColl = this.getOrCreateGeoCollection(pos.body.geohash[0]);
-      let thisFlight = this.flights.get(pos.icao);
+      this.createFlightInGeo(flightRecord);
+
+      this.updateLatestTimestamp(pos);
+   }
+
+   @action("createFlightInGeo")
+   createFlightInGeo(fr: FlightRecord) {
+      const geoColl = this.getOrCreateGeoCollection(fr.positions[0].geohash[0]);
+      let thisFlight = this.flights.get(fr.icao);
       if (thisFlight && thisFlight.geoCollection !== geoColl) {
          thisFlight.destroy();
          thisFlight = undefined;
       }
       if (!thisFlight) {
-         this.flights.set(
-            pos.icao,
-            new FlightObj(this, flightRecord, pos.icao, geoColl)
-         );
+         this.flights.set(fr.icao, new FlightObj(this, fr, fr.icao, geoColl));
       }
-
-      this.updateLatestTimestamp(pos);
    }
 
    // @action('importTrack')
@@ -204,6 +207,14 @@ export class FlightStore {
             aircraftModels[flightRecord.demographic.model].name;
       }
       this.flightData.set(dem.icao, flightRecord);
+   }
+
+   @action("updateFlightData")
+   updateFlightData(bootData: BootData) {
+      forEach(bootData, (bd) => {
+         this.flightData.set(bd.icao, bd);
+         this.createFlightInGeo(bd);
+      });
    }
 
    @action("updateFilteredFlights")

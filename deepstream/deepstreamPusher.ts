@@ -1,4 +1,9 @@
-import { FlightDemographics, FlightPosition } from "./client-source/js/types";
+import {
+   FlightDemographics,
+   FlightPosition,
+   FlightRecord,
+   Icao
+} from "../client-source/js/types";
 const { deepEquals } = require("@deepstream/client/dist/util/utils");
 const { LOCAL_WINS } = require("@deepstream/client/dist/record/merge-strategy");
 const Redis = require("ioredis");
@@ -9,11 +14,15 @@ const ds = new DeepstreamClient("localhost:6020", {
    mergeStrategy: LOCAL_WINS
 });
 
-interface FlightRecord {
-   Icao: string;
-   Position: FlightPosition;
-   Demographic: FlightDemographics;
-   Time?: Date;
+interface DSFlightRecord {
+   icao: string;
+   position: FlightPosition;
+   demographic: FlightDemographics;
+   time?: Date;
+}
+
+export interface BootData {
+   [k: string]: FlightRecord;
 }
 
 const init = async () => {
@@ -34,6 +43,7 @@ const loop = () => {
    });
 
    const keys = new Set<string>();
+   const bootData: BootData = {};
 
    stream.on("data", function(resultKeys: unknown[]) {
       // `resultKeys` is an array of strings representing key names.
@@ -42,20 +52,27 @@ const loop = () => {
       resultKeys.forEach(async (k) => {
          count++;
          const rawData = await redis.get(k);
-         const pos: FlightRecord = JSON.parse(rawData);
-         keys.add(pos.Icao);
+         const pos: DSFlightRecord = JSON.parse(rawData);
+         keys.add(pos.icao);
 
-         const record = ds.record.getRecord(pos.Icao);
+         const record = ds.record.getRecord(pos.icao);
          await record.whenReady();
          if (deepEquals(record.get(), {})) {
             // new record
-            ds.record.setData(pos.Icao, pos);
+            ds.record.setData(pos.icao, pos);
             newCount++;
-         } else if (!deepEquals(record.get("Position"), pos.Position)) {
+         } else if (!deepEquals(record.get("Position"), pos.position)) {
             //update only position, only if it's changed
-            record.set("Position", pos.Position);
+            record.set("Position", pos.position);
             updateCount++;
          }
+
+         bootData[pos.icao] = {
+            icao: pos.icao,
+            positions: [pos.position],
+            demographic: pos.demographic,
+            time: pos.time
+         };
       });
    });
 
@@ -65,6 +82,9 @@ const loop = () => {
       );
       const icaoList = ds.record.getList("icaoList");
       icaoList.setEntries(Array.from(keys));
+
+      ds.record.setData("bootData", bootData);
+      // console.log(bootData);
    });
 };
 

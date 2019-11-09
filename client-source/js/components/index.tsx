@@ -18,6 +18,7 @@ import {
    PositionUpdate
 } from "../types";
 import { Record } from "@deepstream/client/dist/record/record";
+import { BootData } from "../../../deepstream/deepstreamPusher";
 
 const globe = new Globe("cesiumContainer");
 const flightStore = new FlightStore(globe.viewer);
@@ -58,26 +59,44 @@ class Subber {
       this.record = record;
       this.routeUpdate = updater;
 
-      this.record.subscribe("Position", (p: FlightPosition) => {
-         const pUpdate: PositionUpdate = {
-            type: "positionUpdate",
-            icao: this.icao,
-            body: {
-               timestamp: p.timestamp,
-               altitude: p.altitude,
-               latitude: p.latitude,
-               longitude: p.longitude,
-               heading: p.heading,
-               geohash: p.geohash
-            }
-         };
-         // console.log(pUpdate);
-         routeUpdate([pUpdate]);
-      });
+      this.record.subscribe(
+         "Position",
+         (p: FlightPosition) => {
+            const pUpdate: PositionUpdate = {
+               type: "positionUpdate",
+               icao: this.icao,
+               body: {
+                  timestamp: p.timestamp,
+                  altitude: p.altitude,
+                  latitude: p.latitude,
+                  longitude: p.longitude,
+                  heading: p.heading,
+                  geohash: p.geohash
+               }
+            };
+            // console.log(pUpdate);
+            routeUpdate([pUpdate]);
+         },
+         false
+      );
    }
 }
 
-const getData = () => {
+const getData = async () => {
+   // const bootDataUntyped = await ds.record.snapshot("bootData");
+   const bootData = ((await ds.record.snapshot(
+      "bootData"
+   )) as unknown) as BootData;
+   // const bootMap = new Map<string, FlightRecord>(Object.entries(bootData));
+   flightStore.updateFlightData(bootData);
+   // forEach(bootData, (bd) => {
+   //    flightStore.addOrUpdateFlight({
+   //       type: "positionUpdate",
+   //       icao: bd.icao,
+   //       body: bd.positions[0]
+   //    });
+   // });
+
    const icaoList = ds.record.getList("icaoList");
    icaoList.subscribe((icaoList: Icao[]) => {
       icaoList.forEach((icao) => {
