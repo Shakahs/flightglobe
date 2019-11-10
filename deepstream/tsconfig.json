@@ -1,11 +1,11 @@
 {
-  "extends": "../tsconfig",
-  "files": ["deepstreamPusher.ts"],
-  "include": ["../lib/*"],
-  "compilerOptions": {
-    "outDir": "./compiled",
-    "module": "commonjs",
-    "target": "es2015",
-    "noEmitOnError": false
-  }
+   "extends": "../tsconfig",
+   "include": ["../lib/*", "./**/*"],
+   "exclude": ["./compiled"],
+   "compilerOptions": {
+      "outDir": "./compiled",
+      "module": "commonjs",
+      "target": "es2015",
+      "noEmitOnError": false
+   }
 }
