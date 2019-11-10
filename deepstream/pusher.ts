@@ -1,32 +1,11 @@
-import { FlightDemographics, FlightPosition, FlightRecord } from "../lib/types";
+import { BootData, DeepstreamFlightRecord } from "../lib/types";
+import { initConnection } from "./deepstream";
 const { deepEquals } = require("@deepstream/client/dist/util/utils");
-const { LOCAL_WINS } = require("@deepstream/client/dist/record/merge-strategy");
 const Redis = require("ioredis");
-const { DeepstreamClient } = require("@deepstream/client");
 
 const redis = new Redis();
-const ds = new DeepstreamClient("localhost:6020", {
-   mergeStrategy: LOCAL_WINS
-});
 
-interface DSFlightRecord {
-   icao: string;
-   position: FlightPosition;
-   demographic: FlightDemographics;
-   time?: Date;
-}
-
-export interface BootData {
-   [k: string]: FlightRecord;
-}
-
-const init = async () => {
-   await ds.login();
-};
-
-const known = new Map();
-
-const loop = () => {
+const work = (ds) => {
    console.log("looping over points");
    let count = 0;
    let newCount = 0;
@@ -47,7 +26,7 @@ const loop = () => {
       resultKeys.forEach(async (k) => {
          count++;
          const rawData = await redis.get(k);
-         const pos: DSFlightRecord = JSON.parse(rawData);
+         const pos: DeepstreamFlightRecord = JSON.parse(rawData);
          keys.add(pos.icao);
 
          const record = ds.record.getRecord(pos.icao);
@@ -56,17 +35,17 @@ const loop = () => {
             // new record
             ds.record.setData(pos.icao, pos);
             newCount++;
-         } else if (!deepEquals(record.get("Position"), pos.position)) {
+         } else if (!deepEquals(record.get("Position"), pos.latestPosition)) {
             //update only position, only if it's changed
-            record.set("Position", pos.position);
+            record.set("latestPosition", pos.latestPosition);
             updateCount++;
          }
 
          bootData[pos.icao] = {
             icao: pos.icao,
-            positions: [pos.position],
+            positions: [pos.latestPosition],
             demographic: pos.demographic,
-            time: pos.time
+            time: pos.updated
          };
       });
    });
@@ -83,11 +62,12 @@ const loop = () => {
    });
 };
 
-const startLoop = () => {
-   loop();
-   setInterval(loop, 10 * 1000);
-};
-
 if (require.main === module) {
-   init().then(startLoop);
+   initConnection().then((ds) => {
+      const loop = () => {
+         work(ds);
+      };
+      loop();
+      setInterval(loop, 10 * 1000);
+   });
 }
