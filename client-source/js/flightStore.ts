@@ -24,8 +24,7 @@ import { forEach, has, merge } from "lodash-es";
 import { FlightObj } from "./flightObj";
 import { GeoCollection } from "./geoCollection";
 import { Color, Event, Viewer } from "cesium";
-import { BootData } from "../../deepstream/deepstreamPusher";
-import { FlightRecord } from "../../lib/types";
+import { BootData, FlightRecord } from "../../lib/types";
 const aircraftModels: AircraftModelData = require("../resources/aircraft.json");
 
 const Geohash = require("latlon-geohash");

@@ -13,14 +13,17 @@ import { DeepstreamClient } from "@deepstream/client";
 import { REMOTE_WINS } from "@deepstream/client/dist/record/merge-strategy";
 import { Icao, PositionUpdate } from "../types";
 import { Record } from "@deepstream/client/dist/record/record";
-import { BootData } from "../../../deepstream/deepstreamPusher";
 
 const globe = new Globe("cesiumContainer");
 const flightStore = new FlightStore(globe.viewer);
 const routeUpdate = flightStore.routeUpdate.bind(flightStore);
 import { debounce, forEach, throttle } from "lodash-es";
 import { queue } from "d3-queue";
-import { FlightDemographics, FlightPosition } from "../../../lib/types";
+import {
+   BootData,
+   FlightDemographics,
+   FlightPosition
+} from "../../../lib/types";
 // const wsh = new WebsocketHandler(routeUpdate);
 // applyClickHandler(viewer, flightStore)
 

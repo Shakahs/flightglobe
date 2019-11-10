@@ -20,3 +20,16 @@ export interface FlightRecord {
    demographic: FlightDemographics;
    time?: Date;
 }
+
+export interface DeepstreamFlightRecord {
+   icao: string;
+   latestPosition: FlightPosition;
+   trackRecent: FlightPosition[];
+   trackFull: FlightPosition[];
+   demographic: FlightDemographics;
+   updated?: Date;
+}
+
+export interface BootData {
+   [k: string]: FlightRecord;
+}
