@@ -1,5 +1,4 @@
 import * as React from "react";
-import { FlightRecord } from "../../types";
 import { observer } from "mobx-react";
 import { AgGridReact } from "ag-grid-react";
 import { ColDef, FilterChangedEvent } from "ag-grid-community";
@@ -8,6 +7,7 @@ import {
    GridReadyEvent,
    SelectionChangedEvent
 } from "ag-grid-community/dist/lib/events";
+import { FlightRecord } from "../../../../lib/types";
 
 interface FlightTableProps {
    store: FlightStore;

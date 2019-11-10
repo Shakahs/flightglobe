@@ -6,8 +6,6 @@ import {
 } from "../flightStore";
 import { Color, PointPrimitive } from "cesium";
 import {
-   FlightPosition,
-   FlightRecord,
    LabelDisplayOptions,
    LabelDisplayOptionsUpdate,
    PointDisplayOptions,
@@ -27,6 +25,7 @@ import {
 import { flightObj, flightStore, viewer } from "./mockSetup";
 import { FlightObj } from "../flightObj";
 import { cloneDeep, merge } from "lodash-es";
+import { FlightPosition, FlightRecord } from "../../../lib/types";
 
 describe("FlightStore", function() {
    describe("handles LOD changes from moving the globe", function() {

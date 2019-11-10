@@ -1,9 +1,4 @@
-import {
-   FlightDemographics,
-   FlightPosition,
-   FlightRecord,
-   Icao
-} from "../client-source/js/types";
+import { FlightDemographics, FlightPosition, FlightRecord } from "../lib/types";
 const { deepEquals } = require("@deepstream/client/dist/util/utils");
 const { LOCAL_WINS } = require("@deepstream/client/dist/record/merge-strategy");
 const Redis = require("ioredis");

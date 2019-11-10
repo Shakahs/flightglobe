@@ -11,12 +11,7 @@ import "../styles.scss";
 import { Globe } from "../globe/globe";
 import { DeepstreamClient } from "@deepstream/client";
 import { REMOTE_WINS } from "@deepstream/client/dist/record/merge-strategy";
-import {
-   FlightDemographics,
-   FlightPosition,
-   Icao,
-   PositionUpdate
-} from "../types";
+import { Icao, PositionUpdate } from "../types";
 import { Record } from "@deepstream/client/dist/record/record";
 import { BootData } from "../../../deepstream/deepstreamPusher";
 
@@ -25,6 +20,7 @@ const flightStore = new FlightStore(globe.viewer);
 const routeUpdate = flightStore.routeUpdate.bind(flightStore);
 import { debounce, forEach, throttle } from "lodash-es";
 import { queue } from "d3-queue";
+import { FlightDemographics, FlightPosition } from "../../../lib/types";
 // const wsh = new WebsocketHandler(routeUpdate);
 // applyClickHandler(viewer, flightStore)
 
@@ -96,31 +92,31 @@ const getData = async () => {
       }, 1000);
    });
 
-   // const bootDataUntyped = await ds.record.snapshot("bootData");
-   const bootData = ((await ds.record.snapshot(
-      "bootData"
-   )) as unknown) as BootData;
-   // const bootMap = new Map<string, FlightRecord>(Object.entries(bootData));
-   // flightStore.updateFlightData(bootData);
-
    const q = queue(500);
-   const debouncedRefresh = throttle(() => {
-      globe.viewer.scene.requestRender();
-   }, 1000);
+   try {
+      // const bootDataUntyped = await ds.record.snapshot("bootData");
+      const bootData = ((await ds.record.snapshot(
+         "bootData"
+      )) as unknown) as BootData;
+      // const bootMap = new Map<string, FlightRecord>(Object.entries(bootData));
+      // flightStore.updateFlightData(bootData);
 
-   forEach(bootData, (bd) => {
-      q.defer((cb) => {
-         flightStore.addOrUpdateFlight({
-            type: "positionUpdate",
-            icao: bd.icao,
-            body: bd.positions[0]
+      const debouncedRefresh = throttle(() => {
+         globe.viewer.scene.requestRender();
+      }, 1000);
+
+      forEach(bootData, (bd) => {
+         q.defer((cb) => {
+            flightStore.addOrUpdateFlight({
+               type: "positionUpdate",
+               icao: bd.icao,
+               body: bd.positions[0]
+            });
+            debouncedRefresh();
+            setTimeout(cb, 1000);
          });
-         debouncedRefresh();
-         setTimeout(() => {
-            cb();
-         }, 1000);
       });
-   });
+   } catch (e) {}
 
    q.await((err) => {
       console.log("initial data load finished");

@@ -1,20 +1,6 @@
-export interface FlightDemographics {
-   icao?: string;
-   origin: string;
-   destination: string;
-   model: string;
-}
+import { FlightDemographics, FlightPosition } from "../../lib/types";
 
 export type Icao = string;
-
-export interface FlightPosition {
-   timestamp: number;
-   altitude: number;
-   latitude: number;
-   longitude: number;
-   heading: number;
-   geohash: string;
-}
 
 export interface Message {
    type: "demographicUpdate" | "positionUpdate";
@@ -28,13 +14,6 @@ export interface PositionUpdate extends Message {
 
 export interface DemographicsUpdate extends Message {
    body: FlightDemographics;
-}
-
-export interface FlightRecord {
-   icao: string;
-   positions: FlightPosition[];
-   demographic: FlightDemographics;
-   time?: Date;
 }
 
 export interface UpdateRequest {

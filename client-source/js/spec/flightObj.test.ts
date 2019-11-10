@@ -5,7 +5,6 @@ import {
    FlightAPosition2,
    FlightBPosition1
 } from "./mockData";
-import { FlightPosition, FlightRecord } from "../types";
 import { newICAOMap } from "../utility";
 import { FlightObj } from "../flightObj";
 import { Cartesian3, Color, Label, PointPrimitive, Polyline } from "cesium";
@@ -15,6 +14,7 @@ import {
    PointDisplayOptionDefaults,
    TrailDisplayOptionDefaults
 } from "../flightStore";
+import { FlightPosition, FlightRecord } from "../../../lib/types";
 
 describe("FlightObj", function() {
    it("stores the correct FlightRecord", function() {

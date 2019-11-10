@@ -1,6 +1,5 @@
 import axios from "axios";
 import { FlightStore } from "../flightStore";
-import { FlightRecord } from "../types";
 import {
    PointPrimitive,
    Polyline,
@@ -8,6 +7,7 @@ import {
    ScreenSpaceEventType,
    Viewer
 } from "cesium";
+import { FlightRecord } from "../../../lib/types";
 
 const applyClickHandler = function(viewer: Viewer, flightStore: FlightStore) {
    const handler = new ScreenSpaceEventHandler(viewer.canvas);

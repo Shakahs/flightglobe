@@ -1,7 +1,4 @@
 import {
-   FlightDemographics,
-   FlightPosition,
-   FlightRecord,
    Icao,
    LabelDisplayOptions,
    PointDisplayOptions,
@@ -20,6 +17,11 @@ import { autorun, computed, IReactionDisposer } from "mobx";
 import { convertPositionToCartesian } from "./utility";
 import { FlightStore } from "./flightStore";
 import { GeoCollection } from "./geoCollection";
+import {
+   FlightDemographics,
+   FlightPosition,
+   FlightRecord
+} from "../../lib/types";
 
 const labelOffset = new Cartesian2(10, 20);
 

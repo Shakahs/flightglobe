@@ -8,7 +8,6 @@ import {
 } from "mobx";
 import {
    DemographicsUpdate,
-   FlightRecord,
    Icao,
    Message,
    PositionUpdate,
@@ -26,6 +25,7 @@ import { FlightObj } from "./flightObj";
 import { GeoCollection } from "./geoCollection";
 import { Color, Event, Viewer } from "cesium";
 import { BootData } from "../../deepstream/deepstreamPusher";
+import { FlightRecord } from "../../lib/types";
 const aircraftModels: AircraftModelData = require("../resources/aircraft.json");
 
 const Geohash = require("latlon-geohash");

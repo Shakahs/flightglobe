@@ -1,5 +1,6 @@
 import { Cartesian3 } from "cesium";
-import { FlightPosition, FlightRecord, Icao } from "./types";
+import { Icao } from "./types";
+import { FlightPosition, FlightRecord } from "../../lib/types";
 
 const scratchC3 = new Cartesian3();
 export const convertPositionToCartesian = function(
