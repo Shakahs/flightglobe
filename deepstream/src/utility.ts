@@ -30,7 +30,7 @@ export const dsRecordFromRedis = (
       demographic: lastRecord.demographic,
       latestPosition: lastRecord.position,
       trackRecent: extractLastPositions(sourceRecords, 10),
-      trackFull: extractLastPositions(sourceRecords, 10)
+      trackFull: extractLastPositions(sourceRecords)
    };
    return newRecord;
 };
