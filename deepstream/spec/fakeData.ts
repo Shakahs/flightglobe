@@ -1,4 +1,4 @@
-import { FlightPosition, RedisFlightRecord } from "../lib/types";
+import { FlightPosition, RedisFlightRecord } from "../../lib/types";
 import * as faker from "faker";
 const geohash = require("ngeohash");
 
@@ -32,7 +32,7 @@ export const fakeRedisFlightRecord = (): RedisFlightRecord => {
 
 export const fillArray = <T>(gen, count): T[] => {
    const newArr: T[] = [];
-   for (let i = 0; i++; i < count) {
+   for (let i = 0; i < count; i++) {
       newArr.push(gen());
    }
    return newArr;

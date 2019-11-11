@@ -1,4 +1,4 @@
-import { BootData, DeepstreamFlightRecord } from "../lib/types";
+import { BootData, DeepstreamFlightRecord } from "../../lib/types";
 import { initConnection } from "./deepstream";
 const { deepEquals } = require("@deepstream/client/dist/util/utils");
 const Redis = require("ioredis");
