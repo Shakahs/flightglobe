@@ -1,7 +1,7 @@
 import { fakeRedisFlightRecord, fillArray } from "./fakeData";
 import { GeoPositionListCollector } from "../src/GeoPositionListCollector";
 
-describe("DeepstreamGeocollection", () => {
+describe("GeoPositionListCollector", () => {
    it("should not create duplicate geo containers", function() {
       const dg = new GeoPositionListCollector();
       const input = fakeRedisFlightRecord();
