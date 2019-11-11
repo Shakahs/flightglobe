@@ -1,14 +1,36 @@
-import { FlightPosition, RedisFlightRecord } from "../../lib/types";
-import { takeRight } from "lodash";
+import {
+   DeepstreamFlightRecord,
+   FlightPosition,
+   RedisFlightRecord
+} from "../../lib/types";
+import { takeRight, last } from "lodash";
 
 export const extractLastPositions = (
    sr: RedisFlightRecord[],
-   count: number
+   count?: number
 ): FlightPosition[] => {
-   const rightMost = takeRight(sr, count) as RedisFlightRecord[];
+   let rightMost = sr;
+   if (count) {
+      rightMost = takeRight(sr, count) as RedisFlightRecord[];
+   }
+
    const newArr: FlightPosition[] = [];
    rightMost.forEach((r) => {
       newArr.push(r.position);
    });
    return newArr;
+};
+
+export const dsRecordFromRedis = (
+   sourceRecords: RedisFlightRecord[]
+): DeepstreamFlightRecord => {
+   const lastRecord = last(sourceRecords) as RedisFlightRecord;
+   const newRecord = {
+      icao: lastRecord.icao,
+      demographic: lastRecord.demographic,
+      latestPosition: lastRecord.position,
+      trackRecent: extractLastPositions(sourceRecords, 10),
+      trackFull: extractLastPositions(sourceRecords, 10)
+   };
+   return newRecord;
 };
