@@ -1,7 +1,7 @@
 import { FlightPosition, RedisFlightRecord } from "../../lib/types";
-import { takeRight } from "lodash-es";
+import { takeRight } from "lodash";
 
-export const extractPositions = (
+export const extractLastPositions = (
    sr: RedisFlightRecord[],
    count: number
 ): FlightPosition[] => {
