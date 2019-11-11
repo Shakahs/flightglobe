@@ -39,10 +39,10 @@ export interface DeepstreamFlightRecord {
 
 export interface DeepstreamGeo {
    geohash: string;
-   flights: {
-      [k: string]: DeepstreamFlightRecord;
-   };
+   flights: Map<string, DeepstreamFlightRecord>;
 }
+
+export type DeepstreamGeoMap = Map<string, DeepstreamGeo>;
 
 export interface BootData {
    [k: string]: FlightRecord;

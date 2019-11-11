@@ -1,5 +1,7 @@
 import {
    DeepstreamFlightRecord,
+   DeepstreamGeo,
+   DeepstreamGeoMap,
    FlightPosition,
    RedisFlightRecord
 } from "../../lib/types";
