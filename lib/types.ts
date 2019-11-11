@@ -21,6 +21,13 @@ export interface FlightRecord {
    time?: Date;
 }
 
+export interface RedisFlightRecord {
+   icao: string;
+   position: FlightPosition;
+   demographic: FlightDemographics;
+   time?: Date;
+}
+
 export interface DeepstreamFlightRecord {
    icao: string;
    latestPosition: FlightPosition;
@@ -28,6 +35,13 @@ export interface DeepstreamFlightRecord {
    trackFull: FlightPosition[];
    demographic: FlightDemographics;
    updated?: Date;
+}
+
+export interface DeepstreamGeo {
+   geohash: string;
+   flights: {
+      [k: string]: DeepstreamFlightRecord;
+   };
 }
 
 export interface BootData {
