@@ -61,13 +61,13 @@ func getPositions() *pkg.LockableRecordMap {
 	var rmap = pkg.CreateCache()
 	for _, v := range icaoList {
 		rawPos, err := redisClient.Get(v).Bytes()
-		pkg.Check(err)
+		if err == nil {
+			var frecord pkg.FlightRecord
+			err = json.Unmarshal(rawPos, &frecord)
+			pkg.Check(err)
 
-		var frecord pkg.FlightRecord
-		err = json.Unmarshal(rawPos, &frecord)
-		pkg.Check(err)
-
-		rmap.SavePosition(&frecord)
+			rmap.SavePosition(&frecord)
+		}
 	}
 
 	return rmap
