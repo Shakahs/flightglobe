@@ -28,7 +28,7 @@ export interface RedisFlightRecord {
    time?: Date;
 }
 
-export interface DeepstreamFlightRecord {
+export interface MasterFlightRecord {
    icao: string;
    latestPosition: FlightPosition;
    trackRecent: FlightPosition[];
@@ -37,12 +37,14 @@ export interface DeepstreamFlightRecord {
    updated?: Date;
 }
 
-export interface DeepstreamGeo {
+export interface GeoPositionList {
    geohash: string;
-   flights: Map<string, DeepstreamFlightRecord>;
+   flights: {
+      [k: string]: FlightPosition;
+   };
 }
 
-export type DeepstreamGeoMap = Map<string, DeepstreamGeo>;
+export type GeoPositionListCollection = Map<string, GeoPositionList>;
 
 export interface BootData {
    [k: string]: FlightRecord;

@@ -1,7 +1,7 @@
 import {
-   DeepstreamFlightRecord,
-   DeepstreamGeo,
-   DeepstreamGeoMap,
+   MasterFlightRecord,
+   GeoPositionList,
+   GeoPositionListCollection,
    FlightPosition,
    RedisFlightRecord
 } from "../../lib/types";
@@ -23,9 +23,9 @@ export const extractLastPositions = (
    return newArr;
 };
 
-export const dsRecordFromRedis = (
+export const MasterFlightRecordFromRedis = (
    sourceRecords: RedisFlightRecord[]
-): DeepstreamFlightRecord => {
+): MasterFlightRecord => {
    const lastRecord = last(sourceRecords) as RedisFlightRecord;
    const newRecord = {
       icao: lastRecord.icao,

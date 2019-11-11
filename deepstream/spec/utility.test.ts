@@ -1,6 +1,9 @@
 import { fakeRedisFlightRecord, fillArray } from "./fakeData";
-import { DeepstreamFlightRecord, RedisFlightRecord } from "../../lib/types";
-import { dsRecordFromRedis, extractLastPositions } from "../src/utility";
+import { MasterFlightRecord, RedisFlightRecord } from "../../lib/types";
+import {
+   MasterFlightRecordFromRedis,
+   extractLastPositions
+} from "../src/utility";
 import { last } from "lodash";
 
 describe("utility functions", () => {
@@ -34,10 +37,10 @@ describe("utility functions", () => {
       });
    });
 
-   describe("dsRecordFromRedis", () => {
+   describe("MasterFlightRecordFromRedis", () => {
       it("should convert records", function() {
          const input = fillArray<RedisFlightRecord>(fakeRedisFlightRecord, 50);
-         const output = dsRecordFromRedis(input);
+         const output = MasterFlightRecordFromRedis(input);
          const lastPos = last(input) as RedisFlightRecord;
          expect(output.trackRecent.length).toEqual(10);
          expect(output.trackFull.length).toEqual(50);

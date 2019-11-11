@@ -1,9 +1,9 @@
 import { fakeRedisFlightRecord, fillArray } from "./fakeData";
-import { DeepstreamGeocollection } from "../src/DeepstreamGeocollection";
+import { GeoPositionListCollector } from "../src/GeoPositionListCollector";
 
-describe("DeepstreamGeocollection", () => {
+describe("GeoPositionListCollector", () => {
    it("should not create duplicate geo containers", function() {
-      const dg = new DeepstreamGeocollection();
+      const dg = new GeoPositionListCollector();
       const input = fakeRedisFlightRecord();
       expect(dg.geocoll.size).toEqual(0);
       const result1 = dg.getSetGeo(input.position.geohash);
