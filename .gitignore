@@ -18,3 +18,4 @@ dataserver/cmd/fr-db-persistor/fr-db-persistor
 dataserver/cmd/pipelinedb-sidecar/pipelinedb-sidecar
 *packr*
 /deepstream/compiled/
+webpack-stats.json
