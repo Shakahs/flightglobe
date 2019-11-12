@@ -6,7 +6,6 @@ import ReactDOM from "react-dom";
 import { FlightStore } from "../ws-implementation/flightStore";
 // import applyClickHandler from "../globe/clickHandler";
 import App from "./app";
-import WebsocketHandler from "../websocketHandler";
 import "../styles.scss";
 import { Globe } from "../globe/globe";
 import { DeepstreamClient } from "@deepstream/client";

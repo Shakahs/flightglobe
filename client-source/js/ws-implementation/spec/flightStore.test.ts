@@ -13,7 +13,6 @@ import {
    TrailDisplayOptions,
    TrailDisplayOptionsUpdate
 } from "../../types";
-import { convertPositionToCartesian, newICAOMap } from "../../utility";
 import {
    FlightADemographic,
    FlightAPosition1,
@@ -26,6 +25,7 @@ import { flightObj, flightStore, viewer } from "./mockSetup";
 import { FlightObj } from "../flightObj";
 import { cloneDeep, merge } from "lodash-es";
 import { FlightPosition, FlightRecord } from "../../../../lib/types";
+import { convertPositionToCartesian } from "../utility";
 
 describe("FlightStore", function() {
    describe("handles LOD changes from moving the globe", function() {
