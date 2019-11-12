@@ -1,5 +1,5 @@
 import axios from "axios";
-import { FlightStore } from "../flightStore";
+import { FlightStore } from "../ws-implementation/flightStore";
 import {
    PointPrimitive,
    Polyline,

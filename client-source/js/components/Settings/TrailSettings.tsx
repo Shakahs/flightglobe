@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FlightStore } from "../../flightStore";
+import { FlightStore } from "../../ws-implementation/flightStore";
 import Swatch from "../Swatch/Swatch";
 import { observer } from "mobx-react";
 import Container from "reactstrap/lib/Container";

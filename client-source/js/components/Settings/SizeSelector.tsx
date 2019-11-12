@@ -2,7 +2,7 @@ import * as React from "react";
 import { UncontrolledDropdown } from "reactstrap";
 import DropdownItem from "reactstrap/lib/DropdownItem";
 import DropdownMenu from "reactstrap/lib/DropdownMenu";
-import { FlightStore } from "../../flightStore";
+import { FlightStore } from "../../ws-implementation/flightStore";
 import DropdownToggle from "reactstrap/lib/DropdownToggle";
 
 interface SizeSelectorProps {

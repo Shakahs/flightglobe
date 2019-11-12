@@ -7,7 +7,7 @@ import { faCog } from "@fortawesome/free-solid-svg-icons/faCog";
 import { faFilter } from "@fortawesome/free-solid-svg-icons/faFilter";
 import { faCircleNotch } from "@fortawesome/free-solid-svg-icons/faCircleNotch";
 import { faGlobeAmericas } from "@fortawesome/free-solid-svg-icons/faGlobeAmericas";
-import { FlightStore } from "../flightStore";
+import { FlightStore } from "../ws-implementation/flightStore";
 import LoadingScreen from "./LoadingScreen/LoadingScreen";
 import classnames from "classnames";
 import { hot } from "react-hot-loader/root";

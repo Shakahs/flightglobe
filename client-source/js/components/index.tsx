@@ -3,7 +3,7 @@ import "regenerator-runtime/runtime";
 import "cesiumSource/Widgets/widgets.css";
 import * as React from "react";
 import ReactDOM from "react-dom";
-import { FlightStore } from "../flightStore";
+import { FlightStore } from "../ws-implementation/flightStore";
 // import applyClickHandler from "../globe/clickHandler";
 import App from "./app";
 import WebsocketHandler from "../websocketHandler";

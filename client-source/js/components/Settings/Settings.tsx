@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FlightStore } from "../../flightStore";
+import { FlightStore } from "../../ws-implementation/flightStore";
 import NavLink from "reactstrap/lib/NavLink";
 import NavItem from "reactstrap/lib/NavItem";
 import Nav from "reactstrap/lib/Nav";

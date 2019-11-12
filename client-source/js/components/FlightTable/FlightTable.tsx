@@ -2,7 +2,7 @@ import * as React from "react";
 import { observer } from "mobx-react";
 import { AgGridReact } from "ag-grid-react";
 import { ColDef, FilterChangedEvent } from "ag-grid-community";
-import { FlightStore } from "../../flightStore";
+import { FlightStore } from "../../ws-implementation/flightStore";
 import {
    GridReadyEvent,
    SelectionChangedEvent

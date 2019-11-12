@@ -1,8 +1,8 @@
 import * as React from "react";
 import FlightTable from "./FlightTable/FlightTable";
-import { shallow } from "../spec/karma-enzyme";
-import { viewer } from "../spec/mockSetup";
-import { flightStore } from "../spec/mockSetup";
+import { shallow } from "../ws-implementation/spec/karma-enzyme";
+import { viewer } from "../ws-implementation/spec/mockSetup";
+import { flightStore } from "../ws-implementation/spec/mockSetup";
 import App from "./app";
 
 describe("<App />", () => {

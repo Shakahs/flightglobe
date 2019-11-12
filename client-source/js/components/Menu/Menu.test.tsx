@@ -1,8 +1,8 @@
-import { mount } from "../../spec/karma-enzyme";
+import { mount } from "../../ws-implementation/spec/karma-enzyme";
 import * as React from "react";
 import Menu from "./Menu";
 import { noop } from "lodash-es";
-import { globe } from "../../spec/mockSetup";
+import { globe } from "../../ws-implementation/spec/mockSetup";
 import { Button, DropdownItem } from "reactstrap";
 
 describe("<Menu />", () => {
