@@ -2658,10 +2658,10 @@ core-js-compat@^3.1.1:
     browserslist "^4.6.6"
     semver "^6.3.0"
 
-core-js@^3.4.0:
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.4.0.tgz#29ea478601789c72f2978e9bb98f43546f89d3aa"
-  integrity sha512-lQxb4HScV71YugF/X28LtePZj9AB7WqOpcB+YztYxusvhrgZiQXPmCYfPC5LHsw/+ScEtDbXU3xbqH3CjBRmYA==
+core-js@^3.4.1:
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.4.1.tgz#76dd6828412900ab27c8ce0b22e6114d7ce21b18"
+  integrity sha512-KX/dnuY/J8FtEwbnrzmAjUYgLqtk+cxM86hfG60LGiW3MmltIc2yAmDgBgEkfm0blZhUrdr1Zd84J2Y14mLxzg==
 
 core-util-is@1.0.2, core-util-is@~1.0.0:
   version "1.0.2"
@@ -5991,10 +5991,10 @@ mobx-react@^6.1.4:
   dependencies:
     mobx-react-lite "^1.4.2"
 
-mobx@^4.14.1:
-  version "4.14.1"
-  resolved "https://registry.yarnpkg.com/mobx/-/mobx-4.14.1.tgz#0dc5622523363f6f5b467a5a0c4c99846b789748"
-  integrity sha512-Oyg7Sr7r78b+QPYLufJyUmxTWcqeQ96S1nmtyur3QL8SeI6e0TqcKKcxbG+sVJLWANhHQkBW/mDmgG5DDC4fdw==
+mobx@^4.15.0:
+  version "4.15.0"
+  resolved "https://registry.yarnpkg.com/mobx/-/mobx-4.15.0.tgz#039d07af132220ca776889f7adc429817b60a69b"
+  integrity sha512-cEhpWEKSL66m9Y1KbmMdl7X4XY0gDLW/m4H1gLTPhvHuL3uCMw82iyIU97xi92BB6RSCx61AX5yeAgRIxtufjg==
 
 mock-socket@^9.0.2:
   version "9.0.2"
