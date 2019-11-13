@@ -2,6 +2,7 @@ import { GeoManagerCreator } from "../GeoManagerCreator";
 import { provideConnection } from "./support";
 import { GeoManager } from "../GeoManager";
 import { fakeFlightPosition } from "../../../../deepstream/spec/fakeData";
+import { FlightSubscriber } from "../FlightSubscriber";
 
 describe("GeoManager", () => {
    let dsConn;
@@ -87,5 +88,19 @@ describe("GeoManager", () => {
       expect(gm.flightSubscriberMap.size).toEqual(1);
       expect(gm.flightSubscriberMap.has("icaoA")).toBeFalsy();
       expect(gm.flightSubscriberMap.has("icaoB")).toBeTruthy();
+   });
+
+   it("should call the destroy method on FlightSubscribers when itself being destroyed", function() {
+      const fakeDataA = fakeFlightPosition();
+      gm.handleUpdate({
+         geohash: gm.geohash,
+         flights: {
+            icaoA: fakeDataA
+         }
+      });
+      const flightA = gm.flightSubscriberMap.get("icaoA") as FlightSubscriber;
+      spyOn(flightA, "destroy");
+      gm.destroy();
+      expect(flightA.destroy).toHaveBeenCalled();
    });
 });

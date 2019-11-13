@@ -1,1 +1,3 @@
-export class FlightSubscriber {}
+export class FlightSubscriber {
+   destroy() {}
+}
