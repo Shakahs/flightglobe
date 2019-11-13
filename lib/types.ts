@@ -49,3 +49,5 @@ export type GeoPositionListCollection = Map<string, GeoPositionList>;
 export interface BootData {
    [k: string]: FlightRecord;
 }
+
+export type Geohash = string;
