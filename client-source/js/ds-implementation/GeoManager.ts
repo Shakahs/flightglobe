@@ -1,1 +1,3 @@
-export class GeoManager {}
+export class GeoManager {
+   destroy() {}
+}

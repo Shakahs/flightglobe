@@ -22,12 +22,12 @@ export class GeoManagerCreator {
             this.geoManagerMap.set(s, new GeoManager());
          }
       });
-      const toDelete = without(
-         Array.from(this.geoManagerMap.keys()),
-         ...geohashList
+
+      without(Array.from(this.geoManagerMap.keys()), ...geohashList).forEach(
+         (s) => {
+            this.geoManagerMap.get(s)?.destroy();
+            this.geoManagerMap.delete(s);
+         }
       );
-      toDelete.forEach((s) => {
-         this.geoManagerMap.delete(s);
-      });
    }
 }
