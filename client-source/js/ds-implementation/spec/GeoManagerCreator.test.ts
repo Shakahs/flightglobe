@@ -1,19 +1,8 @@
 import "regenerator-runtime/runtime";
 // import DSServer from "./mockServer";
-import { DeepstreamClient } from "@deepstream/client";
 import { GeoManagerCreator } from "../GeoManagerCreator";
 import { GeoManager } from "../GeoManager";
-const {
-   REMOTE_WINS
-} = require("@deepstream/client/dist/record/merge-strategy");
-
-const provideConnection = async () => {
-   const newConn = new DeepstreamClient("localhost:6020", {
-      mergeStrategy: REMOTE_WINS
-   });
-   await newConn.login();
-   return newConn;
-};
+import { provideConnection } from "./support";
 
 const sleep = (n: number) =>
    new Promise(
@@ -55,6 +44,10 @@ describe("GeoManagerCreator", async () => {
       gmc = new GeoManagerCreator(dsConn);
    });
 
+   afterEach(() => {
+      gmc.destroy();
+   });
+
    it("should create GeoManagers when receiving geohashes", function() {
       gmc.handleUpdate(["a"]);
       expect(gmc.geoManagerMap.size).toEqual(1);
@@ -84,8 +77,16 @@ describe("GeoManagerCreator", async () => {
    it("should call the destroy method on a GeoManager when discarding it", function() {
       gmc.handleUpdate(["a"]);
       const geoA = gmc.geoManagerMap.get("a") as GeoManager;
-      spyOn(geoA, "destroy");
+      spyOn(geoA, "destroy").and.callThrough();
       gmc.handleUpdate([]);
+      expect(geoA.destroy).toHaveBeenCalled();
+   });
+
+   it("should call the destroy method on a GeoManager when itself being destroyed", function() {
+      gmc.handleUpdate(["a"]);
+      const geoA = gmc.geoManagerMap.get("a") as GeoManager;
+      spyOn(geoA, "destroy").and.callThrough();
+      gmc.destroy();
       expect(geoA.destroy).toHaveBeenCalled();
    });
 });

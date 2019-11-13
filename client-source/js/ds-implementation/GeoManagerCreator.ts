@@ -5,21 +5,22 @@ import { without } from "lodash-es";
 
 export class GeoManagerCreator {
    dsConn: DeepstreamClient;
+   dsRecord;
    geoManagerMap: Map<Geohash, GeoManager>;
    constructor(dsConn: DeepstreamClient) {
       this.dsConn = dsConn;
       this.geoManagerMap = new Map();
    }
 
-   async subscribe() {
-      const geohashList = await this.dsConn.record.getList("geohashList");
-      geohashList.subscribe(this.handleUpdate);
+   subscribe() {
+      this.dsRecord = this.dsConn.record.getList("geohashList");
+      this.dsRecord.subscribe(this.handleUpdate);
    }
 
-   handleUpdate(geohashList: string[]) {
+   handleUpdate(geohashList: Geohash[]) {
       geohashList.forEach((s) => {
          if (!this.geoManagerMap.has(s)) {
-            this.geoManagerMap.set(s, new GeoManager());
+            this.geoManagerMap.set(s, new GeoManager(this.dsConn, s));
          }
       });
 
@@ -29,5 +30,12 @@ export class GeoManagerCreator {
             this.geoManagerMap.delete(s);
          }
       );
+   }
+
+   destroy() {
+      this.geoManagerMap.forEach((s) => {
+         s.destroy();
+      });
+      // this.dsRecord.discard();
    }
 }
