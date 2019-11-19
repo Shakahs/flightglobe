@@ -1,9 +1,8 @@
 import { DeepstreamClient } from "@deepstream/client";
-import { FlightPosition, Geohash, GeoPositionList } from "../../../lib/types";
-import { ObservableMap } from "mobx";
+import { Geohash, GeoPositionList } from "../../../lib/types";
 import { Icao } from "../types";
 import { FlightSubscriber } from "./FlightSubscriber";
-import { without, forEach, keys } from "lodash";
+import { debounce, forEach, keys, without } from "lodash";
 
 export class GeoManager {
    dsConn: DeepstreamClient;
@@ -15,11 +14,16 @@ export class GeoManager {
    //    "flightPositions"
    // );
    flightSubscriberMap: Map<Icao, FlightSubscriber>;
+   debouncedRender: () => void;
+   hasRendered: boolean = false; //for testing purposes
 
    constructor(dsConn: DeepstreamClient, geohash: Geohash) {
       this.dsConn = dsConn;
       this.geohash = geohash;
       this.flightSubscriberMap = new Map();
+      this.debouncedRender = debounce(this.render.bind(this), 500, {
+         maxWait: 1000
+      });
    }
 
    subscribe() {
@@ -50,6 +54,10 @@ export class GeoManager {
          this.flightSubscriberMap.get(d)?.destroy();
          this.flightSubscriberMap.delete(d);
       });
+   }
+
+   render() {
+      this.hasRendered = true;
    }
 
    destroy() {

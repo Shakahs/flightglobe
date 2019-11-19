@@ -1,5 +1,5 @@
 import { GeoManagerCreator } from "../GeoManagerCreator";
-import { provideConnection } from "./support";
+import { provideConnection, sleep } from "./support";
 import { GeoManager } from "../GeoManager";
 import { fakeFlightPosition } from "../../../../deepstream/spec/fakeData";
 import { FlightSubscriber } from "../FlightSubscriber";
@@ -123,5 +123,13 @@ describe("GeoManager", () => {
       spyOn(flightA, "destroy");
       gm.destroy();
       expect(flightA.destroy).toHaveBeenCalled();
+   });
+
+   it("has a debounced render method that executes after a delay", async () => {
+      spyOn(gm, "render").and.callThrough();
+      gm.debouncedRender();
+      expect(gm.hasRendered).toBeFalsy();
+      await sleep(2000);
+      expect(gm.hasRendered).toBeTruthy();
    });
 });
