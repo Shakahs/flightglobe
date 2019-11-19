@@ -2,7 +2,7 @@ import "regenerator-runtime/runtime";
 // import DSServer from "./mockServer";
 import { GeoManagerCreator } from "../GeoManagerCreator";
 import { GeoManager } from "../GeoManager";
-import { provideConnection } from "./support";
+import { createViewer, destroyViewer, provideConnection } from "./support";
 
 describe("GeoManagerCreator", async () => {
    let testServer;
@@ -78,5 +78,13 @@ describe("GeoManagerCreator", async () => {
       spyOn(geoA, "destroy").and.callThrough();
       gmc.destroy();
       expect(geoA.destroy).toHaveBeenCalled();
+   });
+
+   it("should store a Cesium Viewer if one is provided", function() {
+      const viewer = createViewer();
+      const gmc2 = new GeoManagerCreator(dsConn, viewer);
+      expect(gmc2.viewer).toBe(viewer);
+      destroyViewer(viewer);
+      expect(gmc.viewer).toEqual(null);
    });
 });

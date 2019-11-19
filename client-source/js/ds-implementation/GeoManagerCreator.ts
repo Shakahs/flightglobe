@@ -2,14 +2,23 @@ import { DeepstreamClient } from "@deepstream/client";
 import { Geohash } from "../../../lib/types";
 import { GeoManager } from "./GeoManager";
 import { without } from "lodash-es";
+import { configure } from "mobx";
+import { Viewer } from "cesium";
+
+configure({
+   enforceActions: "observed"
+});
 
 export class GeoManagerCreator {
    dsConn: DeepstreamClient;
    dsRecord;
    geoManagerMap: Map<Geohash, GeoManager>;
-   constructor(dsConn: DeepstreamClient) {
+   viewer: Viewer | null = null;
+
+   constructor(dsConn: DeepstreamClient, viewer?: Viewer) {
       this.dsConn = dsConn;
       this.geoManagerMap = new Map();
+      this.viewer = viewer || null;
    }
 
    subscribe() {
