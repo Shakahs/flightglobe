@@ -44,6 +44,7 @@ export class GeoManager {
          Array.from(this.flightSubscriberMap.keys()),
          ...this.flightPositions.keys()
       ).forEach((d) => {
+         this.flightSubscriberMap.get(d)?.destroy();
          this.flightSubscriberMap.delete(d);
       });
    }

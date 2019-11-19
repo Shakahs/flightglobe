@@ -90,6 +90,27 @@ describe("GeoManager", () => {
       expect(gm.flightSubscriberMap.has("icaoB")).toBeTruthy();
    });
 
+   it("should call the destroy method on FlightSubscribers when discarding them", function() {
+      const fakeDataA = fakeFlightPosition();
+      const fakeDataB = fakeFlightPosition();
+      gm.handleUpdate({
+         geohash: gm.geohash,
+         flights: {
+            icaoA: fakeDataA,
+            icaoB: fakeDataB
+         }
+      });
+      const flightA = gm.flightSubscriberMap.get("icaoA") as FlightSubscriber;
+      spyOn(flightA, "destroy");
+      gm.handleUpdate({
+         geohash: gm.geohash,
+         flights: {
+            icaoB: fakeDataB
+         }
+      });
+      expect(flightA.destroy).toHaveBeenCalled();
+   });
+
    it("should call the destroy method on FlightSubscribers when itself being destroyed", function() {
       const fakeDataA = fakeFlightPosition();
       gm.handleUpdate({
