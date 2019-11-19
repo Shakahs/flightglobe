@@ -4,16 +4,6 @@ import { GeoManagerCreator } from "../GeoManagerCreator";
 import { GeoManager } from "../GeoManager";
 import { provideConnection } from "./support";
 
-const sleep = (n: number) =>
-   new Promise(
-      (resolve) => (
-         setTimeout(() => {
-            resolve();
-         }),
-         n * 1000
-      )
-   );
-
 describe("GeoManagerCreator", async () => {
    let testServer;
    let dsConn;

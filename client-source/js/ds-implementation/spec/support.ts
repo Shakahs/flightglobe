@@ -10,3 +10,6 @@ export const provideConnection = async () => {
    await newConn.login();
    return newConn;
 };
+
+export const sleep = (n: number) =>
+   new Promise((resolve) => setTimeout(resolve, n));
