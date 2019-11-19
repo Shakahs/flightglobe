@@ -27,9 +27,12 @@ export class GeoManagerCreator {
    }
 
    handleUpdate(geohashList: Geohash[]) {
-      geohashList.forEach((s) => {
-         if (!this.geoManagerMap.has(s)) {
-            this.geoManagerMap.set(s, new GeoManager(this.dsConn, s));
+      geohashList.forEach((geohash) => {
+         if (!this.geoManagerMap.has(geohash)) {
+            this.geoManagerMap.set(
+               geohash,
+               new GeoManager(this.dsConn, geohash, this.viewer)
+            );
          }
       });
 

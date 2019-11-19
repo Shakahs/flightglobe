@@ -3,6 +3,8 @@ import { Geohash, GeoPositionList } from "../../../lib/types";
 import { Icao } from "../types";
 import { FlightSubscriber } from "./FlightSubscriber";
 import { debounce, forEach, keys, without } from "lodash";
+import { CesiumPrimitiveHandler } from "./CesiumPrimitiveHandler";
+import { Viewer } from "cesium";
 
 export class GeoManager {
    dsConn: DeepstreamClient;
@@ -16,14 +18,22 @@ export class GeoManager {
    flightSubscriberMap: Map<Icao, FlightSubscriber>;
    debouncedRender: () => void;
    hasRendered: boolean = false; //for testing purposes
+   cph: CesiumPrimitiveHandler | null = null;
 
-   constructor(dsConn: DeepstreamClient, geohash: Geohash) {
+   constructor(
+      dsConn: DeepstreamClient,
+      geohash: Geohash,
+      viewer?: Viewer | null
+   ) {
       this.dsConn = dsConn;
       this.geohash = geohash;
       this.flightSubscriberMap = new Map();
       this.debouncedRender = debounce(this.render.bind(this), 500, {
          maxWait: 1000
       });
+      if (viewer) {
+         this.cph = new CesiumPrimitiveHandler(viewer);
+      }
    }
 
    subscribe() {
