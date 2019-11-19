@@ -138,14 +138,6 @@ describe("GeoManager", () => {
          expect(flightA.destroy).toHaveBeenCalled();
       });
 
-      it("has a debounced render method that executes after a delay", async () => {
-         spyOn(gm, "render").and.callThrough();
-         gm.debouncedRender();
-         expect(gm.hasRendered).toBeFalsy();
-         await sleep(2000);
-         expect(gm.hasRendered).toBeTruthy();
-      });
-
       it("should not store a CesiumPrimitiveHandler when a Cesium Viewer is not provided", function() {
          expect(gm.cph).toEqual(null);
       });
@@ -169,6 +161,15 @@ describe("GeoManager", () => {
 
       it("should store a CesiumPrimitiveHandler when a Cesium Viewer is provided", function() {
          expect(gm.cph instanceof CesiumPrimitiveHandler).toBeTruthy();
+      });
+
+      it("has a debounced render method that calls the CesiumPrimitiveHandler render method", async () => {
+         spyOn(gm.cph as CesiumPrimitiveHandler, "render").and.callThrough();
+         gm.debouncedRender();
+         expect(gm.hasRendered).toBeFalsy();
+         await sleep(2000);
+         expect(gm.hasRendered).toBeTruthy();
+         expect(gm.cph?.render).toHaveBeenCalled();
       });
    });
 });

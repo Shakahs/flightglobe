@@ -67,6 +67,7 @@ export class GeoManager {
    }
 
    render() {
+      this.cph?.render();
       this.hasRendered = true;
    }
 
