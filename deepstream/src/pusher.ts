@@ -1,11 +1,18 @@
 import { initConnection } from "./deepstream";
 import { MasterFlightRecordFromRedis } from "./utility";
 import { GeoPositionListCollector } from "./GeoPositionListCollector";
-import { BootData, RedisFlightRecord } from "../../lib/types";
 import {
+   BootData,
+   FlightDemographics,
+   FlightDemographicsCollection,
+   RedisFlightRecord
+} from "../../lib/types";
+import {
+   DS_DEMOGRAPHICS_KEY,
    DS_GEOHASH_LIST_KEY,
    generateGeohashedPositionsKey
 } from "../../lib/constants";
+import { Icao } from "../../client-source/js/types";
 
 const Redis = require("ioredis");
 
@@ -35,6 +42,7 @@ const work = (ds) => {
    const keys = new Set<string>();
    const bootData: BootData = {};
    const geoCollector = new GeoPositionListCollector();
+   const demographicsMap: FlightDemographicsCollection = {};
 
    stream.on("data", function(resultKeys: unknown[]) {
       // `resultKeys` is an array of strings representing key names.
@@ -44,7 +52,9 @@ const work = (ds) => {
          // count++;
          const rawData: string[] = await redis.lrange(k, 0, -1);
          const pos: RedisFlightRecord[] = rawData.map((i) => JSON.parse(i));
-         geoCollector.store(MasterFlightRecordFromRedis(pos));
+         const masterRecord = MasterFlightRecordFromRedis(pos);
+         geoCollector.store(masterRecord);
+         demographicsMap[masterRecord.icao] = masterRecord.demographic;
          count++;
          // keys.add(pos.icao);
          //
@@ -82,10 +92,18 @@ const work = (ds) => {
       });
 
       const geohashList = ds.record.getList(DS_GEOHASH_LIST_KEY);
+      await geohashList.whenReady();
       await geohashList.setEntriesWithAck(
          Array.from(geoCollector.geocoll.keys())
       );
-      console.log("done writing geohashlist and geohashed positions");
+
+      const demographicsRecord = ds.record.getRecord(DS_DEMOGRAPHICS_KEY);
+      await demographicsRecord.whenReady();
+      await demographicsRecord.setWithAck(demographicsMap);
+
+      console.log(
+         "done writing geohashlist, geohashed positions, and demographics"
+      );
    });
 };
 

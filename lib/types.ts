@@ -51,3 +51,7 @@ export interface BootData {
 }
 
 export type Geohash = string;
+
+export interface FlightDemographicsCollection {
+   [k: string]: FlightDemographics;
+}
