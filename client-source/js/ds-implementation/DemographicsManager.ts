@@ -5,6 +5,7 @@ import { Icao } from "../types";
 import {
    FlightDemographics,
    FlightDemographicsCollection,
+   GeohashBoolMap,
    GeohashBoolMapObservable
 } from "../../../lib/types";
 import { DS_DEMOGRAPHICS_KEY } from "../../../lib/constants";
@@ -39,16 +40,21 @@ export class DemographicsManager {
       this.dsRecord.subscribe(this.handleUpdate.bind(this));
    }
 
+   @action
    handleUpdate(d: FlightDemographicsCollection) {
       this.demographicsMap.replace(d);
    }
 
-   @action
    handleCameraChange() {
       if (this.viewer) {
          const focusGeo = getCameraPositionGeohash(this.viewer);
          const neighborList = getGeohashNeighbors(focusGeo);
-         this.detailedFlights.replace(neighborList);
+         this.updateDetailedFlights(neighborList);
       }
+   }
+
+   @action
+   updateDetailedFlights(neighborList: GeohashBoolMap) {
+      this.detailedFlights.replace(neighborList);
    }
 }

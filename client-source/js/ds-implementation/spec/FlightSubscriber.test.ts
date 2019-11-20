@@ -9,6 +9,8 @@ import { fakeFlightPosition } from "../../../../deepstream/spec/fakeData";
 import { noop } from "lodash";
 import { convertPositionToCartesian } from "../../ws-implementation/utility";
 import { DemographicsManager } from "../DemographicsManager";
+import { flightObj, flightStore } from "../../ws-implementation/spec/mockSetup";
+import { FlightADemographic } from "../../ws-implementation/spec/mockData";
 
 describe("FlightSubscriber", () => {
    let viewer: Viewer;
@@ -53,5 +55,24 @@ describe("FlightSubscriber", () => {
       expect(fsA.requestRender).not.toHaveBeenCalled();
       fsA.updatePosition(fakeFlightPosition());
       expect(fsA.requestRender).toHaveBeenCalled();
+   });
+
+   it("should get the demographic data", function() {
+      expect(fsA.demographic).toBeUndefined();
+      const demoData = {
+         origin: "SFO",
+         destination: "LAX",
+         model: "747-800"
+      };
+      demographics.handleUpdate({ icaoA: demoData });
+      expect(fsA.demographic).toEqual(demoData);
+   });
+
+   it("should get the detail selection status", function() {
+      expect(fsA.isDetailSelected).toBeFalsy();
+      demographics.updateDetailedFlights(
+         new Map([[fsA.position.geohash, true]])
+      );
+      expect(fsA.isDetailSelected).toBeTruthy();
    });
 });

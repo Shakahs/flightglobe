@@ -1,5 +1,5 @@
 import { DeepstreamClient } from "@deepstream/client";
-import { FlightPosition } from "../../../lib/types";
+import { FlightDemographics, FlightPosition } from "../../../lib/types";
 import { Icao } from "../types";
 import {
    action,
@@ -17,6 +17,7 @@ require("./mobxConfig");
 
 interface FlightRenderParams {
    position: Cartesian3;
+   demographic: FlightDemographics | undefined;
 }
 
 export class FlightSubscriber {
@@ -24,10 +25,10 @@ export class FlightSubscriber {
    readonly icao: Icao;
    // gm: GeoManager;
    private disposers: Array<IReactionDisposer>;
-   @observable private position: FlightPosition;
+   @observable position: FlightPosition;
    readonly requestRender: () => void;
    needsRender: boolean = false;
-   demographics: DemographicsManager;
+   demographicsManager: DemographicsManager;
 
    constructor(
       dsConn: DeepstreamClient,
@@ -41,7 +42,7 @@ export class FlightSubscriber {
       // this.gm = gm;
       this.position = pos;
       this.requestRender = requestRender;
-      this.demographics = demographics;
+      this.demographicsManager = demographics;
 
       const renderRequester = reaction(
          () => this.renderParams,
@@ -76,8 +77,21 @@ export class FlightSubscriber {
       return convertPositionToCartesian(this.position);
    }
 
+   @computed get demographic(): FlightDemographics | undefined {
+      return this.demographicsManager.demographicsMap.get(this.icao);
+   }
+
+   @computed get isDetailSelected(): boolean {
+      return this.demographicsManager.detailedFlights.has(
+         this.position.geohash
+      );
+   }
+
    @computed get renderParams(): FlightRenderParams {
-      return { position: this.cartesianPosition };
+      return {
+         position: this.cartesianPosition,
+         demographic: this.demographic
+      };
    }
 
    destroy() {
