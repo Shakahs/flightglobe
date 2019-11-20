@@ -38,4 +38,11 @@ describe("FlightSubscriber", () => {
       fsA.updatePosition(newPos);
       expect(fsA.cartesianPosition).toEqual(convertPositionToCartesian(newPos));
    });
+
+   it("should call the render function when relevant state updates", function() {
+      spyOn(fsA, "requestRender");
+      expect(fsA.requestRender).not.toHaveBeenCalled();
+      fsA.updatePosition(fakeFlightPosition());
+      expect(fsA.requestRender).toHaveBeenCalled();
+   });
 });

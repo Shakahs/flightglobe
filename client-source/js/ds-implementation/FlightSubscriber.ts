@@ -1,18 +1,29 @@
 import { DeepstreamClient } from "@deepstream/client";
 import { FlightPosition } from "../../../lib/types";
 import { Icao } from "../types";
-import { action, autorun, computed, IReactionDisposer, observable } from "mobx";
+import {
+   action,
+   computed,
+   IReactionDisposer,
+   observable,
+   reaction
+} from "mobx";
 import { Cartesian3 } from "cesium";
 import { convertPositionToCartesian } from "../ws-implementation/utility";
+
 require("./mobxConfig");
+
+interface FlightRenderParams {
+   position: Cartesian3;
+}
 
 export class FlightSubscriber {
    private readonly dsConn: DeepstreamClient;
    private readonly icao: Icao;
    // gm: GeoManager;
-   // private disposers: Array<IReactionDisposer>;
+   private disposers: Array<IReactionDisposer>;
    @observable private position: FlightPosition;
-   private readonly requestRender: () => void;
+   readonly requestRender: () => void;
 
    constructor(
       dsConn: DeepstreamClient,
@@ -26,6 +37,16 @@ export class FlightSubscriber {
       this.position = pos;
       this.requestRender = requestRender;
 
+      const renderRequester = reaction(
+         () => this.renderParams,
+         () => {
+            this.requestRender();
+         },
+         {
+            fireImmediately: true
+         }
+      );
+
       // const pointUpdater = autorun(
       //    () => {
       //       const newPosition = this.cartesianPosition;
@@ -35,7 +56,8 @@ export class FlightSubscriber {
       //    },
       //    { name: "pointUpdater" }
       // );
-      // this.disposers = [pointUpdater];
+
+      this.disposers = [renderRequester];
    }
 
    @action
@@ -45,6 +67,10 @@ export class FlightSubscriber {
 
    @computed get cartesianPosition(): Cartesian3 {
       return convertPositionToCartesian(this.position);
+   }
+
+   @computed get renderParams(): FlightRenderParams {
+      return { position: this.cartesianPosition };
    }
 
    destroy() {}
