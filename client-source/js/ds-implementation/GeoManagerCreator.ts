@@ -20,16 +20,15 @@ export class GeoManagerCreator {
 
    subscribe() {
       this.dsRecord = this.dsConn.record.getList("geohashList");
-      this.dsRecord.subscribe(this.handleUpdate);
+      this.dsRecord.subscribe(this.handleUpdate.bind(this));
    }
 
    handleUpdate(geohashList: Geohash[]) {
       geohashList.forEach((geohash) => {
          if (!this.geoManagerMap.has(geohash)) {
-            this.geoManagerMap.set(
-               geohash,
-               new GeoManager(this.dsConn, geohash, this.viewer)
-            );
+            const newGm = new GeoManager(this.dsConn, geohash, this.viewer);
+            newGm.subscribe();
+            this.geoManagerMap.set(geohash, newGm);
          }
       });
 

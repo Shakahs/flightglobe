@@ -39,7 +39,7 @@ export class GeoManager {
 
    subscribe() {
       this.dsRecord = this.dsConn.record.getRecord(this.geohash);
-      this.dsRecord.subscribe(this.handleUpdate);
+      this.dsRecord.subscribe(this.handleUpdate.bind(this));
    }
 
    handleUpdate(update: GeoPositionList) {

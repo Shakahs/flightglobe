@@ -23,6 +23,7 @@ import {
    FlightDemographics,
    FlightPosition
 } from "../../../lib/types";
+import { GeoManagerCreator } from "../ds-implementation/GeoManagerCreator";
 // const wsh = new WebsocketHandler(routeUpdate);
 // applyClickHandler(viewer, flightStore)
 
@@ -36,7 +37,7 @@ ReactDOM.render(
    document.getElementById("reactApp")
 );
 
-const ds = new DeepstreamClient("localhost:6020", {
+const dsConn = new DeepstreamClient("localhost:6020", {
    mergeStrategy: REMOTE_WINS
 });
 
@@ -82,57 +83,61 @@ class Subber {
    }
 }
 
-const getData = async () => {
+const getData = () => {
    //wait until tiles are loaded
-   await new Promise((resolve) => {
-      const poller = setInterval(() => {
-         //@ts-ignore tilesLoaded is missing from TS definition
-         if (globe.viewer.scene.globe.tilesLoaded) {
-            clearInterval(poller);
-            resolve();
-         }
-      }, 1000);
-   });
+   // await new Promise((resolve) => {
+   //    const poller = setInterval(() => {
+   //       //@ts-ignore tilesLoaded is missing from TS definition
+   //       if (globe.viewer.scene.globe.tilesLoaded) {
+   //          clearInterval(poller);
+   //          resolve();
+   //       }
+   //    }, 1000);
+   // });
 
-   const q = queue(500);
-   try {
-      // const bootDataUntyped = await ds.record.snapshot("bootData");
-      const bootData = ((await ds.record.snapshot(
-         "bootData"
-      )) as unknown) as BootData;
-      // const bootMap = new Map<string, FlightRecord>(Object.entries(bootData));
-      // flightStore.updateFlightData(bootData);
+   const gmc = new GeoManagerCreator(dsConn, globe.viewer);
+   gmc.subscribe();
 
-      const debouncedRefresh = throttle(() => {
-         globe.viewer.scene.requestRender();
-      }, 1000);
-
-      forEach(bootData, (bd) => {
-         q.defer((cb) => {
-            flightStore.addOrUpdateFlight({
-               type: "positionUpdate",
-               icao: bd.icao,
-               body: bd.positions[0]
-            });
-            debouncedRefresh();
-            setTimeout(cb, 1000);
-         });
-      });
-   } catch (e) {}
-
-   q.await((err) => {
-      console.log("initial data load finished");
-      const icaoList = ds.record.getList("icaoList");
-      icaoList.subscribe((icaoList: Icao[]) => {
-         icaoList.forEach((icao) => {
-            if (!subscribers.has(icao)) {
-               const record = ds.record.getRecord(icao);
-               subscribers.set(icao, new Subber(icao, record, routeUpdate));
-               // console.log(`Created new subber for ${icao}`);
-            }
-         });
-      });
-   });
+   //
+   // const q = queue(500);
+   // try {
+   //    // const bootDataUntyped = await ds.record.snapshot("bootData");
+   //    const bootData = ((await ds.record.snapshot(
+   //       "bootData"
+   //    )) as unknown) as BootData;
+   //    // const bootMap = new Map<string, FlightRecord>(Object.entries(bootData));
+   //    // flightStore.updateFlightData(bootData);
+   //
+   //    const debouncedRefresh = throttle(() => {
+   //       globe.viewer.scene.requestRender();
+   //    }, 1000);
+   //
+   //    forEach(bootData, (bd) => {
+   //       q.defer((cb) => {
+   //          flightStore.addOrUpdateFlight({
+   //             type: "positionUpdate",
+   //             icao: bd.icao,
+   //             body: bd.positions[0]
+   //          });
+   //          debouncedRefresh();
+   //          setTimeout(cb, 1000);
+   //       });
+   //    });
+   // } catch (e) {}
+   //
+   // q.await((err) => {
+   //    console.log("initial data load finished");
+   //    const icaoList = ds.record.getList("icaoList");
+   //    icaoList.subscribe((icaoList: Icao[]) => {
+   //       icaoList.forEach((icao) => {
+   //          if (!subscribers.has(icao)) {
+   //             const record = ds.record.getRecord(icao);
+   //             subscribers.set(icao, new Subber(icao, record, routeUpdate));
+   //             // console.log(`Created new subber for ${icao}`);
+   //          }
+   //       });
+   //    });
+   // });
 };
 
-ds.login().then(getData);
+dsConn.login().then(getData);
