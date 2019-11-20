@@ -11,6 +11,7 @@ import {
 import { Cartesian3 } from "cesium";
 import { convertPositionToCartesian } from "../ws-implementation/utility";
 import { each } from "lodash";
+import { DemographicsManager } from "./DemographicsManager";
 
 require("./mobxConfig");
 
@@ -26,18 +27,21 @@ export class FlightSubscriber {
    @observable private position: FlightPosition;
    readonly requestRender: () => void;
    needsRender: boolean = false;
+   demographics: DemographicsManager;
 
    constructor(
       dsConn: DeepstreamClient,
       icao: Icao,
       pos: FlightPosition,
-      requestRender: () => void
+      requestRender: () => void,
+      demographics: DemographicsManager
    ) {
       this.dsConn = dsConn;
       this.icao = icao;
       // this.gm = gm;
       this.position = pos;
       this.requestRender = requestRender;
+      this.demographics = demographics;
 
       const renderRequester = reaction(
          () => this.renderParams,

@@ -12,15 +12,18 @@ import { Viewer } from "cesium";
 import { CesiumPrimitiveHandler } from "../CesiumPrimitiveHandler";
 import { FlightPosition } from "../../../../lib/types";
 import { convertPositionToCartesian } from "../../ws-implementation/utility";
+import { DemographicsManager } from "../DemographicsManager";
 
 describe("GeoManager", () => {
    let dsConn;
+   let demographics: DemographicsManager;
 
    beforeAll(async () => {
       // jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
       // testServer = DSServer;
       // testServer.start();
       dsConn = await provideConnection();
+      demographics = new DemographicsManager(dsConn);
    });
 
    describe("render and reconciliation", () => {
@@ -30,7 +33,7 @@ describe("GeoManager", () => {
       let fakeDataB: FlightPosition;
       let flightA: FlightSubscriber;
       beforeEach(() => {
-         gmc = new GeoManagerCreator(dsConn);
+         gmc = new GeoManagerCreator(dsConn, demographics);
          gmc.handleUpdate(["a"]);
          gm = gmc.geoManagerMap.get("a") as GeoManager;
          fakeDataA = fakeFlightPosition();
@@ -144,7 +147,7 @@ describe("GeoManager", () => {
 
       beforeEach(() => {
          viewer = createViewer();
-         gmc = new GeoManagerCreator(dsConn, viewer);
+         gmc = new GeoManagerCreator(dsConn, demographics, viewer);
          gmc.handleUpdate(["a"]);
          gm = gmc.geoManagerMap.get("a") as GeoManager;
       });

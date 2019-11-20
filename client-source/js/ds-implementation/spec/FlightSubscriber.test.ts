@@ -8,6 +8,7 @@ import { FlightSubscriber } from "../FlightSubscriber";
 import { fakeFlightPosition } from "../../../../deepstream/spec/fakeData";
 import { noop } from "lodash";
 import { convertPositionToCartesian } from "../../ws-implementation/utility";
+import { DemographicsManager } from "../DemographicsManager";
 
 describe("FlightSubscriber", () => {
    let viewer: Viewer;
@@ -16,21 +17,29 @@ describe("FlightSubscriber", () => {
    let gmc: GeoManagerCreator;
    let gm: GeoManager;
    let fsA: FlightSubscriber;
+   let demographics: DemographicsManager;
 
    beforeAll(async () => {
       // jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
       // testServer = DSServer;
       // testServer.start();
       dsConn = await provideConnection();
+      demographics = new DemographicsManager(dsConn);
    });
 
    beforeEach(() => {
       viewer = createViewer();
-      gmc = new GeoManagerCreator(dsConn, viewer);
+      gmc = new GeoManagerCreator(dsConn, demographics, viewer);
       gmc.handleUpdate(["a"]);
       gm = gmc.geoManagerMap.get("a") as GeoManager;
       cph = gm.cph as CesiumPrimitiveHandler;
-      fsA = new FlightSubscriber(dsConn, "icaoA", fakeFlightPosition(), noop);
+      fsA = new FlightSubscriber(
+         dsConn,
+         "icaoA",
+         fakeFlightPosition(),
+         noop,
+         demographics
+      );
    });
 
    it("should store updated positions", () => {

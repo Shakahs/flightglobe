@@ -3,11 +3,13 @@ import "regenerator-runtime/runtime";
 import { GeoManagerCreator } from "../GeoManagerCreator";
 import { GeoManager } from "../GeoManager";
 import { createViewer, destroyViewer, provideConnection } from "./support";
+import { DemographicsManager } from "../DemographicsManager";
 
 describe("GeoManagerCreator", async () => {
    let testServer;
    let dsConn;
    let gmc: GeoManagerCreator;
+   let demographics: DemographicsManager;
    beforeAll(async () => {
       // jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
       // testServer = DSServer;
@@ -31,7 +33,8 @@ describe("GeoManagerCreator", async () => {
    // });
 
    beforeEach(() => {
-      gmc = new GeoManagerCreator(dsConn);
+      demographics = new DemographicsManager(dsConn);
+      gmc = new GeoManagerCreator(dsConn, demographics);
    });
 
    afterEach(() => {
@@ -82,7 +85,7 @@ describe("GeoManagerCreator", async () => {
 
    it("should store a Cesium Viewer if one is provided", function() {
       const viewer = createViewer();
-      const gmc2 = new GeoManagerCreator(dsConn, viewer);
+      const gmc2 = new GeoManagerCreator(dsConn, demographics, viewer);
       expect(gmc2.viewer).toBe(viewer);
       destroyViewer(viewer);
       expect(gmc.viewer).toEqual(null);

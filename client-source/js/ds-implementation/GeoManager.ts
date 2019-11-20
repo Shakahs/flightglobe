@@ -6,6 +6,7 @@ import { CesiumPrimitiveHandler } from "./CesiumPrimitiveHandler";
 import { Viewer } from "cesium";
 import { FlightSubscriberMap } from "./types";
 import { generateGeohashedPositionsKey } from "../../../lib/constants";
+import { DemographicsManager } from "./DemographicsManager";
 
 require("./mobxConfig");
 
@@ -21,14 +22,17 @@ export class GeoManager {
    flightSubscriberMap: FlightSubscriberMap;
    debouncedRender: () => void;
    cph: CesiumPrimitiveHandler | null = null;
+   demographics: DemographicsManager;
 
    constructor(
       dsConn: DeepstreamClient,
       geohash: Geohash,
+      demographics: DemographicsManager,
       viewer?: Viewer | null
    ) {
       this.dsConn = dsConn;
       this.geohash = geohash;
+      this.demographics = demographics;
       this.flightSubscriberMap = new Map();
       this.debouncedRender = debounce(this.render.bind(this), 500, {
          maxWait: 1000
@@ -60,7 +64,8 @@ export class GeoManager {
                   this.dsConn,
                   icao,
                   fpos,
-                  this.debouncedRender
+                  this.debouncedRender,
+                  this.demographics
                )
             );
          }

@@ -5,6 +5,7 @@ import { without } from "lodash-es";
 import { configure } from "mobx";
 import { Viewer } from "cesium";
 import { DS_GEOHASH_LIST_KEY } from "../../../lib/constants";
+import { DemographicsManager } from "./DemographicsManager";
 require("./mobxConfig");
 
 export class GeoManagerCreator {
@@ -12,11 +13,17 @@ export class GeoManagerCreator {
    dsRecord;
    geoManagerMap: Map<Geohash, GeoManager>;
    viewer: Viewer | null = null;
+   demographics: DemographicsManager;
 
-   constructor(dsConn: DeepstreamClient, viewer?: Viewer) {
+   constructor(
+      dsConn: DeepstreamClient,
+      demographics: DemographicsManager,
+      viewer?: Viewer
+   ) {
       this.dsConn = dsConn;
-      this.geoManagerMap = new Map();
+      this.demographics = demographics;
       this.viewer = viewer || null;
+      this.geoManagerMap = new Map();
    }
 
    subscribe() {
@@ -27,7 +34,12 @@ export class GeoManagerCreator {
    handleUpdate(geohashList: Geohash[]) {
       geohashList.forEach((geohash) => {
          if (!this.geoManagerMap.has(geohash)) {
-            const newGm = new GeoManager(this.dsConn, geohash, this.viewer);
+            const newGm = new GeoManager(
+               this.dsConn,
+               geohash,
+               this.demographics,
+               this.viewer
+            );
             newGm.subscribe();
             this.geoManagerMap.set(geohash, newGm);
          }
