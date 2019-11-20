@@ -1,20 +1,37 @@
 import { DeepstreamClient } from "@deepstream/client";
-import { Viewer } from "cesium";
-import { ObservableMap } from "mobx";
+import { Event, Viewer } from "cesium";
+import { action, ObservableMap } from "mobx";
 import { Icao } from "../types";
 import {
    FlightDemographics,
-   FlightDemographicsCollection
+   FlightDemographicsCollection,
+   GeohashBoolMapObservable
 } from "../../../lib/types";
 import { DS_DEMOGRAPHICS_KEY } from "../../../lib/constants";
+import {
+   getCameraPositionGeohash,
+   getGeohashNeighbors
+} from "../globe/geohashUtilities";
 
 export class DemographicsManager {
    dsConn: DeepstreamClient;
    dsRecord;
-   demographics: ObservableMap<Icao, FlightDemographics> = new ObservableMap();
+   demographicsMap: ObservableMap<
+      Icao,
+      FlightDemographics
+   > = new ObservableMap();
+   viewer: Viewer | null = null;
+   cameraEventDisposer: Event.RemoveCallback | null;
+   detailedFlights: GeohashBoolMapObservable = new ObservableMap();
 
-   constructor(dsConn: DeepstreamClient) {
+   constructor(dsConn: DeepstreamClient, viewer?: Viewer) {
       this.dsConn = dsConn;
+      this.viewer = viewer || null;
+      this.cameraEventDisposer = viewer
+         ? viewer.camera.changed.addEventListener(
+              this.handleCameraChange.bind(this)
+           )
+         : null;
    }
 
    subscribe() {
@@ -23,6 +40,15 @@ export class DemographicsManager {
    }
 
    handleUpdate(d: FlightDemographicsCollection) {
-      this.demographics.replace(d);
+      this.demographicsMap.replace(d);
+   }
+
+   @action
+   handleCameraChange() {
+      if (this.viewer) {
+         const focusGeo = getCameraPositionGeohash(this.viewer);
+         const neighborList = getGeohashNeighbors(focusGeo);
+         this.detailedFlights.replace(neighborList);
+      }
    }
 }

@@ -96,7 +96,7 @@ const getData = () => {
    //    }, 1000);
    // });
 
-   const dm = new DemographicsManager(dsConn);
+   const dm = new DemographicsManager(dsConn, globe.viewer);
    dm.subscribe();
 
    const gmc = new GeoManagerCreator(dsConn, dm, globe.viewer);
