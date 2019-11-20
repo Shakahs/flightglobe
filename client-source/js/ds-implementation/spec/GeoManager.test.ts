@@ -166,9 +166,8 @@ describe("GeoManager", () => {
       it("has a debounced render method that calls the CesiumPrimitiveHandler render method", async () => {
          spyOn(gm.cph as CesiumPrimitiveHandler, "render").and.callThrough();
          gm.debouncedRender();
-         expect(gm.hasRendered).toBeFalsy();
+         expect(gm.cph?.render).not.toHaveBeenCalled();
          await sleep(2000);
-         expect(gm.hasRendered).toBeTruthy();
          expect(gm.cph?.render).toHaveBeenCalled();
       });
    });

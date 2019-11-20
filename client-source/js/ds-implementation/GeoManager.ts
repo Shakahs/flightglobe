@@ -19,7 +19,6 @@ export class GeoManager {
    // );
    flightSubscriberMap: FlightSubscriberMap;
    debouncedRender: () => void;
-   hasRendered: boolean = false; //for testing purposes
    cph: CesiumPrimitiveHandler | null = null;
 
    constructor(
@@ -69,8 +68,7 @@ export class GeoManager {
    }
 
    render() {
-      this.cph?.render();
-      this.hasRendered = true;
+      this.cph?.render(this.flightSubscriberMap);
    }
 
    destroy() {
