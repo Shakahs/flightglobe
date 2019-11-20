@@ -4,10 +4,7 @@ import { GeoManager } from "./GeoManager";
 import { without } from "lodash-es";
 import { configure } from "mobx";
 import { Viewer } from "cesium";
-
-configure({
-   enforceActions: "observed"
-});
+require("./mobxConfig");
 
 export class GeoManagerCreator {
    dsConn: DeepstreamClient;

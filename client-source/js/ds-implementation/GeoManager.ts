@@ -1,10 +1,12 @@
 import { DeepstreamClient } from "@deepstream/client";
 import { Geohash, GeoPositionList } from "../../../lib/types";
-import { Icao } from "../types";
 import { FlightSubscriber } from "./FlightSubscriber";
 import { debounce, forEach, keys, without } from "lodash";
 import { CesiumPrimitiveHandler } from "./CesiumPrimitiveHandler";
 import { Viewer } from "cesium";
+import { FlightSubscriberMap } from "./types";
+
+require("./mobxConfig");
 
 export class GeoManager {
    dsConn: DeepstreamClient;
@@ -15,7 +17,7 @@ export class GeoManager {
    //    undefined,
    //    "flightPositions"
    // );
-   flightSubscriberMap: Map<Icao, FlightSubscriber>;
+   flightSubscriberMap: FlightSubscriberMap;
    debouncedRender: () => void;
    hasRendered: boolean = false; //for testing purposes
    cph: CesiumPrimitiveHandler | null = null;
