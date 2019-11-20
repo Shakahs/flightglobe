@@ -47,7 +47,10 @@ export class GeoManager {
 
       //create new FlightSubscribers under the respective ICAO key
       forEach(update.flights, (fpos, icao) => {
-         if (!this.flightSubscriberMap.has(icao)) {
+         const foundFlight = this.flightSubscriberMap.get(icao);
+         if (foundFlight) {
+            foundFlight.updatePosition(fpos);
+         } else {
             this.flightSubscriberMap.set(
                icao,
                new FlightSubscriber(this.dsConn, icao, fpos, () => {})

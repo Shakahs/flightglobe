@@ -10,6 +10,8 @@ import { fakeFlightPosition } from "../../../../deepstream/spec/fakeData";
 import { FlightSubscriber } from "../FlightSubscriber";
 import { Viewer } from "cesium";
 import { CesiumPrimitiveHandler } from "../CesiumPrimitiveHandler";
+import { FlightPosition } from "../../../../lib/types";
+import { convertPositionToCartesian } from "../../ws-implementation/utility";
 
 describe("GeoManager", () => {
    let dsConn;
@@ -21,13 +23,25 @@ describe("GeoManager", () => {
       dsConn = await provideConnection();
    });
 
-   describe("non Cesium functionality", () => {
+   describe("render and reconciliation", () => {
       let gmc: GeoManagerCreator;
       let gm: GeoManager;
+      let fakeDataA: FlightPosition;
+      let fakeDataB: FlightPosition;
+      let flightA: FlightSubscriber;
       beforeEach(() => {
          gmc = new GeoManagerCreator(dsConn);
          gmc.handleUpdate(["a"]);
          gm = gmc.geoManagerMap.get("a") as GeoManager;
+         fakeDataA = fakeFlightPosition();
+         fakeDataB = fakeFlightPosition();
+         gm.handleUpdate({
+            geohash: gm.geohash,
+            flights: {
+               icaoA: fakeDataA
+            }
+         });
+         flightA = gm.flightSubscriberMap.get("icaoA") as FlightSubscriber;
       });
 
       // it("should update the flightPositions map when it receives data", function() {
@@ -55,15 +69,6 @@ describe("GeoManager", () => {
       // });
 
       it("should create FlightSubscribers when needed", function() {
-         expect(gm.flightSubscriberMap.size).toEqual(0);
-         const fakeDataA = fakeFlightPosition();
-         const fakeDataB = fakeFlightPosition();
-         gm.handleUpdate({
-            geohash: gm.geohash,
-            flights: {
-               icaoA: fakeDataA
-            }
-         });
          expect(gm.flightSubscriberMap.size).toEqual(1);
          expect(gm.flightSubscriberMap.has("icaoA")).toBeTruthy();
          gm.handleUpdate({
@@ -79,8 +84,6 @@ describe("GeoManager", () => {
       });
 
       it("should destroy FlightSubscribers when they are longer needed", function() {
-         const fakeDataA = fakeFlightPosition();
-         const fakeDataB = fakeFlightPosition();
          gm.handleUpdate({
             geohash: gm.geohash,
             flights: {
@@ -99,19 +102,20 @@ describe("GeoManager", () => {
          expect(gm.flightSubscriberMap.has("icaoB")).toBeTruthy();
       });
 
-      it("should call the destroy method on FlightSubscribers when discarding them", function() {
-         const fakeDataA = fakeFlightPosition();
-         const fakeDataB = fakeFlightPosition();
+      it("should update the positions of existing FlightSubscribers", function() {
+         const newPos = fakeFlightPosition();
          gm.handleUpdate({
             geohash: gm.geohash,
             flights: {
-               icaoA: fakeDataA,
-               icaoB: fakeDataB
+               icaoA: newPos
             }
          });
-         const flightA = gm.flightSubscriberMap.get(
-            "icaoA"
-         ) as FlightSubscriber;
+         expect(flightA.cartesianPosition).toEqual(
+            convertPositionToCartesian(newPos)
+         );
+      });
+
+      it("should call the destroy method on FlightSubscribers when discarding them", function() {
          spyOn(flightA, "destroy");
          gm.handleUpdate({
             geohash: gm.geohash,
@@ -123,16 +127,6 @@ describe("GeoManager", () => {
       });
 
       it("should call the destroy method on FlightSubscribers when itself being destroyed", function() {
-         const fakeDataA = fakeFlightPosition();
-         gm.handleUpdate({
-            geohash: gm.geohash,
-            flights: {
-               icaoA: fakeDataA
-            }
-         });
-         const flightA = gm.flightSubscriberMap.get(
-            "icaoA"
-         ) as FlightSubscriber;
          spyOn(flightA, "destroy");
          gm.destroy();
          expect(flightA.destroy).toHaveBeenCalled();
