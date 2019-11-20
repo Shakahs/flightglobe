@@ -2,7 +2,11 @@ import { initConnection } from "./deepstream";
 import { MasterFlightRecordFromRedis } from "./utility";
 import { GeoPositionListCollector } from "./GeoPositionListCollector";
 import { BootData, RedisFlightRecord } from "../../lib/types";
-const { deepEquals } = require("@deepstream/client/dist/util/utils");
+import {
+   DS_GEOHASH_LIST_KEY,
+   generateGeohashedPositionsKey
+} from "../../lib/constants";
+
 const Redis = require("ioredis");
 
 const redis = new Redis();
@@ -21,10 +25,7 @@ const redis = new Redis();
 // };
 
 const work = (ds) => {
-   console.log("looping over points");
    let count = 0;
-   let newCount = 0;
-   let updateCount = 0;
 
    const stream = redis.scanStream({
       match: "track:*",
@@ -44,6 +45,7 @@ const work = (ds) => {
          const rawData: string[] = await redis.lrange(k, 0, -1);
          const pos: RedisFlightRecord[] = rawData.map((i) => JSON.parse(i));
          geoCollector.store(MasterFlightRecordFromRedis(pos));
+         count++;
          // keys.add(pos.icao);
          //
          // const record = ds.record.getRecord(pos.icao);
@@ -69,18 +71,21 @@ const work = (ds) => {
 
    stream.on("end", async function() {
       console.log(
-         `done looping over ${count} points, ${newCount} new, ${updateCount} updated`
+         `looped over ${count} points, ${geoCollector.geocoll.size} geocollections created`
       );
-      console.log(`${geoCollector.geocoll.size} geocollections created`);
 
       //set the geos first, otherwise the client may request them before they exist
       geoCollector.geocoll.forEach((geo) => {
-         const dsGeo = ds.record.getRecord(geo.geohash);
-         dsGeo.set(geo);
+         const dsGeo = ds.record.getRecord(
+            generateGeohashedPositionsKey(geo.geohash)
+         );
       });
 
-      const geohashList = ds.record.getList("geohashList");
-      geohashList.setEntries(Array.from(geoCollector.geocoll.keys()));
+      const geohashList = ds.record.getList(DS_GEOHASH_LIST_KEY);
+      await geohashList.setEntriesWithAck(
+         Array.from(geoCollector.geocoll.keys())
+      );
+      console.log("done writing geohashlist and geohashed positions");
    });
 };
 

@@ -5,6 +5,7 @@ import { debounce, forEach, keys, without } from "lodash";
 import { CesiumPrimitiveHandler } from "./CesiumPrimitiveHandler";
 import { Viewer } from "cesium";
 import { FlightSubscriberMap } from "./types";
+import { generateGeohashedPositionsKey } from "../../../lib/constants";
 
 require("./mobxConfig");
 
@@ -38,7 +39,9 @@ export class GeoManager {
    }
 
    subscribe() {
-      this.dsRecord = this.dsConn.record.getRecord(this.geohash);
+      this.dsRecord = this.dsConn.record.getRecord(
+         generateGeohashedPositionsKey(this.geohash)
+      );
       this.dsRecord.subscribe(this.handleUpdate.bind(this));
    }
 

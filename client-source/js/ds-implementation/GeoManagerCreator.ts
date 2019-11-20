@@ -4,6 +4,7 @@ import { GeoManager } from "./GeoManager";
 import { without } from "lodash-es";
 import { configure } from "mobx";
 import { Viewer } from "cesium";
+import { DS_GEOHASH_LIST_KEY } from "../../../lib/constants";
 require("./mobxConfig");
 
 export class GeoManagerCreator {
@@ -19,7 +20,7 @@ export class GeoManagerCreator {
    }
 
    subscribe() {
-      this.dsRecord = this.dsConn.record.getList("geohashList");
+      this.dsRecord = this.dsConn.record.getList(DS_GEOHASH_LIST_KEY);
       this.dsRecord.subscribe(this.handleUpdate.bind(this));
    }
 
