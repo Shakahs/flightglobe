@@ -77,5 +77,6 @@ export class GeoManager {
    destroy() {
       this.dsRecord?.discard();
       this.flightSubscriberMap.forEach((f) => f.destroy());
+      this.cph?.destroy();
    }
 }

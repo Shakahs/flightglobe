@@ -164,5 +164,11 @@ describe("GeoManager", () => {
          await sleep(2000);
          expect(gm.cph?.render).toHaveBeenCalled();
       });
+
+      it("should call the destroy method on CesiumPrimitiveHandlers when itself being destroyed", function() {
+         spyOn(gm.cph as CesiumPrimitiveHandler, "destroy");
+         gm.destroy();
+         expect(gm.cph?.destroy).toHaveBeenCalled();
+      });
    });
 });
