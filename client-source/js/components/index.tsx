@@ -24,6 +24,7 @@ import {
    FlightPosition
 } from "../../../lib/types";
 import { GeoManagerCreator } from "../ds-implementation/GeoManagerCreator";
+import { DemographicsManager } from "../ds-implementation/DemographicsManager";
 // const wsh = new WebsocketHandler(routeUpdate);
 // applyClickHandler(viewer, flightStore)
 
@@ -95,7 +96,10 @@ const getData = () => {
    //    }, 1000);
    // });
 
-   const gmc = new GeoManagerCreator(dsConn, globe.viewer);
+   const dm = new DemographicsManager(dsConn);
+   dm.subscribe();
+
+   const gmc = new GeoManagerCreator(dsConn, dm, globe.viewer);
    gmc.subscribe();
 
    //

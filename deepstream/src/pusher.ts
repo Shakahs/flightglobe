@@ -89,6 +89,7 @@ const work = (ds) => {
          const dsGeo = ds.record.getRecord(
             generateGeohashedPositionsKey(geo.geohash)
          );
+         dsGeo.set(geo);
       });
 
       const geohashList = ds.record.getList(DS_GEOHASH_LIST_KEY);
