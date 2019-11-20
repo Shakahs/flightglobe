@@ -1,38 +1,75 @@
 import {
+   Cartesian3,
+   Label,
    LabelCollection,
+   PointPrimitive,
    PointPrimitiveCollection,
+   Polyline,
    PolylineCollection,
    Viewer
 } from "cesium";
+import { FlightSubscriberMap } from "./types";
+import { FlightSubscriber } from "./FlightSubscriber";
+
+require("./mobxConfig");
+
+interface CesiumPrimitiveHolder {
+   point?: PointPrimitive;
+   label?: Label;
+   line?: Polyline;
+}
 
 export class CesiumPrimitiveHandler {
-   viewer: Viewer;
-   points: PointPrimitiveCollection;
-   labels: LabelCollection;
-   lines: PolylineCollection;
+   private readonly viewer: Viewer;
+   private readonly points: PointPrimitiveCollection = new PointPrimitiveCollection();
+   private readonly labels: LabelCollection = new LabelCollection();
+   private readonly lines: PolylineCollection = new PolylineCollection();
+   private readonly children: Map<string, CesiumPrimitiveHolder>;
 
    constructor(viewer: Viewer) {
       this.viewer = viewer;
-      //points
-      this.points = new PointPrimitiveCollection();
       viewer.scene.primitives.add(this.points);
-      //labels
-      this.labels = new LabelCollection();
       viewer.scene.primitives.add(this.labels);
-      //lines
-      this.lines = new PolylineCollection();
       viewer.scene.primitives.add(this.lines);
+      this.children = new Map();
    }
 
-   // render(fs: IterableIterator<[string, FlightSubscriber]>) {
-   //    let done=false
-   //     let res
-   //     while(!done){
-   //        res = fs.next().
-   //     }
-   // }
+   getChild(icao: string): CesiumPrimitiveHolder {
+      let child: CesiumPrimitiveHolder | undefined;
+      child = this.children.get(icao);
+      if (child) {
+         return child;
+      } else {
+         child = {};
+         this.children.set(icao, child);
+      }
+      return child;
+   }
 
-   render() {}
+   render(fs: FlightSubscriberMap) {
+      fs.forEach((f) => {
+         const child = this.getChild(f.icao);
+         if (f.needsRender) {
+            this.renderPoint(child, f);
+            f.needsRender = false;
+         }
+      });
+      this.viewer.scene.requestRender();
+   }
+
+   renderPoint(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
+      if (child.point) {
+         child.point.position = f.cartesianPosition;
+      } else {
+         child.point = this.points.add({
+            position: f.cartesianPosition
+         });
+      }
+   }
+
+   getPoints(): PointPrimitiveCollection {
+      return this.points;
+   }
 
    destroy() {
       this.points.destroy();

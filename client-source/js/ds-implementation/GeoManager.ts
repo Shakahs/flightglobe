@@ -53,7 +53,12 @@ export class GeoManager {
          } else {
             this.flightSubscriberMap.set(
                icao,
-               new FlightSubscriber(this.dsConn, icao, fpos, () => {})
+               new FlightSubscriber(
+                  this.dsConn,
+                  icao,
+                  fpos,
+                  this.debouncedRender
+               )
             );
          }
       });

@@ -10,6 +10,7 @@ import {
 } from "mobx";
 import { Cartesian3 } from "cesium";
 import { convertPositionToCartesian } from "../ws-implementation/utility";
+import { each } from "lodash";
 
 require("./mobxConfig");
 
@@ -19,11 +20,12 @@ interface FlightRenderParams {
 
 export class FlightSubscriber {
    private readonly dsConn: DeepstreamClient;
-   private readonly icao: Icao;
+   readonly icao: Icao;
    // gm: GeoManager;
    private disposers: Array<IReactionDisposer>;
    @observable private position: FlightPosition;
    readonly requestRender: () => void;
+   needsRender: boolean = false;
 
    constructor(
       dsConn: DeepstreamClient,
@@ -40,6 +42,7 @@ export class FlightSubscriber {
       const renderRequester = reaction(
          () => this.renderParams,
          () => {
+            this.needsRender = true;
             this.requestRender();
          },
          {
@@ -73,5 +76,9 @@ export class FlightSubscriber {
       return { position: this.cartesianPosition };
    }
 
-   destroy() {}
+   destroy() {
+      each(this.disposers, (d) => {
+         d();
+      });
+   }
 }
