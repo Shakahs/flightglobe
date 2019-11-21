@@ -1,6 +1,7 @@
 import {
    Cartesian2,
    Cartesian3,
+   Color,
    Label,
    LabelCollection,
    Material,
@@ -14,6 +15,11 @@ import { FlightSubscriberMap } from "./types";
 import { FlightSubscriber } from "./FlightSubscriber";
 import { map } from "lodash";
 import { convertPositionToCartesian } from "../ws-implementation/utility";
+import {
+   LabelDisplayOptionDefaults,
+   PointDisplayOptionDefaults,
+   TrailDisplayOptionDefaults
+} from "../constants";
 
 require("./mobxConfig");
 
@@ -76,6 +82,12 @@ export class CesiumPrimitiveHandler {
             show: f.shouldDisplay
          });
       }
+      child.point.color = PointDisplayOptionDefaults.cesiumColor;
+      child.point.pixelSize = PointDisplayOptionDefaults.size;
+      child.point.outlineColor = Color.fromCssColorString(
+         PointDisplayOptionDefaults.outlineColor
+      );
+      child.point.outlineWidth = PointDisplayOptionDefaults.outlineSize;
    }
 
    reconcileLabel(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
@@ -100,6 +112,8 @@ export class CesiumPrimitiveHandler {
             outlineWidth: 2.0
          });
       }
+      child.label.fillColor = LabelDisplayOptionDefaults.cesiumColor;
+      child.label.font = `${LabelDisplayOptionDefaults.size}px sans-serif`;
    }
 
    destroyLabel(child: CesiumPrimitiveHolder) {
@@ -132,6 +146,10 @@ export class CesiumPrimitiveHandler {
          };
          child.line = this.lines.add(polyLine);
       }
+      child.line.width = TrailDisplayOptionDefaults.size;
+      child.line.material = Material.fromType("Color");
+      child.line.material.uniforms.color =
+         TrailDisplayOptionDefaults.cesiumColor;
    }
 
    destroyLine(child: CesiumPrimitiveHolder, f: FlightSubscriber) {

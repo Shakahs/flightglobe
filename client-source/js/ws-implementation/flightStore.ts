@@ -1,23 +1,16 @@
+import { action, configure, observable, ObservableMap } from "mobx";
 import {
-   action,
-   configure,
-   IReactionDisposer,
-   observable,
-   ObservableMap,
-   reaction
-} from "mobx";
-import {
+   AircraftModelData,
    DemographicsUpdate,
    Icao,
-   Message,
-   PositionUpdate,
-   PointDisplayOptions,
-   PointDisplayOptionsUpdate,
-   TrailDisplayOptions,
-   TrailDisplayOptionsUpdate,
    LabelDisplayOptions,
    LabelDisplayOptionsUpdate,
-   AircraftModelData
+   Message,
+   PointDisplayOptions,
+   PointDisplayOptionsUpdate,
+   PositionUpdate,
+   TrailDisplayOptions,
+   TrailDisplayOptionsUpdate
 } from "../types";
 import { newFlightRecord } from "./utility";
 import { forEach, has, merge } from "lodash-es";
@@ -25,6 +18,13 @@ import { FlightObj } from "./flightObj";
 import { GeoCollection } from "./geoCollection";
 import { Color, Event, Viewer } from "cesium";
 import { BootData, FlightRecord } from "../../../lib/types";
+import {
+   LabelDisplayOptionDefaults,
+   PointDisplayOptionDefaults,
+   SelectedPointDisplayOptionDefaults,
+   TrailDisplayOptionDefaults
+} from "../constants";
+
 const aircraftModels: AircraftModelData = require("../../resources/aircraft.json");
 
 const Geohash = require("latlon-geohash");
@@ -32,34 +32,6 @@ const Geohash = require("latlon-geohash");
 configure({
    enforceActions: "observed"
 });
-
-export const PointDisplayOptionDefaults: PointDisplayOptions = {
-   color: "#3399ff",
-   cesiumColor: Color.fromCssColorString("#3399ff"),
-   size: 4,
-   outlineColor: "#FFF",
-   outlineSize: 1
-};
-
-export const SelectedPointDisplayOptionDefaults: PointDisplayOptions = {
-   color: "#ff3426",
-   cesiumColor: Color.fromCssColorString("#ff3426"),
-   size: 4,
-   outlineColor: "#FFF",
-   outlineSize: 1
-};
-
-export const TrailDisplayOptionDefaults: TrailDisplayOptions = {
-   color: "#3399ff",
-   cesiumColor: Color.fromCssColorString("#3399ff"),
-   size: 4
-};
-
-export const LabelDisplayOptionDefaults: LabelDisplayOptions = {
-   color: "#3399ff",
-   cesiumColor: Color.fromCssColorString("#3399ff"),
-   size: 12
-};
 
 export class FlightStore {
    flightData = new ObservableMap<Icao, FlightRecord>(

@@ -1,9 +1,4 @@
-import {
-   FlightStore,
-   LabelDisplayOptionDefaults,
-   PointDisplayOptionDefaults,
-   TrailDisplayOptionDefaults
-} from "../flightStore";
+import { FlightStore } from "../flightStore";
 import { Color, PointPrimitive } from "cesium";
 import {
    LabelDisplayOptions,
@@ -26,6 +21,11 @@ import { FlightObj } from "../flightObj";
 import { cloneDeep, merge } from "lodash-es";
 import { FlightPosition, FlightRecord } from "../../../../lib/types";
 import { convertPositionToCartesian } from "../utility";
+import {
+   LabelDisplayOptionDefaults,
+   PointDisplayOptionDefaults,
+   TrailDisplayOptionDefaults
+} from "../../constants";
 
 describe("FlightStore", function() {
    describe("handles LOD changes from moving the globe", function() {

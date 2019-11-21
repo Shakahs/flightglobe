@@ -8,13 +8,13 @@ import {
 import { FlightObj } from "../flightObj";
 import { Cartesian3, Color, Label, PointPrimitive, Polyline } from "cesium";
 import { get } from "lodash-es";
+import { FlightPosition, FlightRecord } from "../../../../lib/types";
+import { newICAOMap } from "../utility";
 import {
    LabelDisplayOptionDefaults,
    PointDisplayOptionDefaults,
    TrailDisplayOptionDefaults
-} from "../flightStore";
-import { FlightPosition, FlightRecord } from "../../../../lib/types";
-import { newICAOMap } from "../utility";
+} from "../../constants";
 
 describe("FlightObj", function() {
    it("stores the correct FlightRecord", function() {
