@@ -59,4 +59,3 @@ export interface FlightDemographicsCollection {
 }
 
 export type GeohashBoolMap = Map<Geohash, boolean>;
-export type GeohashBoolMapObservable = ObservableMap<Geohash, boolean>;

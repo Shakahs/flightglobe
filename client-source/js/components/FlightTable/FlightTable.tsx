@@ -2,12 +2,8 @@ import * as React from "react";
 import { observer } from "mobx-react";
 import { AgGridReact } from "ag-grid-react";
 import { ColDef, FilterChangedEvent } from "ag-grid-community";
-import { FlightStore } from "../../ws-implementation/flightStore";
-import {
-   GridReadyEvent,
-   SelectionChangedEvent
-} from "ag-grid-community/dist/lib/events";
-import { FlightDemographics, FlightRecord } from "../../../../lib/types";
+import { GridReadyEvent } from "ag-grid-community/dist/lib/events";
+import { FlightDemographics } from "../../../../lib/types";
 import { DemographicsManager } from "../../ds-implementation/DemographicsManager";
 import { Lambda } from "mobx";
 
@@ -48,7 +44,7 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
          ]
       };
       this.gridReady = this.gridReady.bind(this);
-      // this.filterChanged = this.filterChanged.bind(this);
+      this.filterChanged = this.filterChanged.bind(this);
       // this.selectionChanged = this.selectionChanged.bind(this);
    }
 
@@ -64,9 +60,13 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
 
       // continuous updates
       const disposer = this.props.dManager.demographicsMap.observe((change) => {
-         if ((change.type === "add" || change.type === "update") && event.api) {
+         if (change.type === "add" && event.api) {
             event.api.batchUpdateRowData({
                add: [{ icao: change.name, ...change.newValue }]
+            });
+         } else if (change.type === "update" && event.api) {
+            event.api.batchUpdateRowData({
+               update: [{ icao: change.name, ...change.newValue }]
             });
          }
       });
@@ -80,18 +80,16 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
       }
    }
 
-   // filterChanged(data: FilterChangedEvent) {
-   //    const resultMap = new Map<string, boolean>();
-   //    if (data.api) {
-   //       data.api.forEachNodeAfterFilter((node) => {
-   //          resultMap.set(node.data.icao, true);
-   //       });
-   //       this.props.dManager.updateIsFiltered(
-   //          data.api.isAnyFilterPresent()
-   //       );
-   //    }
-   //    this.props.dManager.updateFilteredFlights(resultMap);
-   // }
+   filterChanged(data: FilterChangedEvent) {
+      const resultMap = new Map<string, boolean>();
+      if (data.api) {
+         data.api.forEachNodeAfterFilter((node) => {
+            resultMap.set(node.data.icao, true);
+         });
+         this.props.dManager.updateIsFiltered(data.api.isAnyFilterPresent());
+      }
+      this.props.dManager.updateFilteredFlights(resultMap);
+   }
    //
    // selectionChanged(event: SelectionChangedEvent) {
    //    if (event.api) {
@@ -111,13 +109,13 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
                <span>
                   Total Flights: {this.props.dManager.demographicsMap.size}
                </span>
-               {/*{this.props.dManager.isFiltered && (*/}
-               {/*   <span>*/}
-               {/*      {" "}*/}
-               {/*      - Filtered Flights:{" "}*/}
-               {/*      {this.props.dManager.filteredFlights.size}*/}
-               {/*   </span>*/}
-               {/*)}*/}
+               {this.props.dManager.isFiltered && (
+                  <span>
+                     {" "}
+                     - Filtered Flights:{" "}
+                     {this.props.dManager.filteredFlights.size}
+                  </span>
+               )}
             </div>
             <div className="ag-theme-balham-dark w-100 h-100">
                <AgGridReact
@@ -125,7 +123,7 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
                   getRowNodeId={(data) => {
                      return data.icao;
                   }}
-                  // onFilterChanged={this.filterChanged}
+                  onFilterChanged={this.filterChanged}
                   onGridReady={this.gridReady}
                   // onSelectionChanged={this.selectionChanged}
                   rowSelection={"multiple"}

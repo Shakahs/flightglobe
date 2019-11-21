@@ -1,12 +1,12 @@
 import { DeepstreamClient } from "@deepstream/client";
 import { Event, Viewer } from "cesium";
-import { action, ObservableMap } from "mobx";
+import { action, observable, ObservableMap } from "mobx";
 import { Icao } from "../types";
 import {
    FlightDemographics,
    FlightDemographicsCollection,
-   GeohashBoolMap,
-   GeohashBoolMapObservable
+   Geohash,
+   GeohashBoolMap
 } from "../../../lib/types";
 import { DS_DEMOGRAPHICS_KEY } from "../../../lib/constants";
 import {
@@ -23,7 +23,13 @@ export class DemographicsManager {
    > = new ObservableMap();
    viewer: Viewer | null = null;
    cameraEventDisposer: Event.RemoveCallback | null;
-   detailedFlights: GeohashBoolMapObservable = new ObservableMap();
+   detailedFlights = observable.map<Geohash, boolean>(undefined, {
+      deep: false
+   });
+   filteredFlights = observable.map<Icao, boolean>(undefined, {
+      deep: false
+   });
+   @observable isFiltered: boolean = false;
 
    constructor(dsConn: DeepstreamClient, viewer?: Viewer) {
       this.dsConn = dsConn;
@@ -57,5 +63,15 @@ export class DemographicsManager {
    updateDetailedFlights(neighborList: GeohashBoolMap) {
       this.detailedFlights.clear();
       this.detailedFlights.merge(neighborList);
+   }
+
+   @action
+   updateIsFiltered(isFiltered: boolean) {
+      this.isFiltered = isFiltered;
+   }
+
+   @action
+   updateFilteredFlights(filterResult: Map<Icao, boolean>) {
+      this.filteredFlights.replace(filterResult);
    }
 }
