@@ -18,9 +18,10 @@ import { generateTrackFullKey } from "../../../lib/constants";
 require("./mobxConfig");
 
 interface FlightRenderParams {
-   position: Cartesian3;
+   cartesianPosition: Cartesian3;
    demographic: FlightDemographics | undefined;
-   detailSelected: boolean;
+   shouldDisplay: boolean;
+   shouldDisplayDetailed: boolean;
    trackFull: FlightPosition[];
 }
 
@@ -111,18 +112,45 @@ export class FlightSubscriber {
       return this.demographicsManager.demographicsMap.get(this.icao);
    }
 
+   // essential data - selection status
+
    @computed get isDetailSelected(): boolean {
       return this.demographicsManager.detailedFlights.has(
          this.position.geohash
       );
    }
 
+   @computed get isFilterSelected(): boolean {
+      return this.demographicsManager.filteredFlights.has(this.icao); // filter active, check the filter result
+   }
+
+   @computed get isSelected(): boolean {
+      return this.demographicsManager.selectedFlights.has(this.icao);
+   }
+
+   // essential data - visibility
+
+   @computed get shouldDisplay(): boolean {
+      if (this.isSelected) {
+         return true;
+      }
+      if (this.demographicsManager.isFiltered) {
+         return this.isSelected || this.isFilterSelected;
+      }
+      return true;
+   }
+
+   @computed get shouldDisplayDetailed(): boolean {
+      return this.isSelected || this.isDetailSelected;
+   }
+
    @computed get renderParams(): FlightRenderParams {
       return {
-         position: this.cartesianPosition,
+         cartesianPosition: this.cartesianPosition,
          demographic: this.demographic,
-         detailSelected: this.isDetailSelected,
-         trackFull: this.trackFull
+         trackFull: this.trackFull,
+         shouldDisplay: this.shouldDisplay,
+         shouldDisplayDetailed: this.shouldDisplayDetailed
       };
    }
 

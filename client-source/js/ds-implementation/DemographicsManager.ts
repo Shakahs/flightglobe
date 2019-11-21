@@ -75,11 +75,13 @@ export class DemographicsManager {
 
    @action
    updateFilteredFlights(filterResult: Map<Icao, boolean>) {
-      this.filteredFlights.replace(filterResult);
+      this.filteredFlights.clear();
+      this.filteredFlights.merge(filterResult);
    }
 
    @action
    updateSelectedFlights(selectResult: Map<Icao, boolean>) {
-      this.selectedFlights.replace(selectResult);
+      this.selectedFlights.clear();
+      this.selectedFlights.merge(selectResult);
    }
 }

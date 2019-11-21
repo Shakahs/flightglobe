@@ -68,15 +68,18 @@ export class CesiumPrimitiveHandler {
    renderPoint(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
       if (child.point) {
          child.point.position = f.cartesianPosition;
+         child.point.show = f.shouldDisplay;
       } else {
          child.point = this.points.add({
-            position: f.cartesianPosition
+            position: f.cartesianPosition,
+            id: f.icao,
+            show: f.shouldDisplay
          });
       }
    }
 
    reconcileLabel(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
-      if (f.demographic && f.isDetailSelected) {
+      if (f.demographic && f.shouldDisplayDetailed && f.shouldDisplay) {
          this.renderLabel(child, f);
       } else {
          this.destroyLabel(child);
@@ -107,7 +110,11 @@ export class CesiumPrimitiveHandler {
    }
 
    reconcileLine(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
-      if (f.trackFull.length > 0 && f.isDetailSelected) {
+      if (
+         f.trackFull.length > 0 &&
+         f.shouldDisplayDetailed &&
+         f.shouldDisplay
+      ) {
          this.renderLine(child, f);
       } else {
          this.destroyLine(child, f);

@@ -134,6 +134,7 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
                   onSelectionChanged={this.selectionChanged}
                   rowSelection={"multiple"}
                   floatingFilter
+                  rowMultiSelectWithClick
                />
             </div>
          </React.Fragment>
