@@ -91,5 +91,6 @@ export class GeoManager {
       this.dsRecord?.discard();
       this.flightSubscriberMap.forEach((f) => f.destroy());
       this.cph?.destroy();
+      this.cph = null;
    }
 }
