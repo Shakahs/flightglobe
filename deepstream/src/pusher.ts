@@ -5,12 +5,15 @@ import {
    BootData,
    FlightDemographics,
    FlightDemographicsCollection,
+   FlightPosition,
+   MasterFlightRecord,
    RedisFlightRecord
 } from "../../lib/types";
 import {
    DS_DEMOGRAPHICS_KEY,
    DS_GEOHASH_LIST_KEY,
-   generateGeohashedPositionsKey
+   generateGeohashedPositionsKey,
+   generateTrackFullKey
 } from "../../lib/constants";
 import { Icao } from "../../client-source/js/types";
 
@@ -43,6 +46,7 @@ const work = (ds) => {
    const bootData: BootData = {};
    const geoCollector = new GeoPositionListCollector();
    const demographicsMap: FlightDemographicsCollection = {};
+   const masterRecordMap = new Map<Icao, MasterFlightRecord>();
 
    stream.on("data", function(resultKeys: unknown[]) {
       // `resultKeys` is an array of strings representing key names.
@@ -53,6 +57,7 @@ const work = (ds) => {
          const rawData: string[] = await redis.lrange(k, 0, -1);
          const pos: RedisFlightRecord[] = rawData.map((i) => JSON.parse(i));
          const masterRecord = MasterFlightRecordFromRedis(pos);
+         masterRecordMap.set(masterRecord.icao, masterRecord);
          geoCollector.store(masterRecord);
          demographicsMap[masterRecord.icao] = masterRecord.demographic;
          count++;
@@ -84,7 +89,7 @@ const work = (ds) => {
          `looped over ${count} points, ${geoCollector.geocoll.size} geocollections created`
       );
 
-      //set the geos first, otherwise the client may request them before they exist
+      //write the geohashed current positions first, otherwise the client may request them before they exist
       geoCollector.geocoll.forEach((geo) => {
          const dsGeo = ds.record.getRecord(
             generateGeohashedPositionsKey(geo.geohash)
@@ -92,18 +97,25 @@ const work = (ds) => {
          dsGeo.set(geo);
       });
 
+      masterRecordMap.forEach((mr) => {
+         const dsTrackFull = ds.record.getRecord(generateTrackFullKey(mr.icao));
+         dsTrackFull.set(mr.trackFull);
+      });
+
+      //write geohash list
       const geohashList = ds.record.getList(DS_GEOHASH_LIST_KEY);
       await geohashList.whenReady();
       await geohashList.setEntriesWithAck(
          Array.from(geoCollector.geocoll.keys())
       );
 
+      //write demographics
       const demographicsRecord = ds.record.getRecord(DS_DEMOGRAPHICS_KEY);
       await demographicsRecord.whenReady();
       await demographicsRecord.setWithAck(demographicsMap);
 
       console.log(
-         "done writing geohashlist, geohashed positions, and demographics"
+         "done writing geohashlist, geohashed positions, full tracks, and demographics"
       );
    });
 };
