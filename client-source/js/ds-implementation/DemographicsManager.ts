@@ -30,6 +30,9 @@ export class DemographicsManager {
       deep: false
    });
    @observable isFiltered: boolean = false;
+   selectedFlights = observable.map<Icao, boolean>(undefined, {
+      deep: false
+   });
 
    constructor(dsConn: DeepstreamClient, viewer?: Viewer) {
       this.dsConn = dsConn;
@@ -73,5 +76,10 @@ export class DemographicsManager {
    @action
    updateFilteredFlights(filterResult: Map<Icao, boolean>) {
       this.filteredFlights.replace(filterResult);
+   }
+
+   @action
+   updateSelectedFlights(selectResult: Map<Icao, boolean>) {
+      this.selectedFlights.replace(selectResult);
    }
 }

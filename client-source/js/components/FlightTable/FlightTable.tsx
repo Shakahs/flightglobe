@@ -1,11 +1,17 @@
 import * as React from "react";
 import { observer } from "mobx-react";
 import { AgGridReact } from "ag-grid-react";
-import { ColDef, FilterChangedEvent } from "ag-grid-community";
+import {
+   ColDef,
+   FilterChangedEvent,
+   SelectionChangedEvent
+} from "ag-grid-community";
 import { GridReadyEvent } from "ag-grid-community/dist/lib/events";
 import { FlightDemographics } from "../../../../lib/types";
 import { DemographicsManager } from "../../ds-implementation/DemographicsManager";
 import { Lambda } from "mobx";
+import { each } from "lodash";
+import { Icao } from "../../types";
 
 interface FlightTableProps {
    dManager: DemographicsManager;
@@ -45,7 +51,7 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
       };
       this.gridReady = this.gridReady.bind(this);
       this.filterChanged = this.filterChanged.bind(this);
-      // this.selectionChanged = this.selectionChanged.bind(this);
+      this.selectionChanged = this.selectionChanged.bind(this);
    }
 
    gridReady(event: GridReadyEvent) {
@@ -90,17 +96,17 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
       }
       this.props.dManager.updateFilteredFlights(resultMap);
    }
-   //
-   // selectionChanged(event: SelectionChangedEvent) {
-   //    if (event.api) {
-   //       const selectedRows = event.api.getSelectedRows() as FlightRecord[];
-   //       const newSelectedMap = new Map<string, boolean>();
-   //       selectedRows.forEach((r) => {
-   //          newSelectedMap.set(r.icao, true);
-   //       });
-   //       this.props.dManager.updateSelectedFlight(newSelectedMap);
-   //    }
-   // }
+
+   selectionChanged(event: SelectionChangedEvent) {
+      if (event.api) {
+         const selectedRows = event.api.getSelectedRows() as FlightDemographics[];
+         const newSelectedMap = new Map<string, boolean>();
+         each(selectedRows, (r) => {
+            newSelectedMap.set(r.icao as Icao, true);
+         });
+         this.props.dManager.updateSelectedFlights(newSelectedMap);
+      }
+   }
 
    render() {
       return (
@@ -125,7 +131,7 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
                   }}
                   onFilterChanged={this.filterChanged}
                   onGridReady={this.gridReady}
-                  // onSelectionChanged={this.selectionChanged}
+                  onSelectionChanged={this.selectionChanged}
                   rowSelection={"multiple"}
                   floatingFilter
                />
