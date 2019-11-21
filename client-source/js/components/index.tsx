@@ -10,138 +10,39 @@ import "../styles.scss";
 import { Globe } from "../globe/globe";
 import { DeepstreamClient } from "@deepstream/client";
 import { REMOTE_WINS } from "@deepstream/client/dist/record/merge-strategy";
-import { Icao, PositionUpdate } from "../types";
-import { Record } from "@deepstream/client/dist/record/record";
+import { GeoManagerCreator } from "../ds-implementation/GeoManagerCreator";
+import { DemographicsManager } from "../ds-implementation/DemographicsManager";
 
 const globe = new Globe("cesiumContainer");
 const flightStore = new FlightStore(globe.viewer);
 const routeUpdate = flightStore.routeUpdate.bind(flightStore);
-import { debounce, forEach, throttle } from "lodash-es";
-import { queue } from "d3-queue";
-import {
-   BootData,
-   FlightDemographics,
-   FlightPosition
-} from "../../../lib/types";
-import { GeoManagerCreator } from "../ds-implementation/GeoManagerCreator";
-import { DemographicsManager } from "../ds-implementation/DemographicsManager";
-// const wsh = new WebsocketHandler(routeUpdate);
 // applyClickHandler(viewer, flightStore)
-
-// setInterval(() => {
-//    // @ts-ignore: we need to send a request here, not a FlightPosition
-//    wsh.send({ lastReceivedTimestamp: flightStore.newestPositionTimestamp });
-// }, 5000);
-
-ReactDOM.render(
-   <App globe={globe} flightStore={flightStore} />,
-   document.getElementById("reactApp")
-);
 
 const dsConn = new DeepstreamClient("localhost:6020", {
    mergeStrategy: REMOTE_WINS
 });
 
-interface DSFlightRecord {
-   Icao: string;
-   Position: FlightPosition;
-   Demographic: FlightDemographics;
-   Time?: Date;
-}
+const dm = new DemographicsManager(dsConn, globe.viewer);
+ReactDOM.render(
+   <App globe={globe} demographicsManager={dm} />,
+   document.getElementById("reactApp")
+);
 
-const subscribers = new Map<string, any>();
-
-class Subber {
-   icao: string;
-   record: Record;
-   routeUpdate: any;
-
-   constructor(icao: string, record, updater) {
-      this.icao = icao;
-      this.record = record;
-      this.routeUpdate = updater;
-
-      this.record.subscribe(
-         "Position",
-         (p: FlightPosition) => {
-            const pUpdate: PositionUpdate = {
-               type: "positionUpdate",
-               icao: this.icao,
-               body: {
-                  timestamp: p.timestamp,
-                  altitude: p.altitude,
-                  latitude: p.latitude,
-                  longitude: p.longitude,
-                  heading: p.heading,
-                  geohash: p.geohash
-               }
-            };
-            // console.log(pUpdate);
-            routeUpdate([pUpdate]);
-         },
-         false
-      );
-   }
-}
-
-const getData = () => {
+const getData = async () => {
    //wait until tiles are loaded
-   // await new Promise((resolve) => {
-   //    const poller = setInterval(() => {
-   //       //@ts-ignore tilesLoaded is missing from TS definition
-   //       if (globe.viewer.scene.globe.tilesLoaded) {
-   //          clearInterval(poller);
-   //          resolve();
-   //       }
-   //    }, 1000);
-   // });
+   await new Promise((resolve) => {
+      const poller = setInterval(() => {
+         //@ts-ignore tilesLoaded is missing from TS definition
+         if (globe.viewer.scene.globe.tilesLoaded) {
+            clearInterval(poller);
+            resolve();
+         }
+      }, 1000);
+   });
 
-   const dm = new DemographicsManager(dsConn, globe.viewer);
    dm.subscribe();
-
    const gmc = new GeoManagerCreator(dsConn, dm, globe.viewer);
    gmc.subscribe();
-
-   //
-   // const q = queue(500);
-   // try {
-   //    // const bootDataUntyped = await ds.record.snapshot("bootData");
-   //    const bootData = ((await ds.record.snapshot(
-   //       "bootData"
-   //    )) as unknown) as BootData;
-   //    // const bootMap = new Map<string, FlightRecord>(Object.entries(bootData));
-   //    // flightStore.updateFlightData(bootData);
-   //
-   //    const debouncedRefresh = throttle(() => {
-   //       globe.viewer.scene.requestRender();
-   //    }, 1000);
-   //
-   //    forEach(bootData, (bd) => {
-   //       q.defer((cb) => {
-   //          flightStore.addOrUpdateFlight({
-   //             type: "positionUpdate",
-   //             icao: bd.icao,
-   //             body: bd.positions[0]
-   //          });
-   //          debouncedRefresh();
-   //          setTimeout(cb, 1000);
-   //       });
-   //    });
-   // } catch (e) {}
-   //
-   // q.await((err) => {
-   //    console.log("initial data load finished");
-   //    const icaoList = ds.record.getList("icaoList");
-   //    icaoList.subscribe((icaoList: Icao[]) => {
-   //       icaoList.forEach((icao) => {
-   //          if (!subscribers.has(icao)) {
-   //             const record = ds.record.getRecord(icao);
-   //             subscribers.set(icao, new Subber(icao, record, routeUpdate));
-   //             // console.log(`Created new subber for ${icao}`);
-   //          }
-   //       });
-   //    });
-   // });
 };
 
 dsConn.login().then(getData);

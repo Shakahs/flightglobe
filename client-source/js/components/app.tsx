@@ -13,11 +13,12 @@ import classnames from "classnames";
 import { hot } from "react-hot-loader/root";
 import Settings from "./Settings/Settings";
 import { Globe } from "../globe/globe";
+import { DemographicsManager } from "../ds-implementation/DemographicsManager";
 
 library.add(faCog, faFilter, faCircleNotch, faGlobeAmericas);
 
 interface AppProps {
-   flightStore: FlightStore;
+   demographicsManager: DemographicsManager;
    globe: Globe;
 }
 
@@ -54,11 +55,11 @@ class App extends React.Component<AppProps, AppState> {
       return (
          <React.Fragment>
             <LoadingScreen viewer={this.props.globe.viewer} />
-            <Settings
-               showModal={this.state.showInfoModal}
-               toggleModal={this.toggleSettingsModal}
-               flightstore={this.props.flightStore}
-            />
+            {/*<Settings*/}
+            {/*   showModal={this.state.showInfoModal}*/}
+            {/*   toggleModal={this.toggleSettingsModal}*/}
+            {/*   flightstore={this.props.demographicsManager}*/}
+            {/*/>*/}
             <Menu
                toggleShowFlightTable={this.toggleShowFlightTable}
                toggleShowInfoModal={this.toggleSettingsModal}
@@ -69,7 +70,7 @@ class App extends React.Component<AppProps, AppState> {
                   "fixed-bottom": this.state.showFlightTable
                })}
             >
-               <FlightTable store={this.props.flightStore} />
+               <FlightTable dManager={this.props.demographicsManager} />
             </div>
          </React.Fragment>
       );

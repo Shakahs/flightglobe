@@ -7,14 +7,17 @@ import {
    GridReadyEvent,
    SelectionChangedEvent
 } from "ag-grid-community/dist/lib/events";
-import { FlightRecord } from "../../../../lib/types";
+import { FlightDemographics, FlightRecord } from "../../../../lib/types";
+import { DemographicsManager } from "../../ds-implementation/DemographicsManager";
+import { Lambda } from "mobx";
 
 interface FlightTableProps {
-   store: FlightStore;
+   dManager: DemographicsManager;
 }
 
 interface FlightTableState {
    columnDefs: ColDef[];
+   disposer?: Lambda;
 }
 
 @observer
@@ -25,19 +28,19 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
          columnDefs: [
             { field: "icao" },
             {
-               field: "demographic.origin",
+               field: "origin",
                headerName: "Origin",
                filter: "agTextColumnFilter",
                sortable: true
             },
             {
-               field: "demographic.destination",
+               field: "destination",
                headerName: "Destination",
                filter: "agTextColumnFilter",
                sortable: true
             },
             {
-               field: "demographic.model",
+               field: "model",
                headerName: "Plane",
                filter: "agTextColumnFilter",
                sortable: true
@@ -45,67 +48,74 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
          ]
       };
       this.gridReady = this.gridReady.bind(this);
-      this.filterChanged = this.filterChanged.bind(this);
-      this.selectionChanged = this.selectionChanged.bind(this);
+      // this.filterChanged = this.filterChanged.bind(this);
+      // this.selectionChanged = this.selectionChanged.bind(this);
    }
 
    gridReady(event: GridReadyEvent) {
       //initial load
-      const initialLoad: FlightRecord[] = [];
-      this.props.store.flightData.forEach((f) => {
-         initialLoad.push(f);
+      const initialLoad: FlightDemographics[] = [];
+      this.props.dManager.demographicsMap.forEach((v, k) => {
+         initialLoad.push({ icao: k, ...v });
       });
       if (event.api) {
          event.api.setRowData(initialLoad);
       }
 
-      //continuous updates
-      const disposer = this.props.store.flightData.observe((change) => {
-         if (change.type === "add" && event.api) {
+      // continuous updates
+      const disposer = this.props.dManager.demographicsMap.observe((change) => {
+         if ((change.type === "add" || change.type === "update") && event.api) {
             event.api.batchUpdateRowData({
-               add: [change.newValue]
-            });
-         } else if (change.type === "update" && event.api) {
-            event.api.batchUpdateRowData({
-               update: [change.newValue]
+               add: [{ icao: change.name, ...change.newValue }]
             });
          }
       });
+
+      this.setState({ disposer });
    }
 
-   filterChanged(data: FilterChangedEvent) {
-      const resultMap = new Map<string, boolean>();
-      if (data.api) {
-         data.api.forEachNodeAfterFilter((node) => {
-            resultMap.set(node.data.icao, true);
-         });
-         this.props.store.updateIsFiltered(data.api.isAnyFilterPresent());
-      }
-      this.props.store.updateFilteredFlights(resultMap);
-   }
+   // componentWillUnmount(): void {
+   //    this.state.disposer?.();
+   // }
 
-   selectionChanged(event: SelectionChangedEvent) {
-      if (event.api) {
-         const selectedRows = event.api.getSelectedRows() as FlightRecord[];
-         const newSelectedMap = new Map<string, boolean>();
-         selectedRows.forEach((r) => {
-            newSelectedMap.set(r.icao, true);
-         });
-         this.props.store.updateSelectedFlight(newSelectedMap);
-      }
-   }
+   // filterChanged(data: FilterChangedEvent) {
+   //    const resultMap = new Map<string, boolean>();
+   //    if (data.api) {
+   //       data.api.forEachNodeAfterFilter((node) => {
+   //          resultMap.set(node.data.icao, true);
+   //       });
+   //       this.props.dManager.updateIsFiltered(
+   //          data.api.isAnyFilterPresent()
+   //       );
+   //    }
+   //    this.props.dManager.updateFilteredFlights(resultMap);
+   // }
+   //
+   // selectionChanged(event: SelectionChangedEvent) {
+   //    if (event.api) {
+   //       const selectedRows = event.api.getSelectedRows() as FlightRecord[];
+   //       const newSelectedMap = new Map<string, boolean>();
+   //       selectedRows.forEach((r) => {
+   //          newSelectedMap.set(r.icao, true);
+   //       });
+   //       this.props.dManager.updateSelectedFlight(newSelectedMap);
+   //    }
+   // }
 
    render() {
       return (
          <React.Fragment>
             <div>
-               <span>Total Flights: {this.props.store.flightData.size}</span>
-               {this.props.store.isFiltered && (
-                  <span>
-                     {" "}
-                     - Filtered Flights: {this.props.store.filteredFlights.size}
-                  </span>
-               )}
+               <span>
+                  Total Flights: {this.props.dManager.demographicsMap.size}
+               </span>
+               {/*{this.props.dManager.isFiltered && (*/}
+               {/*   <span>*/}
+               {/*      {" "}*/}
+               {/*      - Filtered Flights:{" "}*/}
+               {/*      {this.props.dManager.filteredFlights.size}*/}
+               {/*   </span>*/}
+               {/*)}*/}
             </div>
             <div className="ag-theme-balham-dark w-100 h-100">
                <AgGridReact
@@ -113,12 +123,12 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
                   getRowNodeId={(data) => {
                      return data.icao;
                   }}
-                  onFilterChanged={this.filterChanged}
+                  // onFilterChanged={this.filterChanged}
                   onGridReady={this.gridReady}
-                  onSelectionChanged={this.selectionChanged}
+                  // onSelectionChanged={this.selectionChanged}
                   rowSelection={"multiple"}
                   floatingFilter
-               ></AgGridReact>
+               />
             </div>
          </React.Fragment>
       );
