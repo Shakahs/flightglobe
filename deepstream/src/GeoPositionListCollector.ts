@@ -12,10 +12,12 @@ export class GeoPositionListCollector {
    }
 
    getSetGeo(geohash: string): GeoPositionList {
-      let thisGeo = this.geocoll.get(geohash);
+      //use only the first character to key the geohash collections
+      const shortenedGeohash = geohash.charAt(0);
+      let thisGeo = this.geocoll.get(shortenedGeohash);
       if (!thisGeo) {
-         thisGeo = { geohash, flights: {} };
-         this.geocoll.set(geohash, thisGeo);
+         thisGeo = { geohash: shortenedGeohash, flights: {} };
+         this.geocoll.set(shortenedGeohash, thisGeo);
       }
       return thisGeo;
    }
