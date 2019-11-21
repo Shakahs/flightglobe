@@ -21,6 +21,7 @@ interface FlightRenderParams {
    position: Cartesian3;
    demographic: FlightDemographics | undefined;
    detailSelected: boolean;
+   trackFull: FlightPosition[];
 }
 
 export class FlightSubscriber {
@@ -28,7 +29,7 @@ export class FlightSubscriber {
    readonly icao: Icao;
    // gm: GeoManager;
    private disposers: Array<IReactionDisposer>;
-   @observable position: FlightPosition;
+   @observable.shallow position: FlightPosition;
    readonly requestRender: () => void;
    needsRender: boolean = false;
    demographicsManager: DemographicsManager;
@@ -120,7 +121,8 @@ export class FlightSubscriber {
       return {
          position: this.cartesianPosition,
          demographic: this.demographic,
-         detailSelected: this.isDetailSelected
+         detailSelected: this.isDetailSelected,
+         trackFull: this.trackFull
       };
    }
 

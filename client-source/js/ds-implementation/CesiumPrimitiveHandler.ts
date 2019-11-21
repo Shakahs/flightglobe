@@ -3,6 +3,7 @@ import {
    Cartesian3,
    Label,
    LabelCollection,
+   Material,
    PointPrimitive,
    PointPrimitiveCollection,
    Polyline,
@@ -11,6 +12,8 @@ import {
 } from "cesium";
 import { FlightSubscriberMap } from "./types";
 import { FlightSubscriber } from "./FlightSubscriber";
+import { map } from "lodash";
+import { convertPositionToCartesian } from "../ws-implementation/utility";
 
 require("./mobxConfig");
 
@@ -55,6 +58,7 @@ export class CesiumPrimitiveHandler {
          if (f.needsRender) {
             this.renderPoint(child, f);
             this.reconcileLabel(child, f);
+            this.reconcileLine(child, f);
             f.needsRender = false;
          }
       });
@@ -99,6 +103,34 @@ export class CesiumPrimitiveHandler {
       if (child.label) {
          this.labels.remove(child.label);
          child.label = undefined;
+      }
+   }
+
+   reconcileLine(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
+      if (f.trackFull.length > 0 && f.isDetailSelected) {
+         this.renderLine(child, f);
+      } else {
+         this.destroyLine(child, f);
+      }
+   }
+
+   renderLine(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
+      const cartesianPositions = map(f.trackFull, convertPositionToCartesian);
+      if (child.line) {
+         child.line.positions = cartesianPositions;
+      } else {
+         const polyLine = {
+            positions: cartesianPositions,
+            id: f.icao
+         };
+         child.line = this.lines.add(polyLine);
+      }
+   }
+
+   destroyLine(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
+      if (child.line) {
+         this.lines.remove(child.line);
+         child.line = undefined;
       }
    }
 
