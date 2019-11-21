@@ -12,6 +12,8 @@ import { Cartesian3 } from "cesium";
 import { convertPositionToCartesian } from "../ws-implementation/utility";
 import { each } from "lodash";
 import { DemographicsManager } from "./DemographicsManager";
+import { ObservableArray } from "mobx/lib/types/observablearray";
+import { generateTrackFullKey } from "../../../lib/constants";
 
 require("./mobxConfig");
 
@@ -30,6 +32,8 @@ export class FlightSubscriber {
    readonly requestRender: () => void;
    needsRender: boolean = false;
    demographicsManager: DemographicsManager;
+   dsTrackFull;
+   @observable.shallow trackFull: FlightPosition[] = [];
 
    constructor(
       dsConn: DeepstreamClient,
@@ -56,17 +60,41 @@ export class FlightSubscriber {
          }
       );
 
-      // const pointUpdater = autorun(
-      //    () => {
-      //       const newPosition = this.cartesianPosition;
-      //       if (newPosition) {
-      //          this.requestRender();
-      //       }
-      //    },
-      //    { name: "pointUpdater" }
-      // );
+      const trackFullRequester = reaction(
+         () => this.isDetailSelected,
+         () => {
+            if (this.isDetailSelected) {
+               this.subscribeTrackFull();
+            } else {
+               this.unsubscribeTrackFull();
+            }
+         }
+      );
 
-      this.disposers = [renderRequester];
+      this.disposers = [renderRequester, trackFullRequester];
+   }
+
+   subscribeTrackFull() {
+      if (!this.dsTrackFull) {
+         this.dsTrackFull = this.dsConn.record.getRecord(
+            generateTrackFullKey(this.icao)
+         );
+         this.dsTrackFull.subscribe((fullTrack) => {
+            this.updateTrackFull(fullTrack);
+         });
+      }
+   }
+
+   unsubscribeTrackFull() {
+      if (this.dsTrackFull) {
+         this.dsTrackFull.discard();
+         this.dsTrackFull = null;
+      }
+   }
+
+   @action
+   updateTrackFull(track: FlightPosition[]) {
+      this.trackFull = track;
    }
 
    @action
@@ -100,5 +128,6 @@ export class FlightSubscriber {
       each(this.disposers, (d) => {
          d();
       });
+      this.unsubscribeTrackFull();
    }
 }

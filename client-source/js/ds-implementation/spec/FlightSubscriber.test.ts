@@ -74,4 +74,16 @@ describe("FlightSubscriber", () => {
       demographics.updateDetailedFlights(new Map());
       expect(fsA.isDetailSelected).toBeFalsy();
    });
+
+   it("should call the subscribeTrackFull and unsubscribeTrackFull methods when needed", function() {
+      spyOn(fsA, "subscribeTrackFull").and.callThrough();
+      spyOn(fsA, "unsubscribeTrackFull").and.callThrough();
+      expect(fsA.subscribeTrackFull).not.toHaveBeenCalled();
+      demographics.updateDetailedFlights(
+         new Map([[fsA.position.geohash, true]])
+      );
+      expect(fsA.subscribeTrackFull).toHaveBeenCalled();
+      demographics.updateDetailedFlights(new Map());
+      expect(fsA.unsubscribeTrackFull).toHaveBeenCalled();
+   });
 });
