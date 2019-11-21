@@ -18,6 +18,7 @@ require("./mobxConfig");
 interface FlightRenderParams {
    position: Cartesian3;
    demographic: FlightDemographics | undefined;
+   detailSelected: boolean;
 }
 
 export class FlightSubscriber {
@@ -90,7 +91,8 @@ export class FlightSubscriber {
    @computed get renderParams(): FlightRenderParams {
       return {
          position: this.cartesianPosition,
-         demographic: this.demographic
+         demographic: this.demographic,
+         detailSelected: this.isDetailSelected
       };
    }
 

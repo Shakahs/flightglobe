@@ -55,6 +55,7 @@ export class DemographicsManager {
 
    @action
    updateDetailedFlights(neighborList: GeohashBoolMap) {
-      this.detailedFlights.replace(neighborList);
+      this.detailedFlights.clear();
+      this.detailedFlights.merge(neighborList);
    }
 }

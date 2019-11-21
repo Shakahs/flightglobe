@@ -1,4 +1,5 @@
 import {
+   Cartesian2,
    Cartesian3,
    Label,
    LabelCollection,
@@ -18,6 +19,8 @@ interface CesiumPrimitiveHolder {
    label?: Label;
    line?: Polyline;
 }
+
+const labelOffset = new Cartesian2(10, 20);
 
 export class CesiumPrimitiveHandler {
    private readonly viewer: Viewer;
@@ -51,6 +54,7 @@ export class CesiumPrimitiveHandler {
          const child = this.getChild(f.icao);
          if (f.needsRender) {
             this.renderPoint(child, f);
+            this.reconcileLabel(child, f);
             f.needsRender = false;
          }
       });
@@ -64,6 +68,37 @@ export class CesiumPrimitiveHandler {
          child.point = this.points.add({
             position: f.cartesianPosition
          });
+      }
+   }
+
+   reconcileLabel(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
+      if (f.demographic && f.isDetailSelected) {
+         this.renderLabel(child, f);
+      } else {
+         this.destroyLabel(child);
+      }
+   }
+
+   renderLabel(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
+      const labelText = `${f.icao}\n${f.demographic?.origin}\n${f.demographic?.destination}`;
+
+      if (child.label) {
+         child.label.position = f.cartesianPosition;
+         child.label.text = labelText;
+      } else {
+         child.label = this.labels.add({
+            position: f.cartesianPosition,
+            text: labelText,
+            pixelOffset: labelOffset,
+            outlineWidth: 2.0
+         });
+      }
+   }
+
+   destroyLabel(child: CesiumPrimitiveHolder) {
+      if (child.label) {
+         this.labels.remove(child.label);
+         child.label = undefined;
       }
    }
 

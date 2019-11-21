@@ -1,6 +1,5 @@
 import { Viewer } from "cesium";
 import { CesiumPrimitiveHandler } from "../CesiumPrimitiveHandler";
-import { ObservableMap } from "mobx";
 import { GeoManagerCreator } from "../GeoManagerCreator";
 import { GeoManager } from "../GeoManager";
 import { createViewer, provideConnection } from "./support";
@@ -9,8 +8,6 @@ import { fakeFlightPosition } from "../../../../deepstream/spec/fakeData";
 import { noop } from "lodash";
 import { convertPositionToCartesian } from "../../ws-implementation/utility";
 import { DemographicsManager } from "../DemographicsManager";
-import { flightObj, flightStore } from "../../ws-implementation/spec/mockSetup";
-import { FlightADemographic } from "../../ws-implementation/spec/mockData";
 
 describe("FlightSubscriber", () => {
    let viewer: Viewer;
@@ -74,5 +71,7 @@ describe("FlightSubscriber", () => {
          new Map([[fsA.position.geohash, true]])
       );
       expect(fsA.isDetailSelected).toBeTruthy();
+      demographics.updateDetailedFlights(new Map());
+      expect(fsA.isDetailSelected).toBeFalsy();
    });
 });
