@@ -17,14 +17,6 @@ import { generateTrackFullKey } from "../../../lib/constants";
 
 require("./mobxConfig");
 
-interface FlightRenderParams {
-   cartesianPosition: Cartesian3;
-   demographic: FlightDemographics | undefined;
-   shouldDisplay: boolean;
-   shouldDisplayDetailed: boolean;
-   trackFull: FlightPosition[];
-}
-
 export class FlightSubscriber {
    private readonly dsConn: DeepstreamClient;
    readonly icao: Icao;
@@ -52,7 +44,13 @@ export class FlightSubscriber {
       this.demographicsManager = demographics;
 
       const renderRequester = reaction(
-         () => this.renderParams,
+         () => ({
+            cartesianPosition: this.cartesianPosition,
+            demographic: this.demographic,
+            trackFull: this.trackFull,
+            shouldDisplay: this.shouldDisplay,
+            shouldDisplayDetailed: this.shouldDisplayDetailed
+         }),
          () => {
             this.needsRender = true;
             this.requestRender();
@@ -63,9 +61,12 @@ export class FlightSubscriber {
       );
 
       const trackFullRequester = reaction(
-         () => this.isDetailSelected,
+         () => ({
+            shouldDisplay: this.shouldDisplay,
+            shouldDisplayDetailed: this.shouldDisplayDetailed
+         }),
          () => {
-            if (this.isDetailSelected) {
+            if (this.shouldDisplay && this.shouldDisplayDetailed) {
                this.subscribeTrackFull();
             } else {
                this.unsubscribeTrackFull();
@@ -142,16 +143,6 @@ export class FlightSubscriber {
 
    @computed get shouldDisplayDetailed(): boolean {
       return this.isSelected || this.isDetailSelected;
-   }
-
-   @computed get renderParams(): FlightRenderParams {
-      return {
-         cartesianPosition: this.cartesianPosition,
-         demographic: this.demographic,
-         trackFull: this.trackFull,
-         shouldDisplay: this.shouldDisplay,
-         shouldDisplayDetailed: this.shouldDisplayDetailed
-      };
    }
 
    destroy() {
