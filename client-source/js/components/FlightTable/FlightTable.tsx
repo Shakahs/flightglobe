@@ -74,9 +74,11 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
       this.setState({ disposer });
    }
 
-   // componentWillUnmount(): void {
-   //    this.state.disposer?.();
-   // }
+   componentWillUnmount(): void {
+      if (this.state.disposer) {
+         this.state.disposer();
+      }
+   }
 
    // filterChanged(data: FilterChangedEvent) {
    //    const resultMap = new Map<string, boolean>();

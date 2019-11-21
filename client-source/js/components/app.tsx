@@ -65,13 +65,15 @@ class App extends React.Component<AppProps, AppState> {
                toggleShowInfoModal={this.toggleSettingsModal}
                globe={this.props.globe}
             />
-            <div
-               className={classnames("px-2", "pb-2", "flightTable", {
-                  "fixed-bottom": this.state.showFlightTable
-               })}
-            >
-               <FlightTable dManager={this.props.demographicsManager} />
-            </div>
+            {this.state.showFlightTable && (
+               <div
+                  className={classnames("px-2", "pb-2", "flightTable", {
+                     "fixed-bottom": this.state.showFlightTable
+                  })}
+               >
+                  <FlightTable dManager={this.props.demographicsManager} />
+               </div>
+            )}
          </React.Fragment>
       );
    }
