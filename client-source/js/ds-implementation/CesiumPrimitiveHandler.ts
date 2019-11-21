@@ -1,14 +1,15 @@
 import {
    Cartesian2,
-   Cartesian3,
    Color,
+   GeometryInstance,
    Label,
    LabelCollection,
-   Material,
    PointPrimitive,
    PointPrimitiveCollection,
-   Polyline,
-   PolylineCollection,
+   PolylineColorAppearance,
+   PolylineGeometry,
+   Primitive,
+   PrimitiveCollection,
    Viewer
 } from "cesium";
 import { FlightSubscriberMap } from "./types";
@@ -17,8 +18,7 @@ import { map } from "lodash";
 import { convertPositionToCartesian } from "../ws-implementation/utility";
 import {
    LabelDisplayOptionDefaults,
-   PointDisplayOptionDefaults,
-   TrailDisplayOptionDefaults
+   PointDisplayOptionDefaults
 } from "../constants";
 
 require("./mobxConfig");
@@ -26,16 +26,16 @@ require("./mobxConfig");
 interface CesiumPrimitiveHolder {
    point?: PointPrimitive;
    label?: Label;
-   line?: Polyline;
+   line?: Primitive;
 }
 
 const labelOffset = new Cartesian2(10, 20);
 
 export class CesiumPrimitiveHandler {
    private readonly viewer: Viewer;
-   private readonly points: PointPrimitiveCollection = new PointPrimitiveCollection();
-   private readonly labels: LabelCollection = new LabelCollection();
-   private readonly lines: PolylineCollection = new PolylineCollection();
+   private readonly points = new PointPrimitiveCollection();
+   private readonly labels = new LabelCollection();
+   private readonly lines = new PrimitiveCollection();
    private readonly children: Map<string, CesiumPrimitiveHolder>;
 
    constructor(viewer: Viewer) {
@@ -125,7 +125,7 @@ export class CesiumPrimitiveHandler {
 
    reconcileLine(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
       if (
-         f.trackFull.length > 0 &&
+         f.trackFull.length >= 2 && //require at least 2 positions to render a line
          f.shouldDisplayDetailed &&
          f.shouldDisplay
       ) {
@@ -137,19 +137,31 @@ export class CesiumPrimitiveHandler {
 
    renderLine(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
       const cartesianPositions = map(f.trackFull, convertPositionToCartesian);
-      if (child.line) {
-         child.line.positions = cartesianPositions;
-      } else {
-         const polyLine = {
-            positions: cartesianPositions,
-            id: f.icao
-         };
-         child.line = this.lines.add(polyLine);
-      }
-      child.line.width = TrailDisplayOptionDefaults.size;
-      child.line.material = Material.fromType("Color");
-      child.line.material.uniforms.color =
-         TrailDisplayOptionDefaults.cesiumColor;
+      const gradientColors: Color[] = [];
+      cartesianPositions.forEach(() => {
+         gradientColors.push(Color.fromRandom());
+      });
+
+      const newLine = new Primitive({
+         asynchronous: false,
+         geometryInstances: new GeometryInstance({
+            geometry: PolylineGeometry.createGeometry(
+               new PolylineGeometry({
+                  positions: cartesianPositions,
+                  width: 5,
+                  // vertexFormat: Cesium.PolylineColorAppearance.VERTEX_FORMAT,
+                  colors: gradientColors,
+                  colorsPerVertex: true
+               })
+            )
+         }),
+         appearance: new PolylineColorAppearance({
+            translucent: true
+         })
+      });
+      this.destroyLine(child, f);
+      child.line = newLine;
+      this.lines.add(child.line);
    }
 
    destroyLine(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
