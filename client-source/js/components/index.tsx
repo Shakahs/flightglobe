@@ -3,7 +3,6 @@ import "regenerator-runtime/runtime";
 import "cesiumSource/Widgets/widgets.css";
 import * as React from "react";
 import ReactDOM from "react-dom";
-import { FlightStore } from "../ws-implementation/flightStore";
 // import applyClickHandler from "../globe/clickHandler";
 import App from "./app";
 import "../styles.scss";
@@ -14,8 +13,6 @@ import { GeoManagerCreator } from "../ds-implementation/GeoManagerCreator";
 import { DemographicsManager } from "../ds-implementation/DemographicsManager";
 
 const globe = new Globe("cesiumContainer");
-const flightStore = new FlightStore(globe.viewer);
-const routeUpdate = flightStore.routeUpdate.bind(flightStore);
 // applyClickHandler(viewer, flightStore)
 
 const dsConn = new DeepstreamClient("localhost:6020", {
