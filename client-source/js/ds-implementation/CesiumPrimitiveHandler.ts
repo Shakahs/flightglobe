@@ -20,6 +20,8 @@ import {
    LabelDisplayOptionDefaults,
    PointDisplayOptionDefaults
 } from "../constants";
+import { interpolate } from "d3-interpolate";
+import { color, RGBColor } from "d3-color";
 
 require("./mobxConfig");
 
@@ -30,6 +32,7 @@ interface CesiumPrimitiveHolder {
 }
 
 const labelOffset = new Cartesian2(10, 20);
+const colorInterpolator = interpolate("red", "white");
 
 export class CesiumPrimitiveHandler {
    private readonly viewer: Viewer;
@@ -138,9 +141,15 @@ export class CesiumPrimitiveHandler {
    renderLine(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
       const cartesianPositions = map(f.trackFull, convertPositionToCartesian);
       const gradientColors: Color[] = [];
-      cartesianPositions.forEach(() => {
-         gradientColors.push(Color.fromRandom());
-      });
+
+      for (let i = 0; i < f.trackFull.length; i++) {
+         const newColor = color(
+            colorInterpolator(f.trackFull[i].altitude / 50000)
+         ) as RGBColor;
+         gradientColors.push(
+            Color.fromBytes(newColor.r, newColor.g, newColor.b)
+         );
+      }
 
       const newLine = new Primitive({
          asynchronous: false,
@@ -148,7 +157,7 @@ export class CesiumPrimitiveHandler {
             geometry: PolylineGeometry.createGeometry(
                new PolylineGeometry({
                   positions: cartesianPositions,
-                  width: 5,
+                  width: 3,
                   // vertexFormat: Cesium.PolylineColorAppearance.VERTEX_FORMAT,
                   colors: gradientColors,
                   colorsPerVertex: true
