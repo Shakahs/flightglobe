@@ -34,8 +34,8 @@ export class GeoManager {
       this.geohash = geohash;
       this.demographics = demographics;
       this.flightSubscriberMap = new Map();
-      this.debouncedRender = debounce(this.render.bind(this), 500, {
-         maxWait: 1000
+      this.debouncedRender = debounce(this.render.bind(this), 250, {
+         maxWait: 500
       });
       if (viewer) {
          this.cph = new CesiumPrimitiveHandler(viewer);
