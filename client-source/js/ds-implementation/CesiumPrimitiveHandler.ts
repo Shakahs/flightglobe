@@ -22,6 +22,8 @@ import {
 } from "../constants";
 import { interpolate } from "d3-interpolate";
 import { color, RGBColor } from "d3-color";
+import { memoize } from "lodash";
+import { FlightPosition } from "../../../lib/types";
 
 require("./mobxConfig");
 
@@ -35,12 +37,15 @@ const labelOffset = new Cartesian2(10, 20);
 const colorInterpolator = interpolate("red", "white");
 
 const CesiumColorFromAltitude = (
-   altitude: number,
+   position: FlightPosition,
    interpolator: (t: number) => string
 ): Color => {
-   const newColor = color(interpolator(altitude / 50000)) as RGBColor;
+   const newColor = color(interpolator(position.altitude / 50000)) as RGBColor;
    return Color.fromBytes(newColor.r, newColor.g, newColor.b);
 };
+
+memoize.Cache = WeakMap;
+const memoizedCesiumColorFromAltitude = memoize(CesiumColorFromAltitude);
 
 export class CesiumPrimitiveHandler {
    private readonly viewer: Viewer;
@@ -94,8 +99,8 @@ export class CesiumPrimitiveHandler {
          });
       }
       // child.point.color = PointDisplayOptionDefaults.cesiumColor;
-      child.point.color = CesiumColorFromAltitude(
-         f.position.altitude,
+      child.point.color = memoizedCesiumColorFromAltitude(
+         f.position,
          colorInterpolator
       );
       child.point.pixelSize = PointDisplayOptionDefaults.size;
@@ -127,7 +132,11 @@ export class CesiumPrimitiveHandler {
             outlineWidth: 2.0
          });
       }
-      child.label.fillColor = LabelDisplayOptionDefaults.cesiumColor;
+      // child.label.fillColor = LabelDisplayOptionDefaults.cesiumColor;
+      child.label.fillColor = memoizedCesiumColorFromAltitude(
+         f.position,
+         colorInterpolator
+      );
       child.label.font = `${LabelDisplayOptionDefaults.size}px sans-serif`;
    }
 
@@ -156,7 +165,7 @@ export class CesiumPrimitiveHandler {
 
       for (let i = 0; i < f.trackFull.length; i++) {
          gradientColors.push(
-            CesiumColorFromAltitude(f.trackFull[i].altitude, colorInterpolator)
+            memoizedCesiumColorFromAltitude(f.trackFull[i], colorInterpolator)
          );
       }
 
