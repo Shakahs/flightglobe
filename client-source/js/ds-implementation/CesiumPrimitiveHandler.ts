@@ -154,6 +154,7 @@ export class CesiumPrimitiveHandler {
       const newLine = new Primitive({
          asynchronous: false,
          geometryInstances: new GeometryInstance({
+            id: f.icao,
             geometry: PolylineGeometry.createGeometry(
                new PolylineGeometry({
                   positions: cartesianPositions,

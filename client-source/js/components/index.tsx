@@ -11,9 +11,11 @@ import { DeepstreamClient } from "@deepstream/client";
 import { REMOTE_WINS } from "@deepstream/client/dist/record/merge-strategy";
 import { GeoManagerCreator } from "../ds-implementation/GeoManagerCreator";
 import { DemographicsManager } from "../ds-implementation/DemographicsManager";
+import applyClickHandler from "../globe/clickHandler";
+import { noop } from "lodash";
 
 const globe = new Globe("cesiumContainer");
-// applyClickHandler(viewer, flightStore)
+applyClickHandler(globe.viewer, noop);
 
 const dsConn = new DeepstreamClient("localhost:6020", {
    mergeStrategy: REMOTE_WINS
