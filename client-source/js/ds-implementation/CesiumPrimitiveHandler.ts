@@ -34,6 +34,14 @@ interface CesiumPrimitiveHolder {
 const labelOffset = new Cartesian2(10, 20);
 const colorInterpolator = interpolate("red", "white");
 
+const CesiumColorFromAltitude = (
+   altitude: number,
+   interpolator: (t: number) => string
+): Color => {
+   const newColor = color(interpolator(altitude / 50000)) as RGBColor;
+   return Color.fromBytes(newColor.r, newColor.g, newColor.b);
+};
+
 export class CesiumPrimitiveHandler {
    private readonly viewer: Viewer;
    private readonly points = new PointPrimitiveCollection();
@@ -85,7 +93,11 @@ export class CesiumPrimitiveHandler {
             show: f.shouldDisplay
          });
       }
-      child.point.color = PointDisplayOptionDefaults.cesiumColor;
+      // child.point.color = PointDisplayOptionDefaults.cesiumColor;
+      child.point.color = CesiumColorFromAltitude(
+         f.position.altitude,
+         colorInterpolator
+      );
       child.point.pixelSize = PointDisplayOptionDefaults.size;
       child.point.outlineColor = Color.fromCssColorString(
          PointDisplayOptionDefaults.outlineColor
@@ -102,7 +114,7 @@ export class CesiumPrimitiveHandler {
    }
 
    renderLabel(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
-      const labelText = `${f.icao}\n${f.demographic?.origin}\n${f.demographic?.destination}`;
+      const labelText = `${f.icao}\n${f.demographic?.origin}\n${f.demographic?.destination}\n${f.position.altitude}`;
 
       if (child.label) {
          child.label.position = f.cartesianPosition;
@@ -143,11 +155,8 @@ export class CesiumPrimitiveHandler {
       const gradientColors: Color[] = [];
 
       for (let i = 0; i < f.trackFull.length; i++) {
-         const newColor = color(
-            colorInterpolator(f.trackFull[i].altitude / 50000)
-         ) as RGBColor;
          gradientColors.push(
-            Color.fromBytes(newColor.r, newColor.g, newColor.b)
+            CesiumColorFromAltitude(f.trackFull[i].altitude, colorInterpolator)
          );
       }
 

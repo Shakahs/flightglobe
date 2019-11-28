@@ -19,7 +19,6 @@ const applyClickHandler = function(
          | GeometryInstance
          | undefined = viewer.scene.pick(click.position);
       if (pickedObject) {
-         console.log(`picked object id: ${pickedObject.id}`);
          callback(pickedObject.id);
       }
    }, ScreenSpaceEventType.LEFT_CLICK);
