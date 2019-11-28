@@ -12,19 +12,22 @@ import { REMOTE_WINS } from "@deepstream/client/dist/record/merge-strategy";
 import { GeoManagerCreator } from "../ds-implementation/GeoManagerCreator";
 import { DemographicsManager } from "../ds-implementation/DemographicsManager";
 import applyClickHandler from "../globe/clickHandler";
-import { noop } from "lodash";
-
-const globe = new Globe("cesiumContainer");
-applyClickHandler(globe.viewer, noop);
+import { Icao } from "../types";
 
 const dsConn = new DeepstreamClient("localhost:6020", {
    mergeStrategy: REMOTE_WINS
 });
 
+const globe = new Globe("cesiumContainer");
 const dm = new DemographicsManager(dsConn, globe.viewer);
+
 ReactDOM.render(
    <App globe={globe} demographicsManager={dm} />,
    document.getElementById("reactApp")
+);
+
+applyClickHandler(globe.viewer, (id: Icao) =>
+   dm.selectionClickChange.emit("selectionClickChange", id)
 );
 
 const getData = async () => {

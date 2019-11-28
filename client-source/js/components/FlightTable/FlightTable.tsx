@@ -4,6 +4,7 @@ import { AgGridReact } from "ag-grid-react";
 import {
    ColDef,
    FilterChangedEvent,
+   GridApi,
    SelectionChangedEvent
 } from "ag-grid-community";
 import { GridReadyEvent } from "ag-grid-community/dist/lib/events";
@@ -20,6 +21,7 @@ interface FlightTableProps {
 interface FlightTableState {
    columnDefs: ColDef[];
    disposer?: Lambda;
+   GridApi?: GridApi;
 }
 
 @observer
@@ -28,7 +30,12 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
       super(props);
       this.state = {
          columnDefs: [
-            { field: "icao" },
+            {
+               field: "icao",
+               headerName: "ICAO",
+               filter: "agTextColumnFilter",
+               sortable: true
+            },
             {
                field: "origin",
                headerName: "Origin",
@@ -52,6 +59,11 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
       this.gridReady = this.gridReady.bind(this);
       this.filterChanged = this.filterChanged.bind(this);
       this.selectionChanged = this.selectionChanged.bind(this);
+      this.manuallySelect = this.manuallySelect.bind(this);
+      this.props.dManager.selectionClickChange.on(
+         "selectionClickChange",
+         this.manuallySelect
+      );
    }
 
    gridReady(event: GridReadyEvent) {
@@ -77,7 +89,7 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
          }
       });
 
-      this.setState({ disposer });
+      this.setState({ disposer, GridApi: event.api });
    }
 
    componentWillUnmount(): void {
@@ -105,6 +117,15 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
             newSelectedMap.set(r.icao as Icao, true);
          });
          this.props.dManager.updateSelectedFlights(newSelectedMap);
+      }
+   }
+
+   manuallySelect(id: Icao) {
+      if (this.state.GridApi) {
+         const node = this.state.GridApi.getRowNode(id);
+         if (node) {
+            node.setSelected(!node.isSelected());
+         }
       }
    }
 

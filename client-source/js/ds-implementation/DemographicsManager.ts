@@ -13,6 +13,7 @@ import {
    getCameraPositionGeohash,
    getGeohashNeighbors
 } from "../globe/geohashUtilities";
+import { EventEmitter } from "events";
 
 export class DemographicsManager {
    dsConn: DeepstreamClient;
@@ -33,6 +34,7 @@ export class DemographicsManager {
    selectedFlights = observable.map<Icao, boolean>(undefined, {
       deep: false
    });
+   selectionClickChange = new EventEmitter();
 
    constructor(dsConn: DeepstreamClient, viewer?: Viewer) {
       this.dsConn = dsConn;
