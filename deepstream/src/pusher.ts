@@ -42,8 +42,6 @@ const work = (ds) => {
       count: 100
    });
 
-   const keys = new Set<string>();
-   const bootData: BootData = {};
    const geoCollector = new GeoPositionListCollector();
    const demographicsMap: FlightDemographicsCollection = {};
    const masterRecordMap = new Map<Icao, MasterFlightRecord>();
@@ -54,13 +52,21 @@ const work = (ds) => {
       // contain duplicates due to SCAN's implementation in Redis.
       resultKeys.forEach(async (k) => {
          // count++;
-         const rawData: string[] = await redis.lrange(k, 0, -1);
-         const pos: RedisFlightRecord[] = rawData.map((i) => JSON.parse(i));
-         const masterRecord = MasterFlightRecordFromRedis(pos);
-         masterRecordMap.set(masterRecord.icao, masterRecord);
-         geoCollector.store(masterRecord);
-         demographicsMap[masterRecord.icao] = masterRecord.demographic;
-         count++;
+         let rawData: string[] = [];
+         try {
+            rawData = await redis.lrange(k, 0, -1);
+         } catch {
+            console.log("retrieving track from redis failed");
+         }
+         if (rawData.length >= 1) {
+            const pos: RedisFlightRecord[] = rawData.map((i) => JSON.parse(i));
+            const masterRecord = MasterFlightRecordFromRedis(pos);
+            masterRecordMap.set(masterRecord.icao, masterRecord);
+            geoCollector.store(masterRecord);
+            demographicsMap[masterRecord.icao] = masterRecord.demographic;
+            count++;
+         }
+
          // keys.add(pos.icao);
          //
          // const record = ds.record.getRecord(pos.icao);
