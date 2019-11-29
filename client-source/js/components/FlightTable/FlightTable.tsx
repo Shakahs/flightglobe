@@ -10,9 +10,10 @@ import {
 import { GridReadyEvent } from "ag-grid-community/dist/lib/events";
 import { FlightDemographics } from "../../../../lib/types";
 import { DemographicsManager } from "../../ds-implementation/DemographicsManager";
-import { Lambda } from "mobx";
+import { IMapDidChange, Lambda } from "mobx";
 import { each } from "lodash";
 import { Icao } from "../../types";
+const airports = require("../../../resources/airports.json");
 
 interface FlightTableProps {
    dManager: DemographicsManager;
@@ -23,6 +24,23 @@ interface FlightTableState {
    disposer?: Lambda;
    GridApi?: GridApi;
 }
+
+const expandAirportName = (code: string): string => {
+   return `${code} ${airports[code]?.name}`;
+};
+
+const transformDemographicForTable = (
+   icao: string,
+   input: FlightDemographics
+): FlightDemographics => {
+   const newD = {
+      ...input,
+      icao,
+      origin: expandAirportName(input.origin),
+      destination: expandAirportName(input.destination)
+   };
+   return newD;
+};
 
 @observer
 class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
@@ -80,11 +98,13 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
       const disposer = this.props.dManager.demographicsMap.observe((change) => {
          if (change.type === "add" && event.api) {
             event.api.batchUpdateRowData({
-               add: [{ icao: change.name, ...change.newValue }]
+               add: [transformDemographicForTable(change.name, change.newValue)]
             });
          } else if (change.type === "update" && event.api) {
             event.api.batchUpdateRowData({
-               update: [{ icao: change.name, ...change.newValue }]
+               update: [
+                  transformDemographicForTable(change.name, change.newValue)
+               ]
             });
          }
       });

@@ -24,6 +24,7 @@ import { interpolate } from "d3-interpolate";
 import { color, RGBColor } from "d3-color";
 import { memoize } from "lodash";
 import { FlightPosition } from "../../../lib/types";
+const airports = require("../../resources/airports.json");
 
 require("./mobxConfig");
 
@@ -119,7 +120,20 @@ export class CesiumPrimitiveHandler {
    }
 
    renderLabel(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
-      const labelText = `${f.icao}\n${f.demographic?.origin}\n${f.demographic?.destination}\n${f.position.altitude}`;
+      let oCity = f.demographic?.origin;
+      if (f.demographic?.origin && airports[f.demographic.origin]?.city) {
+         oCity = airports[f.demographic.origin].city;
+      }
+
+      let dCity = f.demographic?.destination;
+      if (
+         f.demographic?.destination &&
+         airports[f.demographic.destination]?.city
+      ) {
+         dCity = airports[f.demographic.destination].city;
+      }
+
+      const labelText = `${f.icao}\n${oCity}\n${dCity}\n${f.position.altitude} ft`;
 
       if (child.label) {
          child.label.position = f.cartesianPosition;
