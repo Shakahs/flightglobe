@@ -14,6 +14,7 @@ import { IMapDidChange, Lambda } from "mobx";
 import { each } from "lodash";
 import { Icao } from "../../types";
 const airports = require("../../../resources/airports.json");
+const aircraft = require("../../../resources/aircraft.json");
 
 interface FlightTableProps {
    dManager: DemographicsManager;
@@ -26,7 +27,15 @@ interface FlightTableState {
 }
 
 const expandAirportName = (code: string): string => {
-   return `${code} ${airports[code]?.name}`;
+   const fullname = airports[code]?.name;
+   if (fullname) {
+      return `${fullname} (${code})`;
+   }
+   return code;
+};
+
+const expandAircraftName = (model: string): string => {
+   return aircraft[model]?.name ?? model;
 };
 
 const transformDemographicForTable = (
@@ -34,10 +43,10 @@ const transformDemographicForTable = (
    input: FlightDemographics
 ): FlightDemographics => {
    const newD = {
-      ...input,
       icao,
       origin: expandAirportName(input.origin),
-      destination: expandAirportName(input.destination)
+      destination: expandAirportName(input.destination),
+      model: expandAircraftName(input.model)
    };
    return newD;
 };
