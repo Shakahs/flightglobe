@@ -81,13 +81,15 @@ func publishMessages(publisher message.Publisher) {
 		delay := 29 / len(urlList)
 
 		for _, v := range urlList {
-			rawData := flightradar24.Retrieve(v)
+			rawData, err := flightradar24.Retrieve(v)
 
-			msg := message.NewMessage(watermill.NewUUID(), rawData)
-			middleware.SetCorrelationID(watermill.NewUUID(), msg)
+			if err == nil {
+				msg := message.NewMessage(watermill.NewUUID(), rawData)
+				middleware.SetCorrelationID(watermill.NewUUID(), msg)
 
-			if err := publisher.Publish(incomingChannel, msg); err != nil {
-				panic(err)
+				if err := publisher.Publish(incomingChannel, msg); err != nil {
+					panic(err)
+				}
 			}
 			time.Sleep(time.Duration(delay) * time.Second)
 		}

@@ -48,15 +48,15 @@ func BuildUrlList(pList []*pkg.FlightRecord) []string {
 	return urlList
 }
 
-func Retrieve(url string) []byte {
+func Retrieve(url string) ([]byte, error) {
 	//fmt.Println(url)
 	resp, err := http.Get(url)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
-	return body
+	return body, err
 }
 
 func Scrape(pList []*pkg.FlightRecord, outputChan chan []byte) {
@@ -65,8 +65,10 @@ func Scrape(pList []*pkg.FlightRecord, outputChan chan []byte) {
 	delay := 29 / len(urlList)
 	log.Printf("Retrieving %d URLs for %d flights with a delay of %d", len(urlList), count, delay)
 	for _, v := range urlList {
-		data := Retrieve(v)
-		outputChan <- data
+		data, err := Retrieve(v)
+		if err == nil {
+			outputChan <- data
+		}
 		time.Sleep(time.Duration(delay) * time.Second)
 	}
 }
