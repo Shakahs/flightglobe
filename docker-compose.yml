@@ -4,11 +4,11 @@ services:
       image: redis
       ports:
          - "6379:6379"
-   nats:
-      image: nats-streaming:latest
+   rabbitmq:
+      image: rabbitmq:3.8-management
       ports:
-         - "4222:4222"
-         - "8222:8222"
+         - "5672:5672"
+         - "15672:15672"
    deepstream:
       image: deepstreamio/deepstream.io
       ports:

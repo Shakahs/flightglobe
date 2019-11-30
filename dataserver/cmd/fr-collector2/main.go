@@ -3,17 +3,15 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/Shakahs/flightglobe/dataserver/internal/app/fr-collector/flightradar24"
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"github.com/ThreeDotsLabs/watermill"
-	"github.com/ThreeDotsLabs/watermill-nats/pkg/nats"
+	"github.com/ThreeDotsLabs/watermill-amqp/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 	"github.com/ThreeDotsLabs/watermill/message/router/plugin"
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
 	"github.com/go-redis/redis"
-	"github.com/nats-io/stan.go"
 	"log"
 	"os"
 	"time"
@@ -25,15 +23,14 @@ var (
 	logger          = watermill.NewStdLogger(false, false)
 	incomingChannel = pkg.FR_RAW_DATA
 	outgoingChannel = pkg.FR_PROCESSED_DATA
-	natsAddress     = os.Getenv("NATS_ADDRESS")
 	redisAddress    = os.Getenv("REDIS_ADDRESS")
 	redisPort       = os.Getenv("REDIS_PORT")
 	redisClient     *redis.Client
+	amqpURI         = "amqp://guest:guest@localhost:5672/"
 )
 
 func init() {
-	pkg.CheckEnvVars(natsAddress)
-	pkg.CheckEnvVars(redisAddress, redisPort, natsAddress)
+	pkg.CheckEnvVars(redisAddress, redisPort)
 	redisClient = pkg.ProvideRedisClient(redisAddress, redisPort)
 }
 
@@ -123,33 +120,19 @@ func FrHandler(msg *message.Message) ([]*message.Message, error) {
 }
 
 func main() {
+
 	router, err := message.NewRouter(message.RouterConfig{}, logger)
 	if err != nil {
 		panic(err)
 	}
 
-	router.AddPlugin(plugin.SignalsHandler)
-	router.AddMiddleware(
-		middleware.CorrelationID,
-		middleware.Recoverer,
-	)
-
 	localPubSub := gochannel.NewGoChannel(gochannel.Config{}, logger)
-
-	natsDSN := fmt.Sprintf("nats://%s:4222", natsAddress)
-	log.Println("connecting to NATS at", natsDSN)
-
-	remotePubSub, err := nats.NewStreamingPublisher(
-		nats.StreamingPublisherConfig{
-			ClusterID: "test-cluster",
-			ClientID:  "example-publisher",
-			StanOptions: []stan.Option{
-				stan.NatsURL(natsDSN),
-			},
-			Marshaler: nats.GobMarshaler{},
-		},
-		watermill.NewStdLogger(false, false),
-	)
+	remotePubSub, err := amqp.NewPublisher(
+		amqp.NewNonDurablePubSubConfig(amqpURI, amqp.GenerateQueueNameTopicName),
+		watermill.NewStdLogger(false, false))
+	if err != nil {
+		panic(err)
+	}
 	pkg.Check(err)
 
 	router.AddHandler(
@@ -159,6 +142,12 @@ func main() {
 		outgoingChannel, // topic to which we will publish events
 		remotePubSub,
 		FrHandler,
+	)
+
+	router.AddPlugin(plugin.SignalsHandler)
+	router.AddMiddleware(
+		middleware.CorrelationID,
+		middleware.Recoverer,
 	)
 
 	go publishMessages(localPubSub)
