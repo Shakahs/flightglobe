@@ -33,7 +33,7 @@ class LoadingScreen extends React.Component<
 
    toggle() {
       this.setState({
-         showModal: !this.state.showModal
+         showModal: false
       });
    }
 
