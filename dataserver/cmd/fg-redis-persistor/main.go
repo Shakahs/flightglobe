@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	fg_redis_persistor "github.com/Shakahs/flightglobe/dataserver/internal/app/fg-redis-persistor"
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"github.com/ThreeDotsLabs/watermill"
@@ -26,14 +27,18 @@ var (
 	// You probably want to ship your own implementation of `watermill.LoggerAdapter`.
 	logger          = watermill.NewStdLogger(false, false)
 	incomingChannel = pkg.FR_PROCESSED_DATA
-	amqpURI         = "amqp://guest:guest@localhost:5672/"
+	amqpURI         = fmt.Sprintf("amqp://guest:guest@%s:%s/",
+		os.Getenv("RABBITMQ_HOST"),
+		os.Getenv("RABBITMQ_PORT"))
 )
 
 func init() {
 	//redisSubChannel = os.Getenv("REDIS_SUB_CHANNEL")
 	//redisPubChannel = os.Getenv("REDIS_PUB_CHANNEL")
 	//
-	pkg.CheckEnvVars(redisAddress, redisPort)
+	pkg.CheckEnvVars(redisAddress, redisPort,
+		os.Getenv("RABBITMQ_HOST"),
+		os.Getenv("RABBITMQ_PORT"))
 	//
 	redisClient = pkg.ProvideRedisClient(redisAddress, redisPort)
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/Shakahs/flightglobe/dataserver/internal/app/fr-collector/flightradar24"
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"github.com/ThreeDotsLabs/watermill"
@@ -26,11 +27,15 @@ var (
 	redisAddress    = os.Getenv("REDIS_ADDRESS")
 	redisPort       = os.Getenv("REDIS_PORT")
 	redisClient     *redis.Client
-	amqpURI         = "amqp://guest:guest@localhost:5672/"
+	amqpURI         = fmt.Sprintf("amqp://guest:guest@%s:%s/",
+		os.Getenv("RABBITMQ_HOST"),
+		os.Getenv("RABBITMQ_PORT"))
 )
 
 func init() {
-	pkg.CheckEnvVars(redisAddress, redisPort)
+	pkg.CheckEnvVars(redisAddress, redisPort,
+		os.Getenv("RABBITMQ_HOST"),
+		os.Getenv("RABBITMQ_PORT"))
 	redisClient = pkg.ProvideRedisClient(redisAddress, redisPort)
 }
 
