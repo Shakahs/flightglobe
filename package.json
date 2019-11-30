@@ -4,7 +4,7 @@
    "main": "server/index.js",
    "scripts": {
       "dev": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js --hot",
-      "build": "rm -rf ./dataserver/cmd/fg-server/static/ && node --max_old_space_size=8000 ./node_modules/webpack/bin/webpack.js --config webpack.config.prod.js --profile --json > webpack-stats.json",
+      "build": "rm -rf ./client-build/* && node --max_old_space_size=8000 ./node_modules/webpack/bin/webpack.js --config webpack.config.prod.js --profile --json > webpack-stats.json",
       "analyze-bundle": "./node_modules/webpack-bundle-analyzer/lib/bin/analyzer.js ./webpack-stats.json ./dataserver/cmd/fg-server/static/",
       "lint-break-on-errors": "eslint ./client-source/js ./webpack.config.js -f table --ext .js --ext .jsx",
       "lint": "eslint ./client-source/js ./webpack.config.js -f table --ext .js --ext .jsx || true",
@@ -77,6 +77,7 @@
       "webpackbar": "^4.0.0"
    },
    "dependencies": {
+      "@cloudflare/wrangler": "^1.6.0",
       "@deepstream/client": "^5.0.5",
       "@fortawesome/fontawesome-svg-core": "^1.2.15",
       "@fortawesome/free-solid-svg-icons": "^5.7.2",

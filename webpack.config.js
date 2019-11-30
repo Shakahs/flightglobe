@@ -39,7 +39,7 @@ module.exports = {
    },
    output: {
       filename: "[name].[hash].js",
-      path: path.resolve(__dirname, "dataserver/cmd/fg-server/static"),
+      path: path.resolve(__dirname, "client-build/"),
       // Needed by Cesium for multiline strings
       sourcePrefix: ""
    },

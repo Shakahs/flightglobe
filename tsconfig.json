@@ -1,6 +1,6 @@
 {
    "compilerOptions": {
-      "outDir": "./client-build/", // path to output directory
+      "outDir": "./client-build-ts/", // path to output directory
       "sourceMap": true, // allow sourcemap support
       "strictNullChecks": true, // enable strict null checks as a best practice
       "module": "es6", // specifiy module code generation
