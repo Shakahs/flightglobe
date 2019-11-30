@@ -19,9 +19,9 @@ spec:
           image: gcr.io/flight-globe/deepstream-server
           imagePullPolicy: Always
           ports:
-            - containerPort: 8081
+            - containerPort: 6020
           env:
-            - name: REDIS_ADDRESS
-              value: redis-service
+            - name: REDIS_HOST
+              value: redis-master
             - name: REDIS_PORT
               value: "6379"
