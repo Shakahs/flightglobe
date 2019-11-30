@@ -1,5 +1,5 @@
 import { fakeRedisFlightRecord, fillArray } from "./fakeData";
-import { MasterFlightRecord, RedisFlightRecord } from "../../lib/types";
+import { MasterFlightRecord, RedisFlightRecord } from "../../../lib/types";
 import {
    MasterFlightRecordFromRedis,
    extractLastPositions

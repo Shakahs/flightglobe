@@ -1,10 +1,10 @@
 import { initConnection } from "./deepstream";
 import { DeepstreamClient } from "@deepstream/client";
-import { GeoPositionList } from "../../lib/types";
+import { GeoPositionList } from "../../../lib/types";
 import {
    DS_GEOHASH_LIST_KEY,
    generateGeohashedPositionsKey
-} from "../../lib/constants";
+} from "../../../lib/constants";
 
 if (require.main === module) {
    initConnection().then((conn) => {

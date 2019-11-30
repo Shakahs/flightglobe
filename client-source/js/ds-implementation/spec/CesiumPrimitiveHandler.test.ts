@@ -9,10 +9,10 @@ import {
 } from "./support";
 import { Icao } from "../../types";
 import { FlightSubscriber } from "../FlightSubscriber";
-import { fakeFlightPosition } from "../../../../deepstream/spec/fakeData";
 import { CesiumPrimitiveHandler } from "../CesiumPrimitiveHandler";
 import { action, ObservableMap } from "mobx";
 import { DemographicsManager } from "../DemographicsManager";
+import { fakeFlightPosition } from "../../../../lib/spec/fakeData";
 
 describe("CesiumPrimitiveHandler", () => {
    let viewer: Viewer;

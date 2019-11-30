@@ -8,14 +8,14 @@ import {
    FlightPosition,
    MasterFlightRecord,
    RedisFlightRecord
-} from "../../lib/types";
+} from "../../../lib/types";
 import {
    DS_DEMOGRAPHICS_KEY,
    DS_GEOHASH_LIST_KEY,
    generateGeohashedPositionsKey,
    generateTrackFullKey
-} from "../../lib/constants";
-import { Icao } from "../../client-source/js/types";
+} from "../../../lib/constants";
+import { Icao } from "../../../client-source/js/types";
 
 const Redis = require("ioredis");
 

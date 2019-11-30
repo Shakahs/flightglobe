@@ -6,13 +6,13 @@ import {
    sleep
 } from "./support";
 import { GeoManager } from "../GeoManager";
-import { fakeFlightPosition } from "../../../../deepstream/spec/fakeData";
 import { FlightSubscriber } from "../FlightSubscriber";
 import { Viewer } from "cesium";
 import { CesiumPrimitiveHandler } from "../CesiumPrimitiveHandler";
 import { FlightPosition } from "../../../../lib/types";
 import { convertPositionToCartesian } from "../../ws-implementation/utility";
 import { DemographicsManager } from "../DemographicsManager";
+import { fakeFlightPosition } from "../../../../lib/spec/fakeData";
 
 describe("GeoManager", () => {
    let dsConn;

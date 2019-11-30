@@ -4,10 +4,10 @@ import { GeoManagerCreator } from "../GeoManagerCreator";
 import { GeoManager } from "../GeoManager";
 import { createViewer, provideConnection } from "./support";
 import { FlightSubscriber } from "../FlightSubscriber";
-import { fakeFlightPosition } from "../../../../deepstream/spec/fakeData";
 import { noop } from "lodash";
 import { convertPositionToCartesian } from "../../ws-implementation/utility";
 import { DemographicsManager } from "../DemographicsManager";
+import { fakeFlightPosition } from "../../../../lib/spec/fakeData";
 
 describe("FlightSubscriber", () => {
    let viewer: Viewer;

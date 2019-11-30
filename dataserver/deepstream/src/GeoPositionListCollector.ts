@@ -2,7 +2,7 @@ import {
    MasterFlightRecord,
    GeoPositionList,
    GeoPositionListCollection
-} from "../../lib/types";
+} from "../../../lib/types";
 
 export class GeoPositionListCollector {
    geocoll: GeoPositionListCollection;

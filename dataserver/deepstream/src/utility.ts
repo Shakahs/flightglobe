@@ -4,7 +4,7 @@ import {
    GeoPositionListCollection,
    FlightPosition,
    RedisFlightRecord
-} from "../../lib/types";
+} from "../../../lib/types";
 import { takeRight, last } from "lodash";
 
 export const extractLastPositions = (

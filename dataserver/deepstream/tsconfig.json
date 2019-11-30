@@ -1,7 +1,9 @@
 {
-   "extends": "../tsconfig",
+   "extends": "../../tsconfig",
    "include": ["../lib/*", "./**/*"],
-   "exclude": ["./compiled"],
+   "exclude": [
+      "./compiled"
+   ],
    "compilerOptions": {
       "outDir": "./compiled",
       "module": "commonjs",
