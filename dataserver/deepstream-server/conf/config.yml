@@ -210,6 +210,8 @@ cache:
    options:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
+      ttl: 900
+      db: 1
 
 # storage:
 #   name: mongodb
