@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: "Deployment"
+metadata:
+  name: "deepstream-server"
+  labels:
+    app: deepstream-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deepstream-server
+  template:
+    metadata:
+      labels:
+        app: deepstream-server
+    spec:
+      containers:
+        - name: deepstream-server
+          image: gcr.io/flight-globe/deepstream-server
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8081
+          env:
+            - name: REDIS_ADDRESS
+              value: redis-service
+            - name: REDIS_PORT
+              value: "6379"

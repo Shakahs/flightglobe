@@ -10,9 +10,16 @@ services:
          - "5672:5672"
          - "15672:15672"
    deepstream:
-      image: deepstreamio/deepstream.io
+      image: deepstream-server
       ports:
          - "6020:6020"
+      links:
+         - redis
+      depends_on:
+        - redis
+      environment:
+         REDIS_HOST: redis
+         REDIS_PORT: 6379
    benthos:
       image: jeffail/benthos
       ports:
