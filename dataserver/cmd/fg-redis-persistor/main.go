@@ -12,6 +12,8 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 	"github.com/ThreeDotsLabs/watermill/message/router/plugin"
 	"github.com/go-redis/redis"
+	"github.com/paulbellamy/ratecounter"
+	"github.com/robfig/cron"
 	"log"
 	"os"
 	"time"
@@ -30,6 +32,7 @@ var (
 	amqpURI         = fmt.Sprintf("amqp://user:secretpassword@%s:%s/",
 		os.Getenv("RABBITMQ_HOST"),
 		os.Getenv("RABBITMQ_PORT"))
+	counter = ratecounter.NewRateCounter(30 * time.Second)
 )
 
 func init() {
@@ -55,6 +58,8 @@ func persistor(msg *message.Message) error {
 	if err != nil {
 		log.Println("persistor error:", err)
 		return err
+	} else {
+		counter.Incr(1)
 	}
 	return nil
 }
@@ -92,6 +97,13 @@ func main() {
 		// In this case, it passes them as errors to the Retry middleware.
 		middleware.Recoverer,
 	)
+
+	c := cron.New()
+	err = c.AddFunc("@every 30s", func() {
+		fmt.Println(fmt.Sprintf("Processed %d items in the past 30s", counter.Rate()))
+	})
+	pkg.Check(err)
+	c.Start()
 
 	ctx := context.Background()
 	if err := router.Run(ctx); err != nil {

@@ -13,7 +13,8 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message/router/plugin"
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
 	"github.com/go-redis/redis"
-	"log"
+	"github.com/paulbellamy/ratecounter"
+	"github.com/robfig/cron"
 	"os"
 	"time"
 )
@@ -30,6 +31,7 @@ var (
 	amqpURI         = fmt.Sprintf("amqp://user:secretpassword@%s:%s/",
 		os.Getenv("RABBITMQ_HOST"),
 		os.Getenv("RABBITMQ_PORT"))
+	counter = ratecounter.NewRateCounter(30 * time.Second)
 )
 
 func init() {
@@ -79,7 +81,7 @@ func publishMessages(publisher message.Publisher) {
 	for {
 		rmap := getPositions()
 		urlList := flightradar24.BuildUrlList(rmap.GetPositions())
-		log.Println(urlList)
+		//log.Println(urlList)
 		delay := 29 / len(urlList)
 
 		for _, v := range urlList {
@@ -106,7 +108,6 @@ func FrHandler(msg *message.Message) ([]*message.Message, error) {
 	standardizedRecords := pkg.Filter(unfilteredRecords)
 
 	var outgoingData []*message.Message
-	count := 0
 
 	for _, r := range standardizedRecords {
 		encoded, err := json.Marshal(r)
@@ -116,10 +117,8 @@ func FrHandler(msg *message.Message) ([]*message.Message, error) {
 		middleware.SetCorrelationID(middleware.MessageCorrelationID(msg), newMsg)
 
 		outgoingData = append(outgoingData, newMsg)
-		count++
+		counter.Incr(1)
 	}
-
-	log.Printf("FrHandler processed %d valid records from %d input records", count, len(unfilteredRecords))
 
 	return outgoingData, nil
 }
@@ -156,6 +155,13 @@ func main() {
 	)
 
 	go publishMessages(localPubSub)
+
+	c := cron.New()
+	err = c.AddFunc("@every 30s", func() {
+		fmt.Println(fmt.Sprintf("Published %d items in the past 30s", counter.Rate()))
+	})
+	pkg.Check(err)
+	c.Start()
 
 	ctx := context.Background()
 	if err := router.Run(ctx); err != nil {
