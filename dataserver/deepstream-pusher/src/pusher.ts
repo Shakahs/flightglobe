@@ -1,11 +1,10 @@
+// import "regenerator-runtime/runtime";
 import { initConnection } from "./deepstream";
 import { MasterFlightRecordFromRedis } from "./utility";
 import { GeoPositionListCollector } from "./GeoPositionListCollector";
 import {
-   BootData,
-   FlightDemographics,
    FlightDemographicsCollection,
-   FlightPosition,
+   Icao,
    MasterFlightRecord,
    RedisFlightRecord
 } from "../../../lib/types";
@@ -15,24 +14,10 @@ import {
    generateGeohashedPositionsKey,
    generateTrackFullKey
 } from "../../../lib/constants";
-import { Icao } from "../../../client-source/js/types";
 
 const Redis = require("ioredis");
 
 const redis = new Redis();
-
-// export const dsRecordFromRedis = (
-//    sourceRecords: RedisFlightRecord[]
-// ): DeepstreamFlightRecord => {
-//    const lastRecord = last(sourceRecords) as RedisFlightRecord;
-//    const newRecord = {
-//       icao: lastRecord.icao,
-//       demographic: lastRecord.demographic,
-//       latestPosition: lastRecord.position,
-//       trackRecent: values(pick(takeRight(sourceRecords, 10), ["position"]))
-//    };
-//    return newRecord;
-// };
 
 const work = (ds) => {
    let count = 0;
@@ -66,27 +51,6 @@ const work = (ds) => {
             demographicsMap[masterRecord.icao] = masterRecord.demographic;
             count++;
          }
-
-         // keys.add(pos.icao);
-         //
-         // const record = ds.record.getRecord(pos.icao);
-         // await record.whenReady();
-         // if (deepEquals(record.get(), {})) {
-         //    // new record
-         //    ds.record.setData(pos.icao, pos);
-         //    newCount++;
-         // } else if (!deepEquals(record.get("Position"), pos.position)) {
-         //    //update only position, only if it's changed
-         //    record.set("latestPosition", pos.latestPosition);
-         //    updateCount++;
-         // }
-         //
-         // bootData[pos.icao] = {
-         //    icao: pos.icao,
-         //    positions: [pos.latestPosition],
-         //    demographic: pos.demographic,
-         //    time: pos.updated
-         // };
       });
    });
 

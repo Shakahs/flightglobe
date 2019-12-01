@@ -3,4 +3,4 @@
 ( cd dataserver/cmd/fr-collector2 && go get -v && go build -v )
 ( cd dataserver/cmd/fg-redis-persistor && go get -v && go build -v )
 ( cd dataserver/cmd/fg-server && go get -v && go build -v )
-( rm -rf ./dataserver/deepstream/compiled/* && ./node_modules/.bin/tsc --build dataserver/deepstream/tsconfig.json )
+( cd dataserver/deepstream-pusher && rm -rf ./compiled/* && ../../node_modules/.bin/tsc --build ./tsconfig.json )

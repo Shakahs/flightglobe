@@ -1,7 +1,7 @@
 import { DeepstreamClient } from "@deepstream/client";
 import { Geohash } from "../../../lib/types";
 import { GeoManager } from "./GeoManager";
-import { without } from "lodash-es";
+import { without } from "lodash";
 import { configure } from "mobx";
 import { Viewer } from "cesium";
 import { DS_GEOHASH_LIST_KEY } from "../../../lib/constants";
