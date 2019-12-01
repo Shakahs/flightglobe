@@ -1,0 +1,5 @@
+rabbitmq:
+   username: user
+   password: "secretpassword"
+persistence:
+   enabled: false

@@ -27,7 +27,7 @@ var (
 	redisAddress    = os.Getenv("REDIS_ADDRESS")
 	redisPort       = os.Getenv("REDIS_PORT")
 	redisClient     *redis.Client
-	amqpURI         = fmt.Sprintf("amqp://guest:guest@%s:%s/",
+	amqpURI         = fmt.Sprintf("amqp://user:secretpassword@%s:%s/",
 		os.Getenv("RABBITMQ_HOST"),
 		os.Getenv("RABBITMQ_PORT"))
 )

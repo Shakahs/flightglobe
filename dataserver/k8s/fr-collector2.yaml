@@ -19,5 +19,11 @@ spec:
           image: gcr.io/flight-globe/fr-collector2
           imagePullPolicy: Always
           env:
-            - name: NATS_ADDRESS
-              value: nats-service
+            - name: REDIS_ADDRESS
+              value: redis-master
+            - name: REDIS_PORT
+              value: "6379"
+            - name: RABBITMQ_HOST
+              value: rabbitmq
+            - name: RABBITMQ_PORT
+              value: "5672"

@@ -27,7 +27,7 @@ var (
 	// You probably want to ship your own implementation of `watermill.LoggerAdapter`.
 	logger          = watermill.NewStdLogger(false, false)
 	incomingChannel = pkg.FR_PROCESSED_DATA
-	amqpURI         = fmt.Sprintf("amqp://guest:guest@%s:%s/",
+	amqpURI         = fmt.Sprintf("amqp://user:secretpassword@%s:%s/",
 		os.Getenv("RABBITMQ_HOST"),
 		os.Getenv("RABBITMQ_PORT"))
 )
