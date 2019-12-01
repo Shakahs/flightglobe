@@ -14,7 +14,8 @@ import { DemographicsManager } from "../ds-implementation/DemographicsManager";
 import applyClickHandler from "../globe/clickHandler";
 import { Icao } from "../../../lib/types";
 
-const dsConn = new DeepstreamClient("localhost:6020", {
+const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+const dsConn = new DeepstreamClient(`${wsProtocol}://data.flight.earth:6020`, {
    mergeStrategy: REMOTE_WINS
 });
 

@@ -1,8 +1,13 @@
 name = "flightglobe"
 type = "webpack"
 account_id = "e8e846e1058343b74e56016ca42f3418"
-workers_dev = true
+workers_dev = false
 
 [site]
 bucket = "./client-build"
 entry-point = "workers-site"
+
+[env.production]
+name = 'flightglobe-prod'
+zone_id = "5cfac87e0001ef855bd87449d825f9e4"
+route = "flight.earth/*"
