@@ -1,33 +1,22 @@
-kind: Service
-apiVersion: v1
-metadata:
-  name: deepstream-server-service
-spec:
-  selector:
-    app: deepstream-server
-  ports:
-    - protocol: TCP
-      port: 6020
----
 apiVersion: apps/v1
 kind: "Deployment"
 metadata:
-  name: "deepstream-server"
+  name: "deepstream-pusher"
   labels:
-    app: deepstream-server
+    app: deepstream-pusher
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: deepstream-server
+      app: deepstream-pusher
   template:
     metadata:
       labels:
-        app: deepstream-server
+        app: deepstream-pusher
     spec:
       containers:
-        - name: deepstream-server
-          image: gcr.io/flight-globe/deepstream-server
+        - name: deepstream-pusher
+          image: gcr.io/flight-globe/deepstream-pusher
           imagePullPolicy: Always
           ports:
             - containerPort: 6020
@@ -36,3 +25,7 @@ spec:
               value: redis-master
             - name: REDIS_PORT
               value: "6379"
+            - name: DEEPSTREAM_HOST
+              value: deepstream-server-service
+            - name: DEEPSTREAM_PORT
+              value: "6020"

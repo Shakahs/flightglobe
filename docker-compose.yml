@@ -20,6 +20,19 @@ services:
       environment:
          REDIS_HOST: redis
          REDIS_PORT: 6379
+   deepstream-pusher:
+      image: deepstream-pusher
+      links:
+         - redis
+         - deepstream
+      depends_on:
+         - redis
+         - deepstream
+      environment:
+         REDIS_HOST: redis
+         REDIS_PORT: 6379
+         DEEPSTREAM_HOST: deepstream
+         DEEPSTREAM_PORT: 6020
    benthos:
       image: jeffail/benthos
       ports:

@@ -17,7 +17,9 @@ import {
 
 const Redis = require("ioredis");
 
-const redis = new Redis();
+console.log("deepstream pusher starting");
+
+const redis = new Redis(process.env.REDIS_PORT, process.env.REDIS_HOST);
 
 const work = (ds) => {
    let count = 0;
