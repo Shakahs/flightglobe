@@ -1,6 +1,4 @@
-import { FlightDemographics, FlightPosition } from "../../lib/types";
-
-export type Icao = string;
+import { FlightDemographics, FlightPosition, Icao } from "../../lib/types";
 
 export interface Message {
    type: "demographicUpdate" | "positionUpdate";

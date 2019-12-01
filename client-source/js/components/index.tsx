@@ -12,7 +12,7 @@ import { REMOTE_WINS } from "@deepstream/client/dist/record/merge-strategy";
 import { GeoManagerCreator } from "../ds-implementation/GeoManagerCreator";
 import { DemographicsManager } from "../ds-implementation/DemographicsManager";
 import applyClickHandler from "../globe/clickHandler";
-import { Icao } from "../types";
+import { Icao } from "../../../lib/types";
 
 const dsConn = new DeepstreamClient("localhost:6020", {
    mergeStrategy: REMOTE_WINS

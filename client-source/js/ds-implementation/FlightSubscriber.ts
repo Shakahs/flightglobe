@@ -1,6 +1,5 @@
 import { DeepstreamClient } from "@deepstream/client";
-import { FlightDemographics, FlightPosition } from "../../../lib/types";
-import { Icao } from "../types";
+import { FlightDemographics, FlightPosition, Icao } from "../../../lib/types";
 import {
    action,
    computed,

@@ -8,11 +8,10 @@ import {
    SelectionChangedEvent
 } from "ag-grid-community";
 import { GridReadyEvent } from "ag-grid-community/dist/lib/events";
-import { FlightDemographics } from "../../../../lib/types";
+import { FlightDemographics, Icao } from "../../../../lib/types";
 import { DemographicsManager } from "../../ds-implementation/DemographicsManager";
 import { IMapDidChange, Lambda } from "mobx";
 import { each } from "lodash";
-import { Icao } from "../../types";
 const airports = require("../../../resources/airports.json");
 const aircraft = require("../../../resources/aircraft.json");
 

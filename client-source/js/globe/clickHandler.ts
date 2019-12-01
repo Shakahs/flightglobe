@@ -5,7 +5,7 @@ import {
    ScreenSpaceEventType,
    Viewer
 } from "cesium";
-import { Icao } from "../types";
+import { Icao } from "../../../lib/types";
 
 const applyClickHandler = function(
    viewer: Viewer,

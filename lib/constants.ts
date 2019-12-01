@@ -1,4 +1,4 @@
-import { Icao } from "../client-source/js/types";
+import { Icao } from "./types";
 
 export const DS_GEOHASH_LIST_KEY = "geohashList";
 export const DS_DEMOGRAPHICS_KEY = "demographics";

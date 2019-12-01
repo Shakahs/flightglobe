@@ -2,7 +2,6 @@ import { action, configure, observable, ObservableMap } from "mobx";
 import {
    AircraftModelData,
    DemographicsUpdate,
-   Icao,
    LabelDisplayOptions,
    LabelDisplayOptionsUpdate,
    Message,
@@ -17,7 +16,7 @@ import { forEach, has, merge } from "lodash-es";
 import { FlightObj } from "./flightObj";
 import { GeoCollection } from "./geoCollection";
 import { Color, Event, Viewer } from "cesium";
-import { BootData, FlightRecord } from "../../../lib/types";
+import { BootData, FlightRecord, Icao } from "../../../lib/types";
 import {
    LabelDisplayOptionDefaults,
    PointDisplayOptionDefaults,

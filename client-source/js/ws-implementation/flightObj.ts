@@ -1,5 +1,4 @@
 import {
-   Icao,
    LabelDisplayOptions,
    PointDisplayOptions,
    TrailDisplayOptions
@@ -20,7 +19,8 @@ import { GeoCollection } from "./geoCollection";
 import {
    FlightDemographics,
    FlightPosition,
-   FlightRecord
+   FlightRecord,
+   Icao
 } from "../../../lib/types";
 
 const labelOffset = new Cartesian2(10, 20);

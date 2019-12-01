@@ -1,5 +1,3 @@
-import { ObservableMap } from "mobx";
-
 export interface FlightDemographics {
    icao?: string;
    origin: string;
@@ -59,3 +57,5 @@ export interface FlightDemographicsCollection {
 }
 
 export type GeohashBoolMap = Map<Geohash, boolean>;
+
+export type Icao = string;

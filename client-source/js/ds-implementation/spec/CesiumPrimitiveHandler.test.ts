@@ -7,12 +7,12 @@ import {
    provideConnection,
    sleep
 } from "./support";
-import { Icao } from "../../types";
 import { FlightSubscriber } from "../FlightSubscriber";
 import { CesiumPrimitiveHandler } from "../CesiumPrimitiveHandler";
 import { action, ObservableMap } from "mobx";
 import { DemographicsManager } from "../DemographicsManager";
 import { fakeFlightPosition } from "../../../../lib/spec/fakeData";
+import { Icao } from "../../../../lib/types";
 
 describe("CesiumPrimitiveHandler", () => {
    let viewer: Viewer;

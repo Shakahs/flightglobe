@@ -1,12 +1,12 @@
 import { DeepstreamClient } from "@deepstream/client";
 import { Event, Viewer } from "cesium";
 import { action, observable, ObservableMap } from "mobx";
-import { Icao } from "../types";
 import {
    FlightDemographics,
    FlightDemographicsCollection,
    Geohash,
-   GeohashBoolMap
+   GeohashBoolMap,
+   Icao
 } from "../../../lib/types";
 import { DS_DEMOGRAPHICS_KEY } from "../../../lib/constants";
 import {
