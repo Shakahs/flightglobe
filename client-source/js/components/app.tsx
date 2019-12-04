@@ -1,6 +1,5 @@
 import FlightTable from "./FlightTable/FlightTable";
 import * as React from "react";
-import { Container, Row, Col } from "reactstrap";
 import Menu from "./Menu/Menu";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faCog } from "@fortawesome/free-solid-svg-icons/faCog";
@@ -10,20 +9,23 @@ import { faGlobeAmericas } from "@fortawesome/free-solid-svg-icons/faGlobeAmeric
 import LoadingScreen from "./LoadingScreen/LoadingScreen";
 import classnames from "classnames";
 import { hot } from "react-hot-loader/root";
-import Settings from "./Settings/Settings";
 import { Globe } from "../globe/globe";
 import { DemographicsManager } from "../ds-implementation/DemographicsManager";
+import "antd/dist/antd.css";
+import { DisplayPreferences } from "../ds-implementation/DisplayPreferences";
+import Settings2 from "./Settings2/Settings2";
 
 library.add(faCog, faFilter, faCircleNotch, faGlobeAmericas);
 
 interface AppProps {
    demographicsManager: DemographicsManager;
+   displayPreferences: DisplayPreferences;
    globe: Globe;
 }
 
 interface AppState {
    showFlightTable: boolean;
-   showInfoModal: boolean;
+   showSettings: boolean;
 }
 
 class App extends React.Component<AppProps, AppState> {
@@ -31,22 +33,24 @@ class App extends React.Component<AppProps, AppState> {
       super(props);
       this.state = {
          showFlightTable: false,
-         showInfoModal: false
+         showSettings: false
       };
 
       this.toggleShowFlightTable = this.toggleShowFlightTable.bind(this);
-      this.toggleSettingsModal = this.toggleSettingsModal.bind(this);
+      this.toggleShowSettings = this.toggleShowSettings.bind(this);
    }
 
    toggleShowFlightTable() {
       this.setState({
-         showFlightTable: !this.state.showFlightTable
+         showFlightTable: !this.state.showFlightTable,
+         showSettings: false
       });
    }
 
-   toggleSettingsModal() {
+   toggleShowSettings() {
       this.setState({
-         showInfoModal: !this.state.showInfoModal
+         showSettings: !this.state.showSettings,
+         showFlightTable: false
       });
    }
 
@@ -54,6 +58,11 @@ class App extends React.Component<AppProps, AppState> {
       return (
          <React.Fragment>
             <LoadingScreen viewer={this.props.globe.viewer} />
+            <Settings2
+               visible={this.state.showSettings}
+               toggleVisible={this.toggleShowSettings}
+               displayPreferences={this.props.displayPreferences}
+            />
             {/*<Settings*/}
             {/*   showModal={this.state.showInfoModal}*/}
             {/*   toggleModal={this.toggleSettingsModal}*/}
@@ -61,7 +70,7 @@ class App extends React.Component<AppProps, AppState> {
             {/*/>*/}
             <Menu
                toggleShowFlightTable={this.toggleShowFlightTable}
-               toggleShowInfoModal={this.toggleSettingsModal}
+               toggleShowInfoModal={this.toggleShowSettings}
                globe={this.props.globe}
             />
             <div
