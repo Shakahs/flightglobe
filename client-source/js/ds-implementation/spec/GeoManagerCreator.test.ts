@@ -4,6 +4,7 @@ import { GeoManagerCreator } from "../GeoManagerCreator";
 import { GeoManager } from "../GeoManager";
 import { createViewer, destroyViewer, provideConnection } from "./support";
 import { DemographicsManager } from "../DemographicsManager";
+import { DisplayPreferences } from "../DisplayPreferences";
 
 describe("GeoManagerCreator", async () => {
    let testServer;
@@ -34,7 +35,11 @@ describe("GeoManagerCreator", async () => {
 
    beforeEach(() => {
       demographics = new DemographicsManager(dsConn);
-      gmc = new GeoManagerCreator(dsConn, demographics);
+      gmc = new GeoManagerCreator(
+         dsConn,
+         demographics,
+         new DisplayPreferences()
+      );
    });
 
    afterEach(() => {
@@ -85,7 +90,12 @@ describe("GeoManagerCreator", async () => {
 
    it("should store a Cesium Viewer if one is provided", function() {
       const viewer = createViewer();
-      const gmc2 = new GeoManagerCreator(dsConn, demographics, viewer);
+      const gmc2 = new GeoManagerCreator(
+         dsConn,
+         demographics,
+         new DisplayPreferences(),
+         viewer
+      );
       expect(gmc2.viewer).toBe(viewer);
       destroyViewer(viewer);
       expect(gmc.viewer).toEqual(null);

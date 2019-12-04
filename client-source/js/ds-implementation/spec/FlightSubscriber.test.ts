@@ -8,6 +8,7 @@ import { noop } from "lodash";
 import { convertPositionToCartesian } from "../../ws-implementation/utility";
 import { DemographicsManager } from "../DemographicsManager";
 import { fakeFlightPosition } from "../../../../lib/spec/fakeData";
+import { DisplayPreferences } from "../DisplayPreferences";
 
 describe("FlightSubscriber", () => {
    let viewer: Viewer;
@@ -28,7 +29,12 @@ describe("FlightSubscriber", () => {
 
    beforeEach(() => {
       viewer = createViewer();
-      gmc = new GeoManagerCreator(dsConn, demographics, viewer);
+      gmc = new GeoManagerCreator(
+         dsConn,
+         demographics,
+         new DisplayPreferences(),
+         viewer
+      );
       gmc.handleUpdate(["a"]);
       gm = gmc.geoManagerMap.get("a") as GeoManager;
       cph = gm.cph as CesiumPrimitiveHandler;
@@ -37,7 +43,8 @@ describe("FlightSubscriber", () => {
          "icaoA",
          fakeFlightPosition(),
          noop,
-         demographics
+         demographics,
+         new DisplayPreferences()
       );
    });
 

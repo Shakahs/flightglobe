@@ -11,8 +11,8 @@ import { Cartesian3 } from "cesium";
 import { convertPositionToCartesian } from "../ws-implementation/utility";
 import { each } from "lodash";
 import { DemographicsManager } from "./DemographicsManager";
-import { ObservableArray } from "mobx/lib/types/observablearray";
 import { generateTrackFullKey } from "../../../lib/constants";
+import { DisplayPreferences } from "./DisplayPreferences";
 
 require("./mobxConfig");
 
@@ -27,13 +27,15 @@ export class FlightSubscriber {
    demographicsManager: DemographicsManager;
    dsTrackFull;
    @observable.shallow trackFull: FlightPosition[] = [];
+   displayPreferences: DisplayPreferences;
 
    constructor(
       dsConn: DeepstreamClient,
       icao: Icao,
       pos: FlightPosition,
       requestRender: () => void,
-      demographics: DemographicsManager
+      demographics: DemographicsManager,
+      displayPreferences: DisplayPreferences
    ) {
       this.dsConn = dsConn;
       this.icao = icao;
@@ -41,6 +43,7 @@ export class FlightSubscriber {
       this.position = pos;
       this.requestRender = requestRender;
       this.demographicsManager = demographics;
+      this.displayPreferences = displayPreferences;
 
       const renderRequester = reaction(
          () => ({
@@ -142,6 +145,13 @@ export class FlightSubscriber {
 
    @computed get shouldDisplayDetailed(): boolean {
       return this.isSelected || this.isDetailSelected;
+   }
+
+   @computed get shouldDisplayTrail(): boolean {
+      if (this.isSelected) {
+         return true;
+      }
+      return this.displayPreferences.showNearbyTrails && this.isCameraAdjacent;
    }
 
    destroy() {

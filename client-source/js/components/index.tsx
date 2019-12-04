@@ -13,14 +13,16 @@ import { GeoManagerCreator } from "../ds-implementation/GeoManagerCreator";
 import { DemographicsManager } from "../ds-implementation/DemographicsManager";
 import applyClickHandler from "../globe/clickHandler";
 import { Icao } from "../../../lib/types";
+import { DisplayPreferences } from "../ds-implementation/DisplayPreferences";
 
 const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
-const dsConn = new DeepstreamClient(`${wsProtocol}://data.flight.earth:6020`, {
+const dsConn = new DeepstreamClient(`${wsProtocol}://localhost:6020`, {
    mergeStrategy: REMOTE_WINS
 });
 
 const globe = new Globe("cesiumContainer");
 const dm = new DemographicsManager(dsConn, globe.viewer);
+const displayPrefs = new DisplayPreferences();
 
 ReactDOM.render(
    <App globe={globe} demographicsManager={dm} />,
@@ -44,7 +46,7 @@ const getData = async () => {
    });
 
    dm.subscribe();
-   const gmc = new GeoManagerCreator(dsConn, dm, globe.viewer);
+   const gmc = new GeoManagerCreator(dsConn, dm, displayPrefs, globe.viewer);
    gmc.subscribe();
 };
 

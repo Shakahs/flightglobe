@@ -13,6 +13,7 @@ import { action, ObservableMap } from "mobx";
 import { DemographicsManager } from "../DemographicsManager";
 import { fakeFlightPosition } from "../../../../lib/spec/fakeData";
 import { Icao } from "../../../../lib/types";
+import { DisplayPreferences } from "../DisplayPreferences";
 
 describe("CesiumPrimitiveHandler", () => {
    let viewer: Viewer;
@@ -33,7 +34,12 @@ describe("CesiumPrimitiveHandler", () => {
 
    beforeEach(() => {
       viewer = createViewer();
-      gmc = new GeoManagerCreator(dsConn, demographics, viewer);
+      gmc = new GeoManagerCreator(
+         dsConn,
+         demographics,
+         new DisplayPreferences(),
+         viewer
+      );
       gmc.handleUpdate(["a"]);
       gm = gmc.geoManagerMap.get("a") as GeoManager;
       cph = gm.cph as CesiumPrimitiveHandler;

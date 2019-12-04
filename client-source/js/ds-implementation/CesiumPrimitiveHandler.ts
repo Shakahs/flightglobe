@@ -164,7 +164,7 @@ export class CesiumPrimitiveHandler {
    reconcileLine(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
       if (
          f.trackFull.length >= 2 && //require at least 2 positions to render a line
-         f.shouldDisplayDetailed &&
+         f.shouldDisplayTrail &&
          f.shouldDisplay
       ) {
          this.renderLine(child, f);

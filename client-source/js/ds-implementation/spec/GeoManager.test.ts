@@ -13,6 +13,7 @@ import { FlightPosition } from "../../../../lib/types";
 import { convertPositionToCartesian } from "../../ws-implementation/utility";
 import { DemographicsManager } from "../DemographicsManager";
 import { fakeFlightPosition } from "../../../../lib/spec/fakeData";
+import { DisplayPreferences } from "../DisplayPreferences";
 
 describe("GeoManager", () => {
    let dsConn;
@@ -33,7 +34,11 @@ describe("GeoManager", () => {
       let fakeDataB: FlightPosition;
       let flightA: FlightSubscriber;
       beforeEach(() => {
-         gmc = new GeoManagerCreator(dsConn, demographics);
+         gmc = new GeoManagerCreator(
+            dsConn,
+            demographics,
+            new DisplayPreferences()
+         );
          gmc.handleUpdate(["a"]);
          gm = gmc.geoManagerMap.get("a") as GeoManager;
          fakeDataA = fakeFlightPosition();
@@ -147,7 +152,12 @@ describe("GeoManager", () => {
 
       beforeEach(() => {
          viewer = createViewer();
-         gmc = new GeoManagerCreator(dsConn, demographics, viewer);
+         gmc = new GeoManagerCreator(
+            dsConn,
+            demographics,
+            new DisplayPreferences(),
+            viewer
+         );
          gmc.handleUpdate(["a"]);
          gm = gmc.geoManagerMap.get("a") as GeoManager;
       });
