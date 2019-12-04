@@ -73,13 +73,13 @@ describe("FlightSubscriber", () => {
    });
 
    it("should get the detail selection status", function() {
-      expect(fsA.isDetailSelected).toBeFalsy();
+      expect(fsA.isCameraAdjacent).toBeFalsy();
       demographics.updateDetailedFlights(
          new Map([[fsA.position.geohash, true]])
       );
-      expect(fsA.isDetailSelected).toBeTruthy();
+      expect(fsA.isCameraAdjacent).toBeTruthy();
       demographics.updateDetailedFlights(new Map());
-      expect(fsA.isDetailSelected).toBeFalsy();
+      expect(fsA.isCameraAdjacent).toBeFalsy();
    });
 
    it("should call the subscribeTrackFull and unsubscribeTrackFull methods when needed", function() {

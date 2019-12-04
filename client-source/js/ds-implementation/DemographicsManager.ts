@@ -24,7 +24,7 @@ export class DemographicsManager {
    > = new ObservableMap();
    viewer: Viewer | null = null;
    cameraEventDisposer: Event.RemoveCallback | null;
-   detailedFlights = observable.map<Geohash, boolean>(undefined, {
+   cameraAdjacentFlights = observable.map<Geohash, boolean>(undefined, {
       deep: false
    });
    filteredFlights = observable.map<Icao, boolean>(undefined, {
@@ -66,8 +66,8 @@ export class DemographicsManager {
 
    @action
    updateDetailedFlights(neighborList: GeohashBoolMap) {
-      this.detailedFlights.clear();
-      this.detailedFlights.merge(neighborList);
+      this.cameraAdjacentFlights.clear();
+      this.cameraAdjacentFlights.merge(neighborList);
    }
 
    @action

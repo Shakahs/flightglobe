@@ -117,8 +117,8 @@ export class FlightSubscriber {
 
    // essential data - selection status
 
-   @computed get isDetailSelected(): boolean {
-      return this.demographicsManager.detailedFlights.has(
+   @computed get isCameraAdjacent(): boolean {
+      return this.demographicsManager.cameraAdjacentFlights.has(
          this.position.geohash
       );
    }
@@ -144,7 +144,7 @@ export class FlightSubscriber {
    }
 
    @computed get shouldDisplayDetailed(): boolean {
-      return this.isSelected || this.isDetailSelected;
+      return this.isSelected || this.isCameraAdjacent;
    }
 
    @computed get shouldDisplayTrail(): boolean {
