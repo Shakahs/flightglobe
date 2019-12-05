@@ -91,6 +91,7 @@ describe("FlightSubscriber", () => {
             expect(fsA.isCameraAdjacent).toBeFalsy();
             expect(fsA.shouldFetchTrack).toBeFalsy();
          });
+
          it("should resolve correctly based on selection status", function() {
             expect(fsA.shouldFetchTrack).toBeFalsy();
             demographics.updateSelectedFlights(new Map([[fsA.icao, true]]));
@@ -99,6 +100,7 @@ describe("FlightSubscriber", () => {
             dp.updateTrackDisplay({ showWhenSelected: true });
             expect(fsA.shouldFetchTrack).toBeTruthy();
          });
+
          it("should resolve correctly based on camera adjacent status", function() {
             expect(fsA.shouldFetchTrack).toBeFalsy();
             demographics.updateCameraAdjacentFlights(
@@ -108,6 +110,15 @@ describe("FlightSubscriber", () => {
             expect(fsA.shouldFetchTrack).toBeFalsy();
             dp.updateTrackDisplay({ showWhenCameraAdjacent: true });
             expect(fsA.shouldFetchTrack).toBeTruthy();
+         });
+
+         it("should resolve correctly based on track length", () => {
+            expect(fsA.shouldDisplayTrack).toBeFalsy();
+            demographics.updateSelectedFlights(new Map([[fsA.icao, true]]));
+            dp.updateTrackDisplay({ showWhenSelected: true });
+            expect(fsA.shouldDisplayTrack).toBeFalsy();
+            fsA.updateTrackFull([fakeFlightPosition(), fakeFlightPosition()]);
+            expect(fsA.shouldDisplayTrack).toBeTruthy();
          });
       });
 

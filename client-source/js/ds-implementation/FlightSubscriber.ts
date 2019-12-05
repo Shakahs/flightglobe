@@ -51,7 +51,11 @@ export class FlightSubscriber {
             demographic: this.demographic,
             trackFull: this.trackFull,
             shouldDisplay: this.shouldDisplay,
-            shouldDisplayDetailed: this.shouldFetchTrack
+            shouldDisplayLabel: this.shouldDisplayLabel,
+            shouldDisplayTrack: this.shouldDisplayTrack,
+            pointDisplayOptions: this.displayPreferences.pointDisplayOptions,
+            trackDisplayOptions: this.displayPreferences.trackDisplayOptions,
+            labelDisplayOptions: this.displayPreferences.labelDisplayOptions
          }),
          () => {
             this.needsRender = true;

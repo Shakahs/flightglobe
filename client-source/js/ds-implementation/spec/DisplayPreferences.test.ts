@@ -83,5 +83,11 @@ describe("DisplayPreferences", function() {
             )
          ).toBeTruthy();
       });
+      it("should update display options", () => {
+         dp.updateLabelDisplay({ showWhenCameraAdjacent: false });
+         expect(dp.labelDisplayOptions.showWhenCameraAdjacent).toBeFalsy();
+         dp.updateLabelDisplay({ showWhenCameraAdjacent: true });
+         expect(dp.labelDisplayOptions.showWhenCameraAdjacent).toBeTruthy();
+      });
    });
 });

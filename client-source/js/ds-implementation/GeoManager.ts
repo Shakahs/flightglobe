@@ -70,7 +70,7 @@ export class GeoManager {
                   fpos,
                   this.debouncedRender,
                   this.demographics,
-                  new DisplayPreferences()
+                  this.displayPreferences
                )
             );
          }
