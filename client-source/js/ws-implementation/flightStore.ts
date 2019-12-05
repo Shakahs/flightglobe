@@ -8,8 +8,8 @@ import {
    PointDisplayOptions,
    PointDisplayOptionsUpdate,
    PositionUpdate,
-   TrailDisplayOptions,
-   TrailDisplayOptionsUpdate
+   TrackDisplayOptions,
+   TrackDisplayOptionsUpdate
 } from "../types";
 import { newFlightRecord } from "./utility";
 import { forEach, has, merge } from "lodash-es";
@@ -21,7 +21,7 @@ import {
    LabelDisplayOptionDefaults,
    PointDisplayOptionDefaults,
    SelectedPointDisplayOptionDefaults,
-   TrailDisplayOptionDefaults
+   TrackDisplayOptionDefaults
 } from "../constants";
 
 const aircraftModels: AircraftModelData = require("../../resources/aircraft.json");
@@ -63,7 +63,7 @@ export class FlightStore {
    @observable
    selectedPointDisplayOptions: PointDisplayOptions = SelectedPointDisplayOptionDefaults;
    @observable
-   trailDisplayOptions: TrailDisplayOptions = TrailDisplayOptionDefaults;
+   trailDisplayOptions: TrackDisplayOptions = TrackDisplayOptionDefaults;
    @observable
    labelDisplayOptions: LabelDisplayOptions = LabelDisplayOptionDefaults;
    @observable isFiltered: boolean = false;
@@ -221,11 +221,11 @@ export class FlightStore {
    }
 
    @action("updateTrailDisplay")
-   updateTrailDisplay(newOptions: TrailDisplayOptionsUpdate) {
+   updateTrailDisplay(newOptions: TrackDisplayOptionsUpdate) {
       if (newOptions.color) {
          newOptions.cesiumColor = Color.fromCssColorString(newOptions.color);
       }
-      merge<TrailDisplayOptions, TrailDisplayOptionsUpdate>(
+      merge<TrackDisplayOptions, TrackDisplayOptionsUpdate>(
          this.trailDisplayOptions,
          newOptions
       );

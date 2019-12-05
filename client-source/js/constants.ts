@@ -1,7 +1,7 @@
 import {
    LabelDisplayOptions,
    PointDisplayOptions,
-   TrailDisplayOptions
+   TrackDisplayOptions
 } from "./types";
 import { Color } from "cesium";
 
@@ -19,13 +19,17 @@ export const SelectedPointDisplayOptionDefaults: PointDisplayOptions = {
    outlineColor: "#FFF",
    outlineSize: 1
 };
-export const TrailDisplayOptionDefaults: TrailDisplayOptions = {
+export const TrackDisplayOptionDefaults: TrackDisplayOptions = {
    color: "#3399ff",
    cesiumColor: Color.fromCssColorString("#3399ff"),
-   size: 4
+   size: 4,
+   showWhenCameraAdjacent: false,
+   showWhenSelected: true
 };
 export const LabelDisplayOptionDefaults: LabelDisplayOptions = {
    color: "#3399ff",
    cesiumColor: Color.fromCssColorString("#3399ff"),
-   size: 12
+   size: 12,
+   showWhenCameraAdjacent: true,
+   showWhenSelected: true
 };

@@ -31,11 +31,17 @@ export interface PointDisplayOptions extends ElementDisplayOptions {
 
 export type PointDisplayOptionsUpdate = Partial<PointDisplayOptions>;
 
-export interface TrailDisplayOptions extends ElementDisplayOptions {}
+export interface TrackDisplayOptions extends ElementDisplayOptions {
+   showWhenSelected: boolean;
+   showWhenCameraAdjacent: boolean;
+}
 
-export type TrailDisplayOptionsUpdate = Partial<TrailDisplayOptions>;
+export type TrackDisplayOptionsUpdate = Partial<TrackDisplayOptions>;
 
-export interface LabelDisplayOptions extends ElementDisplayOptions {}
+export interface LabelDisplayOptions extends ElementDisplayOptions {
+   showWhenSelected: boolean;
+   showWhenCameraAdjacent: boolean;
+}
 
 export type LabelDisplayOptionsUpdate = Partial<LabelDisplayOptions>;
 

@@ -1,7 +1,7 @@
 import {
    LabelDisplayOptions,
    PointDisplayOptions,
-   TrailDisplayOptions
+   TrackDisplayOptions
 } from "../types";
 import {
    Cartesian2,
@@ -220,7 +220,7 @@ export class FlightObj {
       );
    }
 
-   renderTrail(positions: Cartesian3[], displayOptions: TrailDisplayOptions) {
+   renderTrail(positions: Cartesian3[], displayOptions: TrackDisplayOptions) {
       if (this.trail) {
          this.trail.positions = positions;
       } else {

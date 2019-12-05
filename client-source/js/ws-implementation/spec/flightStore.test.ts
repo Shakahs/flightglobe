@@ -5,8 +5,8 @@ import {
    LabelDisplayOptionsUpdate,
    PointDisplayOptions,
    PointDisplayOptionsUpdate,
-   TrailDisplayOptions,
-   TrailDisplayOptionsUpdate
+   TrackDisplayOptions,
+   TrackDisplayOptionsUpdate
 } from "../../types";
 import {
    FlightADemographic,
@@ -24,7 +24,7 @@ import { convertPositionToCartesian } from "../utility";
 import {
    LabelDisplayOptionDefaults,
    PointDisplayOptionDefaults,
-   TrailDisplayOptionDefaults
+   TrackDisplayOptionDefaults
 } from "../../constants";
 
 describe("FlightStore", function() {
@@ -232,14 +232,14 @@ describe("FlightStore", function() {
       describe("for trails", function() {
          it("should update the trail display options", function() {
             expect(flightStore.trailDisplayOptions).toEqual(
-               TrailDisplayOptionDefaults
+               TrackDisplayOptionDefaults
             );
             const newOptions = {
                color: "#ff6699"
             };
             flightStore.updateTrailDisplay(newOptions);
-            const finalResult = cloneDeep(TrailDisplayOptionDefaults);
-            merge<TrailDisplayOptions, TrailDisplayOptionsUpdate>(
+            const finalResult = cloneDeep(TrackDisplayOptionDefaults);
+            merge<TrackDisplayOptions, TrackDisplayOptionsUpdate>(
                finalResult,
                newOptions
             );

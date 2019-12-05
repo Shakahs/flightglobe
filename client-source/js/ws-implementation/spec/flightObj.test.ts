@@ -13,7 +13,7 @@ import { newICAOMap } from "../utility";
 import {
    LabelDisplayOptionDefaults,
    PointDisplayOptionDefaults,
-   TrailDisplayOptionDefaults
+   TrackDisplayOptionDefaults
 } from "../../constants";
 
 describe("FlightObj", function() {
@@ -408,7 +408,7 @@ describe("FlightObj", function() {
 
             const currentColor = get(trail, "material.uniforms.color") as Color;
             const expectedColor = Color.fromCssColorString(
-               TrailDisplayOptionDefaults.color
+               TrackDisplayOptionDefaults.color
             );
             expect(expectedColor.equals(currentColor)).toBeTruthy();
 

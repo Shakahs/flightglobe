@@ -4,39 +4,34 @@ import {
    LabelDisplayOptionsUpdate,
    PointDisplayOptions,
    PointDisplayOptionsUpdate,
-   TrailDisplayOptions,
-   TrailDisplayOptionsUpdate
+   TrackDisplayOptions,
+   TrackDisplayOptionsUpdate
 } from "../types";
 import {
    LabelDisplayOptionDefaults,
    PointDisplayOptionDefaults,
    SelectedPointDisplayOptionDefaults,
-   TrailDisplayOptionDefaults
+   TrackDisplayOptionDefaults
 } from "../constants";
 import { Color } from "cesium";
 import { merge } from "lodash-es";
 
 export class DisplayPreferences {
-   @observable showNearbyTrails: boolean = true;
    @observable
    pointDisplayOptions: PointDisplayOptions = PointDisplayOptionDefaults;
    @observable
    selectedPointDisplayOptions: PointDisplayOptions = SelectedPointDisplayOptionDefaults;
+
    @observable
-   trailDisplayOptions: TrailDisplayOptions = TrailDisplayOptionDefaults;
+   trackDisplayOptions: TrackDisplayOptions = TrackDisplayOptionDefaults;
+
    @observable
    labelDisplayOptions: LabelDisplayOptions = LabelDisplayOptionDefaults;
 
    constructor() {
-      this.toggleShowNearbyTrails = this.toggleShowNearbyTrails.bind(this);
       this.updatePointDisplay = this.updatePointDisplay.bind(this);
-      this.updateTrailDisplay = this.updateTrailDisplay.bind(this);
+      this.updateTrackDisplay = this.updateTrackDisplay.bind(this);
       this.updateLabelDisplay = this.updateLabelDisplay.bind(this);
-   }
-
-   @action
-   toggleShowNearbyTrails() {
-      this.showNearbyTrails = !this.showNearbyTrails;
    }
 
    @action("updatePointDisplay")
@@ -50,13 +45,13 @@ export class DisplayPreferences {
       );
    }
 
-   @action("updateTrailDisplay")
-   updateTrailDisplay(newOptions: TrailDisplayOptionsUpdate) {
+   @action("updateTrackDisplay")
+   updateTrackDisplay(newOptions: TrackDisplayOptionsUpdate) {
       if (newOptions.color) {
          newOptions.cesiumColor = Color.fromCssColorString(newOptions.color);
       }
-      merge<TrailDisplayOptions, TrailDisplayOptionsUpdate>(
-         this.trailDisplayOptions,
+      merge<TrackDisplayOptions, TrackDisplayOptionsUpdate>(
+         this.trackDisplayOptions,
          newOptions
       );
    }
