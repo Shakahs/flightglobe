@@ -1,15 +1,8 @@
 import * as React from "react";
 import { FontAwesomeIcon as FontAwesome } from "@fortawesome/react-fontawesome";
-import {
-   Button,
-   DropdownItem,
-   DropdownMenu,
-   DropdownToggle,
-   UncontrolledButtonDropdown
-} from "reactstrap";
+import { Button } from "antd";
 import { observer } from "mobx-react";
 import { Globe } from "../../globe/globe";
-import { GlobeImageryTypes } from "../../types";
 
 interface MenuProps {
    toggleShowFlightTable: () => void;
@@ -54,39 +47,6 @@ class Menu extends React.Component<MenuProps, MenuState> {
             >
                <FontAwesome icon="filter" size="lg" />
             </Button>
-            <UncontrolledButtonDropdown>
-               <DropdownToggle>
-                  <FontAwesome icon="globe-americas" size="lg" />
-               </DropdownToggle>
-               <DropdownMenu>
-                  <DropdownItem
-                     active={
-                        this.props.globe.selectedImagery ===
-                        GlobeImageryTypes.topographic
-                     }
-                     onClick={() => {
-                        this.props.globe.selectImagery(
-                           GlobeImageryTypes.topographic
-                        );
-                     }}
-                  >
-                     Topographic
-                  </DropdownItem>
-                  <DropdownItem
-                     active={
-                        this.props.globe.selectedImagery ===
-                        GlobeImageryTypes.satellite
-                     }
-                     onClick={() => {
-                        this.props.globe.selectImagery(
-                           GlobeImageryTypes.satellite
-                        );
-                     }}
-                  >
-                     Satellite
-                  </DropdownItem>
-               </DropdownMenu>
-            </UncontrolledButtonDropdown>
          </div>
       );
    }

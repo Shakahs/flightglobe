@@ -62,6 +62,7 @@ class App extends React.Component<AppProps, AppState> {
                visible={this.state.showSettings}
                toggleVisible={this.toggleShowSettings}
                displayPreferences={this.props.displayPreferences}
+               globe={this.props.globe}
             />
             {/*<Settings*/}
             {/*   showModal={this.state.showInfoModal}*/}
