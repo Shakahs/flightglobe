@@ -179,9 +179,12 @@ describe("GeoManager", () => {
       });
 
       it("should call the destroy method on CesiumPrimitiveHandlers when itself being destroyed", function() {
-         spyOn(gm.cph as CesiumPrimitiveHandler, "destroy");
+         const cph = gm.cph as CesiumPrimitiveHandler;
+         spyOn(cph, "destroy");
+         expect(cph.destroy).not.toHaveBeenCalled();
          gm.destroy();
-         expect(gm.cph?.destroy).toHaveBeenCalled();
+         expect(cph.destroy).toHaveBeenCalled();
+         expect(gm.cph).toBeNull();
       });
    });
 });
