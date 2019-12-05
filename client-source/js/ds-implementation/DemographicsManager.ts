@@ -1,6 +1,13 @@
 import { DeepstreamClient } from "@deepstream/client";
 import { Event, Viewer } from "cesium";
-import { action, observable, ObservableMap } from "mobx";
+import {
+   action,
+   autorun,
+   computed,
+   observable,
+   ObservableMap,
+   reaction
+} from "mobx";
 import {
    FlightDemographics,
    FlightDemographicsCollection,
@@ -14,6 +21,7 @@ import {
    getGeohashNeighbors
 } from "../globe/geohashUtilities";
 import { EventEmitter } from "events";
+import { Globe } from "../globe/globe";
 
 export class DemographicsManager {
    dsConn: DeepstreamClient;
@@ -22,11 +30,7 @@ export class DemographicsManager {
       Icao,
       FlightDemographics
    > = new ObservableMap();
-   viewer: Viewer | null = null;
-   cameraEventDisposer: Event.RemoveCallback | null;
-   cameraAdjacentFlights = observable.map<Geohash, boolean>(undefined, {
-      deep: false
-   });
+   globe: Globe | null = null;
    filteredFlights = observable.map<Icao, boolean>(undefined, {
       deep: false
    });
@@ -36,14 +40,9 @@ export class DemographicsManager {
    });
    selectionClickChange = new EventEmitter();
 
-   constructor(dsConn: DeepstreamClient, viewer?: Viewer) {
+   constructor(dsConn: DeepstreamClient, globe?: Globe) {
       this.dsConn = dsConn;
-      this.viewer = viewer || null;
-      this.cameraEventDisposer = viewer
-         ? viewer.camera.changed.addEventListener(
-              this.handleCameraChange.bind(this)
-           )
-         : null;
+      this.globe = globe || null;
    }
 
    subscribe() {
@@ -54,20 +53,6 @@ export class DemographicsManager {
    @action
    handleUpdate(d: FlightDemographicsCollection) {
       this.demographicsMap.replace(d);
-   }
-
-   handleCameraChange() {
-      if (this.viewer) {
-         const focusGeo = getCameraPositionGeohash(this.viewer);
-         const neighborList = getGeohashNeighbors(focusGeo);
-         this.updateCameraAdjacentFlights(neighborList);
-      }
-   }
-
-   @action
-   updateCameraAdjacentFlights(neighborList: GeohashBoolMap) {
-      this.cameraAdjacentFlights.clear();
-      this.cameraAdjacentFlights.merge(neighborList);
    }
 
    @action
@@ -85,5 +70,15 @@ export class DemographicsManager {
    updateSelectedFlights(selectResult: Map<Icao, boolean>) {
       this.selectedFlights.clear();
       this.selectedFlights.merge(selectResult);
+   }
+
+   @computed
+   get cameraAdjacentFlights(): Map<Geohash, boolean> {
+      if (this.globe) {
+         return getGeohashNeighbors(
+            getCameraPositionGeohash(this.globe.cameraPosition)
+         );
+      }
+      return new Map();
    }
 }

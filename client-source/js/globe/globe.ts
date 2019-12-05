@@ -1,4 +1,9 @@
-import { UrlTemplateImageryProvider, Viewer } from "cesium";
+import {
+   Cartesian3,
+   Cartographic,
+   UrlTemplateImageryProvider,
+   Viewer
+} from "cesium";
 import { action, observable } from "mobx";
 import { GlobeImageryTypes } from "../types";
 
@@ -7,6 +12,7 @@ export class Globe {
    maxZoom: number = 13;
    @observable selectedImagery: GlobeImageryTypes =
       GlobeImageryTypes.topographic;
+   @observable cameraPosition: Cartographic;
 
    constructor(container: Element | string) {
       this.viewer = new Viewer(container, {
@@ -39,6 +45,22 @@ export class Globe {
 
       //percentage of change to trigger camera changed event. lowered to make camera events more responsive
       this.viewer.camera.percentageChanged = 0.3;
+
+      this.cameraPosition = this.calculateCameraPosition();
+      this.viewer.camera.changed.addEventListener(
+         this.updateCameraPosition.bind(this)
+      );
+   }
+
+   @action
+   updateCameraPosition() {
+      this.cameraPosition = this.calculateCameraPosition();
+   }
+
+   calculateCameraPosition(): Cartographic {
+      return this.viewer.scene.globe.ellipsoid.cartesianToCartographic(
+         this.viewer.camera.position
+      );
    }
 
    @action
