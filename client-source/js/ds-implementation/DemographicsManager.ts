@@ -60,12 +60,12 @@ export class DemographicsManager {
       if (this.viewer) {
          const focusGeo = getCameraPositionGeohash(this.viewer);
          const neighborList = getGeohashNeighbors(focusGeo);
-         this.updateDetailedFlights(neighborList);
+         this.updateCameraAdjacentFlights(neighborList);
       }
    }
 
    @action
-   updateDetailedFlights(neighborList: GeohashBoolMap) {
+   updateCameraAdjacentFlights(neighborList: GeohashBoolMap) {
       this.cameraAdjacentFlights.clear();
       this.cameraAdjacentFlights.merge(neighborList);
    }

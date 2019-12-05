@@ -18,6 +18,7 @@ describe("FlightSubscriber", () => {
    let gm: GeoManager;
    let fsA: FlightSubscriber;
    let demographics: DemographicsManager;
+   let dp: DisplayPreferences;
 
    beforeAll(async () => {
       // jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
@@ -38,13 +39,14 @@ describe("FlightSubscriber", () => {
       gmc.handleUpdate(["a"]);
       gm = gmc.geoManagerMap.get("a") as GeoManager;
       cph = gm.cph as CesiumPrimitiveHandler;
+      dp = new DisplayPreferences();
       fsA = new FlightSubscriber(
          dsConn,
          "icaoA",
          fakeFlightPosition(),
          noop,
          demographics,
-         new DisplayPreferences()
+         dp
       );
    });
 
@@ -74,23 +76,50 @@ describe("FlightSubscriber", () => {
 
    it("should get the detail selection status", function() {
       expect(fsA.isCameraAdjacent).toBeFalsy();
-      demographics.updateDetailedFlights(
+      demographics.updateCameraAdjacentFlights(
          new Map([[fsA.position.geohash, true]])
       );
       expect(fsA.isCameraAdjacent).toBeTruthy();
-      demographics.updateDetailedFlights(new Map());
+      demographics.updateCameraAdjacentFlights(new Map());
       expect(fsA.isCameraAdjacent).toBeFalsy();
    });
 
-   it("should call the subscribeTrackFull and unsubscribeTrackFull methods when needed", function() {
-      spyOn(fsA, "subscribeTrackFull").and.callThrough();
-      spyOn(fsA, "unsubscribeTrackFull").and.callThrough();
-      expect(fsA.subscribeTrackFull).not.toHaveBeenCalled();
-      demographics.updateDetailedFlights(
-         new Map([[fsA.position.geohash, true]])
-      );
-      expect(fsA.subscribeTrackFull).toHaveBeenCalled();
-      demographics.updateDetailedFlights(new Map());
-      expect(fsA.unsubscribeTrackFull).toHaveBeenCalled();
+   describe("tracks", () => {
+      describe("shouldFetchTrack / shouldDisplayTrack", () => {
+         it("should resolve to false when shouldDisplay is false ", function() {
+            expect(fsA.isSelected).toBeFalsy();
+            expect(fsA.isCameraAdjacent).toBeFalsy();
+            expect(fsA.shouldFetchTrack).toBeFalsy();
+         });
+         it("should resolve correctly based on selection status", function() {
+            expect(fsA.shouldFetchTrack).toBeFalsy();
+            demographics.updateSelectedFlights(new Map([[fsA.icao, true]]));
+            dp.updateTrackDisplay({ showWhenSelected: false });
+            expect(fsA.shouldFetchTrack).toBeFalsy();
+            dp.updateTrackDisplay({ showWhenSelected: true });
+            expect(fsA.shouldFetchTrack).toBeTruthy();
+         });
+         it("should resolve correctly based on camera adjacent status", function() {
+            expect(fsA.shouldFetchTrack).toBeFalsy();
+            demographics.updateCameraAdjacentFlights(
+               new Map([[fsA.position.geohash, true]])
+            );
+            dp.updateTrackDisplay({ showWhenCameraAdjacent: false });
+            expect(fsA.shouldFetchTrack).toBeFalsy();
+            dp.updateTrackDisplay({ showWhenCameraAdjacent: true });
+            expect(fsA.shouldFetchTrack).toBeTruthy();
+         });
+      });
+
+      it("should call the subscribeTrackFull and unsubscribeTrackFull methods when needed", function() {
+         spyOn(fsA, "subscribeTrackFull").and.callThrough();
+         spyOn(fsA, "unsubscribeTrackFull").and.callThrough();
+         expect(fsA.subscribeTrackFull).not.toHaveBeenCalled();
+         demographics.updateSelectedFlights(new Map([[fsA.icao, true]]));
+         dp.updateTrackDisplay({ showWhenSelected: true });
+         expect(fsA.subscribeTrackFull).toHaveBeenCalled();
+         demographics.updateSelectedFlights(new Map());
+         expect(fsA.unsubscribeTrackFull).toHaveBeenCalled();
+      });
    });
 });
