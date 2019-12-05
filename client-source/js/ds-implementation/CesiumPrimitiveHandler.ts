@@ -31,7 +31,7 @@ require("./mobxConfig");
 interface CesiumPrimitiveHolder {
    point?: PointPrimitive;
    label?: Label;
-   line?: Primitive;
+   track?: Primitive;
 }
 
 const labelOffset = new Cartesian2(10, 20);
@@ -52,14 +52,14 @@ export class CesiumPrimitiveHandler {
    private readonly viewer: Viewer;
    private readonly points = new PointPrimitiveCollection();
    private readonly labels = new LabelCollection();
-   private readonly lines = new PrimitiveCollection();
+   private readonly tracks = new PrimitiveCollection();
    private readonly children: Map<string, CesiumPrimitiveHolder>;
 
    constructor(viewer: Viewer) {
       this.viewer = viewer;
       viewer.scene.primitives.add(this.points);
       viewer.scene.primitives.add(this.labels);
-      viewer.scene.primitives.add(this.lines);
+      viewer.scene.primitives.add(this.tracks);
       this.children = new Map();
    }
 
@@ -81,7 +81,7 @@ export class CesiumPrimitiveHandler {
          if (f.needsRender) {
             this.renderPoint(child, f);
             this.reconcileLabel(child, f);
-            this.reconcileLine(child, f);
+            this.reconcileTrack(child, f);
             f.needsRender = false;
          }
       });
@@ -112,7 +112,7 @@ export class CesiumPrimitiveHandler {
    }
 
    reconcileLabel(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
-      if (f.demographic && f.shouldDisplayDetailed && f.shouldDisplay) {
+      if (f.shouldDisplayLabel) {
          this.renderLabel(child, f);
       } else {
          this.destroyLabel(child);
@@ -161,19 +161,15 @@ export class CesiumPrimitiveHandler {
       }
    }
 
-   reconcileLine(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
-      if (
-         f.trackFull.length >= 2 && //require at least 2 positions to render a line
-         f.shouldDisplayTrail &&
-         f.shouldDisplay
-      ) {
-         this.renderLine(child, f);
+   reconcileTrack(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
+      if (f.shouldDisplayTrack) {
+         this.renderTrack(child, f);
       } else {
-         this.destroyLine(child, f);
+         this.destroyTrack(child, f);
       }
    }
 
-   renderLine(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
+   renderTrack(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
       const cartesianPositions = map(f.trackFull, convertPositionToCartesian);
       const gradientColors: Color[] = [];
 
@@ -183,7 +179,7 @@ export class CesiumPrimitiveHandler {
          );
       }
 
-      const newLine = new Primitive({
+      const newTrack = new Primitive({
          asynchronous: false,
          geometryInstances: new GeometryInstance({
             id: f.icao,
@@ -201,15 +197,15 @@ export class CesiumPrimitiveHandler {
             translucent: true
          })
       });
-      this.destroyLine(child, f);
-      child.line = newLine;
-      this.lines.add(child.line);
+      this.destroyTrack(child, f);
+      child.track = newTrack;
+      this.tracks.add(child.track);
    }
 
-   destroyLine(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
-      if (child.line) {
-         this.lines.remove(child.line);
-         child.line = undefined;
+   destroyTrack(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
+      if (child.track) {
+         this.tracks.remove(child.track);
+         child.track = undefined;
       }
    }
 
@@ -220,6 +216,6 @@ export class CesiumPrimitiveHandler {
    destroy() {
       this.points.destroy();
       this.labels.destroy();
-      this.lines.destroy();
+      this.tracks.destroy();
    }
 }

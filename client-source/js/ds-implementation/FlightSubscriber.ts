@@ -51,7 +51,7 @@ export class FlightSubscriber {
             demographic: this.demographic,
             trackFull: this.trackFull,
             shouldDisplay: this.shouldDisplay,
-            shouldDisplayDetailed: this.shouldDisplayDetailed
+            shouldDisplayDetailed: this.shouldFetchTrack
          }),
          () => {
             this.needsRender = true;
@@ -63,12 +63,9 @@ export class FlightSubscriber {
       );
 
       const trackFullRequester = reaction(
-         () => ({
-            shouldDisplay: this.shouldDisplay,
-            shouldDisplayDetailed: this.shouldDisplayDetailed
-         }),
-         () => {
-            if (this.shouldDisplay && this.shouldDisplayDetailed) {
+         () => this.shouldFetchTrack,
+         (shouldFetchTrack) => {
+            if (shouldFetchTrack) {
                this.subscribeTrackFull();
             } else {
                this.unsubscribeTrackFull();
@@ -138,20 +135,48 @@ export class FlightSubscriber {
          return true;
       }
       if (this.demographicsManager.isFiltered) {
-         return this.isSelected || this.isFilterSelected;
+         return this.isFilterSelected;
       }
       return true;
    }
 
-   @computed get shouldDisplayDetailed(): boolean {
-      return this.isSelected || this.isCameraAdjacent;
-   }
-
-   @computed get shouldDisplayTrail(): boolean {
-      if (this.isSelected) {
+   @computed get shouldFetchTrack(): boolean {
+      if (!this.shouldDisplay) {
+         return false;
+      }
+      if (
+         this.displayPreferences.trackDisplayOptions.showWhenSelected &&
+         this.isSelected
+      ) {
          return true;
       }
-      return this.displayPreferences.showNearbyTrails && this.isCameraAdjacent;
+      return (
+         this.displayPreferences.trackDisplayOptions.showWhenCameraAdjacent &&
+         this.isCameraAdjacent
+      );
+   }
+
+   @computed get shouldDisplayTrack(): boolean {
+      return this.shouldFetchTrack && this.trackFull.length >= 2;
+   }
+
+   @computed get shouldDisplayLabel(): boolean {
+      if (!this.shouldDisplay) {
+         return false;
+      }
+      if (!this.demographic) {
+         return false;
+      }
+      if (
+         this.displayPreferences.labelDisplayOptions.showWhenSelected &&
+         this.isSelected
+      ) {
+         return true;
+      }
+      return (
+         this.displayPreferences.labelDisplayOptions.showWhenCameraAdjacent &&
+         this.isCameraAdjacent
+      );
    }
 
    destroy() {
