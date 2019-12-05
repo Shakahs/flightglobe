@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Select, Checkbox, Drawer, Collapse } from "antd";
+import { Select, Checkbox, Drawer, Collapse, InputNumber } from "antd";
 import { DisplayPreferences } from "../../ds-implementation/DisplayPreferences";
 import { observer } from "mobx-react";
 import Swatch from "../Swatch/Swatch";
@@ -45,6 +45,40 @@ class Settings2 extends React.Component<Settings2Props> {
                   </Select>
                </Panel>
                <Panel header={"Points"} key={1}>
+                  <div>
+                     Size:{" "}
+                     <InputNumber
+                        min={1}
+                        max={10}
+                        value={
+                           this.props.displayPreferences.pointDisplayOptions
+                              .size
+                        }
+                        onChange={(size) =>
+                           this.props.displayPreferences.updatePointDisplay({
+                              size
+                           })
+                        }
+                        style={{ width: "60px" }}
+                     />
+                  </div>
+                  <div>
+                     Outline width:{" "}
+                     <InputNumber
+                        min={1}
+                        max={10}
+                        value={
+                           this.props.displayPreferences.pointDisplayOptions
+                              .outlineSize
+                        }
+                        onChange={(outlineSize) =>
+                           this.props.displayPreferences.updatePointDisplay({
+                              outlineSize
+                           })
+                        }
+                        style={{ width: "60px" }}
+                     />
+                  </div>
                   <div>
                      Fill Color:
                      <Swatch
