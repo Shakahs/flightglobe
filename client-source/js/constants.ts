@@ -24,12 +24,14 @@ export const TrackDisplayOptionDefaults: TrackDisplayOptions = {
    cesiumColor: Color.fromCssColorString("#3399ff"),
    size: 4,
    showWhenCameraAdjacent: false,
-   showWhenSelected: true
+   showWhenSelected: true,
+   maxCameraHeight: 500000
 };
 export const LabelDisplayOptionDefaults: LabelDisplayOptions = {
    color: "#3399ff",
    cesiumColor: Color.fromCssColorString("#3399ff"),
    size: 12,
    showWhenCameraAdjacent: true,
-   showWhenSelected: true
+   showWhenSelected: true,
+   maxCameraHeight: 500000
 };

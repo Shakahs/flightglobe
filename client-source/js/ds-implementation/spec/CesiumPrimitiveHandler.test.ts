@@ -1,23 +1,16 @@
 import { GeoManagerCreator } from "../GeoManagerCreator";
 import { GeoManager } from "../GeoManager";
-import { Viewer } from "cesium";
-import {
-   createViewer,
-   destroyViewer,
-   provideConnection,
-   sleep
-} from "./support";
+import { createGlobe, destroyGlobe, provideConnection, sleep } from "./support";
 import { FlightSubscriber } from "../FlightSubscriber";
 import { CesiumPrimitiveHandler } from "../CesiumPrimitiveHandler";
-import { action, ObservableMap } from "mobx";
+import { ObservableMap } from "mobx";
 import { DemographicsManager } from "../DemographicsManager";
 import { fakeFlightPosition } from "../../../../lib/spec/fakeData";
-import { Icao } from "../../../../lib/types";
 import { DisplayPreferences } from "../DisplayPreferences";
-import { noop } from "lodash";
+import { Globe } from "../../globe/globe";
 
 describe("CesiumPrimitiveHandler", () => {
-   let viewer: Viewer;
+   let globe: Globe;
    let cph: CesiumPrimitiveHandler;
    let dsConn;
    let fsMap: ObservableMap;
@@ -36,12 +29,12 @@ describe("CesiumPrimitiveHandler", () => {
    });
 
    beforeEach(() => {
-      viewer = createViewer();
+      globe = createGlobe();
       gmc = new GeoManagerCreator(
          dsConn,
          demographics,
          new DisplayPreferences(),
-         viewer
+         globe
       );
       gmc.handleUpdate(["a"]);
       gm = gmc.geoManagerMap.get("a") as GeoManager;
@@ -58,7 +51,7 @@ describe("CesiumPrimitiveHandler", () => {
    });
 
    afterEach(() => {
-      destroyViewer(viewer);
+      destroyGlobe(globe);
    });
 
    describe("points", () => {

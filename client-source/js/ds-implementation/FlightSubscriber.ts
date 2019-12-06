@@ -13,6 +13,7 @@ import { each } from "lodash";
 import { DemographicsManager } from "./DemographicsManager";
 import { generateTrackFullKey } from "../../../lib/constants";
 import { DisplayPreferences } from "./DisplayPreferences";
+import { Globe } from "../globe/globe";
 
 require("./mobxConfig");
 
@@ -28,6 +29,7 @@ export class FlightSubscriber {
    dsTrackFull;
    @observable.shallow trackFull: FlightPosition[] = [];
    displayPreferences: DisplayPreferences;
+   globe: Globe | undefined;
 
    constructor(
       dsConn: DeepstreamClient,
@@ -35,7 +37,8 @@ export class FlightSubscriber {
       pos: FlightPosition,
       requestRender: () => void,
       demographics: DemographicsManager,
-      displayPreferences: DisplayPreferences
+      displayPreferences: DisplayPreferences,
+      globe?: Globe
    ) {
       this.dsConn = dsConn;
       this.icao = icao;
@@ -44,6 +47,7 @@ export class FlightSubscriber {
       this.requestRender = requestRender;
       this.demographicsManager = demographics;
       this.displayPreferences = displayPreferences;
+      this.globe = globe;
 
       const renderRequester = reaction(
          () => ({
@@ -56,6 +60,7 @@ export class FlightSubscriber {
             pointDisplayOptions: this.displayPreferences.pointDisplayOptions,
             trackDisplayOptions: this.displayPreferences.trackDisplayOptions,
             labelDisplayOptions: this.displayPreferences.labelDisplayOptions
+            // cameraHeight: this.globe?.cameraPosition.height
          }),
          () => {
             this.needsRender = true;
@@ -169,6 +174,12 @@ export class FlightSubscriber {
          return false;
       }
       if (!this.demographic) {
+         return false;
+      }
+      if (
+         (this.globe?.cameraPosition.height || 0) > //default to 0 height if globe is undefined
+         this.displayPreferences.labelDisplayOptions.maxCameraHeight
+      ) {
          return false;
       }
       if (

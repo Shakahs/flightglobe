@@ -34,6 +34,7 @@ export type PointDisplayOptionsUpdate = Partial<PointDisplayOptions>;
 export interface TrackDisplayOptions extends ElementDisplayOptions {
    showWhenSelected: boolean;
    showWhenCameraAdjacent: boolean;
+   maxCameraHeight: number; //meters!
 }
 
 export type TrackDisplayOptionsUpdate = Partial<TrackDisplayOptions>;
@@ -41,6 +42,7 @@ export type TrackDisplayOptionsUpdate = Partial<TrackDisplayOptions>;
 export interface LabelDisplayOptions extends ElementDisplayOptions {
    showWhenSelected: boolean;
    showWhenCameraAdjacent: boolean;
+   maxCameraHeight: number; //meters!
 }
 
 export type LabelDisplayOptionsUpdate = Partial<LabelDisplayOptions>;

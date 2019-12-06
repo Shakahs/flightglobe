@@ -16,16 +16,13 @@ export const provideConnection = async () => {
 export const sleep = (n: number) =>
    new Promise((resolve) => setTimeout(resolve, n));
 
-export const createViewer = (): Viewer => {
+export const createGlobe = (): Globe => {
    const cesiumDiv = document.createElement("div");
    document.body.appendChild(cesiumDiv);
    const globe = new Globe(cesiumDiv);
-   const viewer = globe.viewer;
-   return viewer;
+   return globe;
 };
 
-export const destroyViewer = (viewer: Viewer) => {
-   if (!viewer.isDestroyed()) {
-      viewer.destroy();
-   }
+export const destroyGlobe = (globe: Globe) => {
+   globe.viewer.destroy();
 };

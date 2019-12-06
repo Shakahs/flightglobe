@@ -1,10 +1,5 @@
 import { GeoManagerCreator } from "../GeoManagerCreator";
-import {
-   createViewer,
-   destroyViewer,
-   provideConnection,
-   sleep
-} from "./support";
+import { createGlobe, destroyGlobe, provideConnection, sleep } from "./support";
 import { GeoManager } from "../GeoManager";
 import { FlightSubscriber } from "../FlightSubscriber";
 import { Viewer } from "cesium";
@@ -14,6 +9,7 @@ import { convertPositionToCartesian } from "../../ws-implementation/utility";
 import { DemographicsManager } from "../DemographicsManager";
 import { fakeFlightPosition } from "../../../../lib/spec/fakeData";
 import { DisplayPreferences } from "../DisplayPreferences";
+import { Globe } from "../../globe/globe";
 
 describe("GeoManager", () => {
    let dsConn;
@@ -148,22 +144,22 @@ describe("GeoManager", () => {
    describe("Cesium Viewer integration", () => {
       let gmc: GeoManagerCreator;
       let gm: GeoManager;
-      let viewer: Viewer;
+      let globe: Globe;
 
       beforeEach(() => {
-         viewer = createViewer();
+         globe = createGlobe();
          gmc = new GeoManagerCreator(
             dsConn,
             demographics,
             new DisplayPreferences(),
-            viewer
+            globe
          );
          gmc.handleUpdate(["a"]);
          gm = gmc.geoManagerMap.get("a") as GeoManager;
       });
 
       afterEach(() => {
-         destroyViewer(viewer);
+         destroyGlobe(globe);
       });
 
       it("should store a CesiumPrimitiveHandler when a Cesium Viewer is provided", function() {

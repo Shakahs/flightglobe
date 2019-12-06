@@ -21,7 +21,7 @@ const dsConn = new DeepstreamClient(`${wsProtocol}://localhost:6020`, {
 });
 
 const globe = new Globe("cesiumContainer");
-const dm = new DemographicsManager(dsConn, globe.viewer);
+const dm = new DemographicsManager(dsConn, globe);
 const dp = new DisplayPreferences();
 
 ReactDOM.render(
@@ -46,7 +46,7 @@ const getData = async () => {
    });
 
    dm.subscribe();
-   const gmc = new GeoManagerCreator(dsConn, dm, dp, globe.viewer);
+   const gmc = new GeoManagerCreator(dsConn, dm, dp, globe);
    gmc.subscribe();
 };
 

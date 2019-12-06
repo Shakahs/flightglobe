@@ -7,13 +7,14 @@ import { Viewer } from "cesium";
 import { DS_GEOHASH_LIST_KEY } from "../../../lib/constants";
 import { DemographicsManager } from "./DemographicsManager";
 import { DisplayPreferences } from "./DisplayPreferences";
+import { Globe } from "../globe/globe";
 require("./mobxConfig");
 
 export class GeoManagerCreator {
    dsConn: DeepstreamClient;
    dsRecord;
    geoManagerMap: Map<Geohash, GeoManager>;
-   viewer: Viewer | null = null;
+   globe: Globe | null = null;
    demographics: DemographicsManager;
    displayPreferences: DisplayPreferences;
 
@@ -21,11 +22,11 @@ export class GeoManagerCreator {
       dsConn: DeepstreamClient,
       demographics: DemographicsManager,
       displayPreferences: DisplayPreferences,
-      viewer?: Viewer
+      globe?: Globe
    ) {
       this.dsConn = dsConn;
       this.demographics = demographics;
-      this.viewer = viewer || null;
+      this.globe = globe || null;
       this.geoManagerMap = new Map();
       this.displayPreferences = displayPreferences;
    }
@@ -43,7 +44,7 @@ export class GeoManagerCreator {
                geohash,
                this.demographics,
                this.displayPreferences,
-               this.viewer
+               this.globe
             );
             newGm.subscribe();
             this.geoManagerMap.set(geohash, newGm);

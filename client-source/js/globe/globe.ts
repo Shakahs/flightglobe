@@ -6,6 +6,7 @@ import {
 } from "cesium";
 import { action, observable } from "mobx";
 import { GlobeImageryTypes } from "../types";
+import { debounce } from "lodash-es";
 
 export class Globe {
    viewer: Viewer;
@@ -47,9 +48,13 @@ export class Globe {
       this.viewer.camera.percentageChanged = 0.3;
 
       this.cameraPosition = this.calculateCameraPosition();
-      this.viewer.camera.changed.addEventListener(
-         this.updateCameraPosition.bind(this)
+      const debouncedCameraUpdate = debounce(
+         this.updateCameraPosition.bind(this),
+         500,
+         { maxWait: 1500 }
       );
+
+      this.viewer.camera.changed.addEventListener(debouncedCameraUpdate);
    }
 
    @action

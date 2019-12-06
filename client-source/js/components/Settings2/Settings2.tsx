@@ -1,10 +1,11 @@
 import * as React from "react";
-import { Select, Checkbox, Drawer, Collapse, InputNumber } from "antd";
+import { Select, Checkbox, Drawer, Collapse, InputNumber, Card } from "antd";
 import { DisplayPreferences } from "../../ds-implementation/DisplayPreferences";
 import { observer } from "mobx-react";
 import Swatch from "../Swatch/Swatch";
 import { Globe } from "../../globe/globe";
 import { GlobeImageryTypes } from "../../types";
+import { round } from "lodash";
 
 interface Settings2Props {
    visible: boolean;
@@ -12,6 +13,12 @@ interface Settings2Props {
    displayPreferences: DisplayPreferences;
    globe: Globe;
 }
+
+const metricConversion = 3.2808;
+
+const feetFromMeters = (m: number): number => round(m * metricConversion);
+
+const metersFromFeet = (ft: number): number => ft / metricConversion;
 
 @observer
 class Settings2 extends React.Component<Settings2Props> {
@@ -27,6 +34,10 @@ class Settings2 extends React.Component<Settings2Props> {
             placement={"left"}
             onClose={this.props.toggleVisible}
          >
+            <Card title={"Status"}>
+               Camera Altitude:{" "}
+               {`${feetFromMeters(this.props.globe.cameraPosition.height)} ft`}
+            </Card>
             <Collapse defaultActiveKey={0}>
                <Panel header={"General"} key={0}>
                   Imagery:{" "}
@@ -188,6 +199,20 @@ class Settings2 extends React.Component<Settings2Props> {
                   >
                      Show Labels for aircraft near the camera
                   </Checkbox>
+                  Max altitude to show nearby labels:
+                  <InputNumber
+                     value={feetFromMeters(
+                        this.props.displayPreferences.labelDisplayOptions
+                           .maxCameraHeight
+                     )}
+                     onChange={(ftHeight) => {
+                        if (ftHeight) {
+                           this.props.displayPreferences.updateLabelDisplay({
+                              maxCameraHeight: metersFromFeet(ftHeight)
+                           });
+                        }
+                     }}
+                  />
                   Color:
                   <Swatch
                      color={

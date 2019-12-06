@@ -2,7 +2,7 @@ import "regenerator-runtime/runtime";
 // import DSServer from "./mockServer";
 import { GeoManagerCreator } from "../GeoManagerCreator";
 import { GeoManager } from "../GeoManager";
-import { createViewer, destroyViewer, provideConnection } from "./support";
+import { createGlobe, destroyGlobe, provideConnection } from "./support";
 import { DemographicsManager } from "../DemographicsManager";
 import { DisplayPreferences } from "../DisplayPreferences";
 
@@ -89,15 +89,15 @@ describe("GeoManagerCreator", async () => {
    });
 
    it("should store a Cesium Viewer if one is provided", function() {
-      const viewer = createViewer();
+      const globe = createGlobe();
       const gmc2 = new GeoManagerCreator(
          dsConn,
          demographics,
          new DisplayPreferences(),
-         viewer
+         globe
       );
-      expect(gmc2.viewer).toBe(viewer);
-      destroyViewer(viewer);
-      expect(gmc.viewer).toEqual(null);
+      expect(gmc2.globe).toBe(globe);
+      destroyGlobe(globe);
+      expect(gmc.globe).toEqual(null);
    });
 });

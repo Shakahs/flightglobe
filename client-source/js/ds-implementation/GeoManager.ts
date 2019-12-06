@@ -8,6 +8,7 @@ import { FlightSubscriberMap } from "./types";
 import { generateGeohashedPositionsKey } from "../../../lib/constants";
 import { DemographicsManager } from "./DemographicsManager";
 import { DisplayPreferences } from "./DisplayPreferences";
+import { Globe } from "../globe/globe";
 
 require("./mobxConfig");
 
@@ -25,13 +26,13 @@ export class GeoManager {
    cph: CesiumPrimitiveHandler | null = null;
    demographics: DemographicsManager;
    displayPreferences: DisplayPreferences;
-
+   globe: Globe | undefined;
    constructor(
       dsConn: DeepstreamClient,
       geohash: Geohash,
       demographics: DemographicsManager,
       displayPreferences: DisplayPreferences,
-      viewer?: Viewer | null
+      globe?: Globe | null
    ) {
       this.dsConn = dsConn;
       this.geohash = geohash;
@@ -40,8 +41,9 @@ export class GeoManager {
       this.debouncedRender = debounce(this.render.bind(this), 250, {
          maxWait: 500
       });
-      if (viewer) {
-         this.cph = new CesiumPrimitiveHandler(viewer);
+      if (globe) {
+         this.globe = globe;
+         this.cph = new CesiumPrimitiveHandler(globe.viewer);
       }
       this.displayPreferences = displayPreferences;
    }
@@ -70,7 +72,8 @@ export class GeoManager {
                   fpos,
                   this.debouncedRender,
                   this.demographics,
-                  this.displayPreferences
+                  this.displayPreferences,
+                  this.globe
                )
             );
          }

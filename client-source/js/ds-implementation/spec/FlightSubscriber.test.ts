@@ -2,16 +2,17 @@ import { Viewer } from "cesium";
 import { CesiumPrimitiveHandler } from "../CesiumPrimitiveHandler";
 import { GeoManagerCreator } from "../GeoManagerCreator";
 import { GeoManager } from "../GeoManager";
-import { createViewer, provideConnection } from "./support";
+import { createGlobe, provideConnection } from "./support";
 import { FlightSubscriber } from "../FlightSubscriber";
 import { noop } from "lodash";
 import { convertPositionToCartesian } from "../../ws-implementation/utility";
 import { DemographicsManager } from "../DemographicsManager";
 import { fakeFlightPosition } from "../../../../lib/spec/fakeData";
 import { DisplayPreferences } from "../DisplayPreferences";
+import { Globe } from "../../globe/globe";
 
 describe("FlightSubscriber", () => {
-   let viewer: Viewer;
+   let globe: Globe;
    let cph: CesiumPrimitiveHandler;
    let dsConn;
    let gmc: GeoManagerCreator;
@@ -29,12 +30,12 @@ describe("FlightSubscriber", () => {
    });
 
    beforeEach(() => {
-      viewer = createViewer();
+      globe = createGlobe();
       gmc = new GeoManagerCreator(
          dsConn,
          demographics,
          new DisplayPreferences(),
-         viewer
+         globe
       );
       gmc.handleUpdate(["a"]);
       gm = gmc.geoManagerMap.get("a") as GeoManager;
