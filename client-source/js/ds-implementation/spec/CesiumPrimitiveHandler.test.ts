@@ -58,7 +58,7 @@ describe("CesiumPrimitiveHandler", () => {
       it("should render a point", async function() {
          let fakePos = fakeFlightPosition();
          spyOn(cph, "renderPoint").and.callThrough();
-         gm.handleUpdate({
+         gm.reconcile({
             geohash: gm.geohash,
             flights: {
                icaoA: fakePos

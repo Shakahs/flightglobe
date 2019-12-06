@@ -46,38 +46,21 @@ export class GeoManager {
          this.cph = new CesiumPrimitiveHandler(globe.viewer);
       }
       this.displayPreferences = displayPreferences;
+      this.updateOrCreateFlightSubscriber = this.updateOrCreateFlightSubscriber.bind(
+         this
+      );
    }
 
    subscribe() {
       this.dsRecord = this.dsConn.record.getRecord(
          generateGeohashedPositionsKey(this.geohash)
       );
-      this.dsRecord.subscribe(this.handleUpdate.bind(this));
+      this.dsRecord.subscribe(this.reconcile.bind(this));
    }
 
-   handleUpdate(update: GeoPositionList) {
-      // this.flightPositions.replace(update.flights);
-
-      //create new FlightSubscribers under the respective ICAO key
-      forEach(update.flights, (fpos, icao) => {
-         const foundFlight = this.flightSubscriberMap.get(icao);
-         if (foundFlight) {
-            foundFlight.updatePosition(fpos);
-         } else {
-            this.flightSubscriberMap.set(
-               icao,
-               new FlightSubscriber(
-                  this.dsConn,
-                  icao,
-                  fpos,
-                  this.debouncedRender,
-                  this.demographics,
-                  this.displayPreferences,
-                  this.globe
-               )
-            );
-         }
-      });
+   reconcile(update: GeoPositionList) {
+      //create or update FlightSubscribers under the respective ICAO key
+      forEach(update.flights, this.updateOrCreateFlightSubscriber);
 
       // the provided flight position update is our source of truth,
       // so subtract the flight position keys from our current flightSubscriberMap,
@@ -89,6 +72,26 @@ export class GeoManager {
          this.flightSubscriberMap.get(d)?.destroy();
          this.flightSubscriberMap.delete(d);
       });
+   }
+
+   updateOrCreateFlightSubscriber(fpos, icao) {
+      const foundFlight = this.flightSubscriberMap.get(icao);
+      if (foundFlight) {
+         foundFlight.updatePosition(fpos);
+      } else {
+         this.flightSubscriberMap.set(
+            icao,
+            new FlightSubscriber(
+               this.dsConn,
+               icao,
+               fpos,
+               this.debouncedRender,
+               this.demographics,
+               this.displayPreferences,
+               this.globe
+            )
+         );
+      }
    }
 
    render() {

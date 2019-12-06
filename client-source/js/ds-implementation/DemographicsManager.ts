@@ -22,15 +22,16 @@ import {
 } from "../globe/geohashUtilities";
 import { EventEmitter } from "events";
 import { Globe } from "../globe/globe";
+import { shallowEnhancer } from "mobx/lib/types/modifiers";
 
 export class DemographicsManager {
    dsConn: DeepstreamClient;
    dsRecord;
-   demographicsMap: ObservableMap<
-      Icao,
-      FlightDemographics
-   > = new ObservableMap();
    globe: Globe | null = null;
+   demographicsMap: ObservableMap<Icao, FlightDemographics> = observable.map(
+      [],
+      { deep: false }
+   );
    filteredFlights = observable.map<Icao, boolean>(undefined, {
       deep: false
    });

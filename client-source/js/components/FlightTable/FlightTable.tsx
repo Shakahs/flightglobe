@@ -190,6 +190,9 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
                   rowSelection={"multiple"}
                   floatingFilter
                   rowMultiSelectWithClick
+                  gridOptions={{
+                     batchUpdateWaitMillis: 2000
+                  }}
                />
             </div>
          </React.Fragment>

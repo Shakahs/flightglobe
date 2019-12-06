@@ -19,6 +19,7 @@ import { merge } from "lodash-es";
 export class DisplayPreferences {
    @observable
    pointDisplayOptions: PointDisplayOptions = PointDisplayOptionDefaults;
+
    @observable
    selectedPointDisplayOptions: PointDisplayOptions = SelectedPointDisplayOptionDefaults;
 

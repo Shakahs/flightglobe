@@ -13,7 +13,7 @@ export class Globe {
    maxZoom: number = 13;
    @observable selectedImagery: GlobeImageryTypes =
       GlobeImageryTypes.topographic;
-   @observable cameraPosition: Cartographic;
+   @observable.ref cameraPosition: Cartographic;
 
    constructor(container: Element | string) {
       this.viewer = new Viewer(container, {
@@ -50,8 +50,7 @@ export class Globe {
       this.cameraPosition = this.calculateCameraPosition();
       const debouncedCameraUpdate = debounce(
          this.updateCameraPosition.bind(this),
-         500,
-         { maxWait: 1500 }
+         500
       );
 
       this.viewer.camera.changed.addEventListener(debouncedCameraUpdate);

@@ -22,12 +22,12 @@ export class FlightSubscriber {
    readonly icao: Icao;
    // gm: GeoManager;
    private disposers: Array<IReactionDisposer>;
-   @observable.shallow position: FlightPosition;
+   @observable.ref position: FlightPosition;
    readonly requestRender: () => void;
    needsRender: boolean = false;
    demographicsManager: DemographicsManager;
    dsTrackFull;
-   @observable.shallow trackFull: FlightPosition[] = [];
+   @observable.ref trackFull: FlightPosition[] = [];
    displayPreferences: DisplayPreferences;
    globe: Globe | undefined;
 

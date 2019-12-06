@@ -39,7 +39,7 @@ describe("GeoManager", () => {
          gm = gmc.geoManagerMap.get("a") as GeoManager;
          fakeDataA = fakeFlightPosition();
          fakeDataB = fakeFlightPosition();
-         gm.handleUpdate({
+         gm.reconcile({
             geohash: gm.geohash,
             flights: {
                icaoA: fakeDataA
@@ -75,7 +75,7 @@ describe("GeoManager", () => {
       it("should create FlightSubscribers when needed", function() {
          expect(gm.flightSubscriberMap.size).toEqual(1);
          expect(gm.flightSubscriberMap.has("icaoA")).toBeTruthy();
-         gm.handleUpdate({
+         gm.reconcile({
             geohash: gm.geohash,
             flights: {
                icaoA: fakeDataA,
@@ -88,14 +88,14 @@ describe("GeoManager", () => {
       });
 
       it("should destroy FlightSubscribers when they are longer needed", function() {
-         gm.handleUpdate({
+         gm.reconcile({
             geohash: gm.geohash,
             flights: {
                icaoA: fakeDataA,
                icaoB: fakeDataB
             }
          });
-         gm.handleUpdate({
+         gm.reconcile({
             geohash: gm.geohash,
             flights: {
                icaoB: fakeDataB
@@ -108,7 +108,7 @@ describe("GeoManager", () => {
 
       it("should update the positions of existing FlightSubscribers", function() {
          const newPos = fakeFlightPosition();
-         gm.handleUpdate({
+         gm.reconcile({
             geohash: gm.geohash,
             flights: {
                icaoA: newPos
@@ -121,7 +121,7 @@ describe("GeoManager", () => {
 
       it("should call the destroy method on FlightSubscribers when discarding them", function() {
          spyOn(flightA, "destroy");
-         gm.handleUpdate({
+         gm.reconcile({
             geohash: gm.geohash,
             flights: {
                icaoB: fakeDataB
