@@ -6,7 +6,6 @@ import { faCog } from "@fortawesome/free-solid-svg-icons/faCog";
 import { faFilter } from "@fortawesome/free-solid-svg-icons/faFilter";
 import { faCircleNotch } from "@fortawesome/free-solid-svg-icons/faCircleNotch";
 import { faGlobeAmericas } from "@fortawesome/free-solid-svg-icons/faGlobeAmericas";
-import LoadingScreen from "./LoadingScreen/LoadingScreen";
 import classnames from "classnames";
 import { hot } from "react-hot-loader/root";
 import { Globe } from "../globe/globe";
@@ -14,6 +13,7 @@ import { DemographicsManager } from "../ds-implementation/DemographicsManager";
 import "antd/dist/antd.css";
 import { DisplayPreferences } from "../ds-implementation/DisplayPreferences";
 import Settings2 from "./Settings2/Settings2";
+import { message } from "antd";
 
 library.add(faCog, faFilter, faCircleNotch, faGlobeAmericas);
 
@@ -54,21 +54,26 @@ class App extends React.Component<AppProps, AppState> {
       });
    }
 
+   componentDidMount() {
+      const hide = message.loading("Loading globe imagery...", 0);
+      const timer = setInterval(() => {
+         //@ts-ignore tilesLoaded is not in the TS definition
+         if (this.props.globe.viewer.scene.globe.tilesLoaded) {
+            clearInterval(timer);
+            hide();
+         }
+      }, 250);
+   }
+
    render() {
       return (
          <React.Fragment>
-            <LoadingScreen viewer={this.props.globe.viewer} />
             <Settings2
                visible={this.state.showSettings}
                toggleVisible={this.toggleShowSettings}
                displayPreferences={this.props.displayPreferences}
                globe={this.props.globe}
             />
-            {/*<Settings*/}
-            {/*   showModal={this.state.showInfoModal}*/}
-            {/*   toggleModal={this.toggleSettingsModal}*/}
-            {/*   flightstore={this.props.demographicsManager}*/}
-            {/*/>*/}
             <Menu
                toggleShowFlightTable={this.toggleShowFlightTable}
                toggleShowInfoModal={this.toggleShowSettings}
