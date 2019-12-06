@@ -104,11 +104,12 @@ export class CesiumPrimitiveHandler {
          f.position,
          colorInterpolator
       );
-      child.point.pixelSize = PointDisplayOptionDefaults.size;
+      child.point.pixelSize = f.displayPreferences.pointDisplayOptions.size;
       child.point.outlineColor = Color.fromCssColorString(
-         PointDisplayOptionDefaults.outlineColor
+         f.displayPreferences.pointDisplayOptions.outlineColor
       );
-      child.point.outlineWidth = PointDisplayOptionDefaults.outlineSize;
+      child.point.outlineWidth =
+         f.displayPreferences.pointDisplayOptions.outlineSize;
    }
 
    reconcileLabel(child: CesiumPrimitiveHolder, f: FlightSubscriber) {

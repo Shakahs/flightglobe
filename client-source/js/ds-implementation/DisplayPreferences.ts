@@ -14,10 +14,10 @@ import {
    TrackDisplayOptionDefaults
 } from "../constants";
 import { Color } from "cesium";
-import { merge } from "lodash-es";
+import { assign, merge } from "lodash";
 
 export class DisplayPreferences {
-   @observable
+   @observable.ref
    pointDisplayOptions: PointDisplayOptions = PointDisplayOptionDefaults;
 
    @observable
@@ -40,10 +40,11 @@ export class DisplayPreferences {
       if (newOptions.color) {
          newOptions.cesiumColor = Color.fromCssColorString(newOptions.color);
       }
-      merge<PointDisplayOptions, PointDisplayOptionsUpdate>(
-         this.pointDisplayOptions,
-         newOptions
-      );
+      this.pointDisplayOptions = assign<
+         unknown,
+         PointDisplayOptions,
+         PointDisplayOptionsUpdate
+      >({}, this.pointDisplayOptions, newOptions);
    }
 
    @action("updateTrackDisplay")

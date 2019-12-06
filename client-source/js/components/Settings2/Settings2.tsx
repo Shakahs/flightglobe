@@ -6,7 +6,8 @@ import {
    Collapse,
    InputNumber,
    Card,
-   Slider
+   Slider,
+   Divider
 } from "antd";
 import { DisplayPreferences } from "../../ds-implementation/DisplayPreferences";
 import { observer } from "mobx-react";
@@ -33,6 +34,7 @@ class Settings2 extends React.Component<Settings2Props> {
    render() {
       const { Panel } = Collapse;
       const { Option } = Select;
+      const dividerStyle = { margin: "6px 0" };
 
       return (
          <Drawer
@@ -46,7 +48,7 @@ class Settings2 extends React.Component<Settings2Props> {
                Camera Altitude:{" "}
                {`${this.props.globe.cameraPosition.height} meters`}
             </Card>
-            <Collapse defaultActiveKey={0}>
+            <Collapse defaultActiveKey={0} style={{ textAlign: "right" }}>
                <Panel header={"General"} key={0}>
                   Imagery:{" "}
                   <Select
@@ -81,6 +83,7 @@ class Settings2 extends React.Component<Settings2Props> {
                         style={{ width: "60px" }}
                      />
                   </div>
+                  <Divider style={dividerStyle} />
                   <div>
                      Outline width:{" "}
                      <InputNumber
@@ -98,8 +101,9 @@ class Settings2 extends React.Component<Settings2Props> {
                         style={{ width: "60px" }}
                      />
                   </div>
+                  <Divider style={dividerStyle} />
                   <div>
-                     Fill Color:
+                     <span>Fill Color:</span>
                      <Swatch
                         color={
                            this.props.displayPreferences.pointDisplayOptions
@@ -112,6 +116,7 @@ class Settings2 extends React.Component<Settings2Props> {
                         }
                      />
                   </div>
+                  <Divider style={dividerStyle} />
                   <div>
                      Outline Color:{" "}
                      <Swatch

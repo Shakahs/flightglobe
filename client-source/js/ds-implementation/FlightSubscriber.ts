@@ -56,7 +56,8 @@ export class FlightSubscriber {
             trackFull: this.trackFull,
             shouldDisplay: this.shouldDisplay,
             shouldDisplayLabel: this.shouldDisplayLabel,
-            shouldDisplayTrack: this.shouldDisplayTrack
+            shouldDisplayTrack: this.shouldDisplayTrack,
+            pointDisplayOptions: this.displayPreferences.pointDisplayOptions
             // cameraHeight: this.globe?.cameraPosition.height
          }),
          () => {
