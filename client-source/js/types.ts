@@ -20,12 +20,13 @@ export interface UpdateRequest {
 
 interface ElementDisplayOptions {
    color: string;
-   cesiumColor: Cesium.Color;
+   colorCesium: Cesium.Color;
    size: number;
 }
 
 export interface PointDisplayOptions extends ElementDisplayOptions {
    outlineColor: string;
+   outlineColorCesium: Cesium.Color;
    outlineSize: number;
 }
 

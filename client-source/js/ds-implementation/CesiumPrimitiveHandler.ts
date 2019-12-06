@@ -105,9 +105,8 @@ export class CesiumPrimitiveHandler {
          colorInterpolator
       );
       child.point.pixelSize = f.displayPreferences.pointDisplayOptions.size;
-      child.point.outlineColor = Color.fromCssColorString(
-         f.displayPreferences.pointDisplayOptions.outlineColor
-      );
+      child.point.outlineColor =
+         f.displayPreferences.pointDisplayOptions.outlineColorCesium;
       child.point.outlineWidth =
          f.displayPreferences.pointDisplayOptions.outlineSize;
    }

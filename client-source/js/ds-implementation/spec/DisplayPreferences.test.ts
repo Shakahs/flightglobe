@@ -36,7 +36,7 @@ describe("DisplayPreferences", function() {
          );
          expect(dp.pointDisplayOptions).toEqual(finalResult);
          expect(
-            dp.pointDisplayOptions.cesiumColor.equals(
+            dp.pointDisplayOptions.colorCesium.equals(
                Color.fromCssColorString(newOptions.color as string)
             )
          ).toBeTruthy();
@@ -57,7 +57,7 @@ describe("DisplayPreferences", function() {
          );
          expect(dp.trackDisplayOptions).toEqual(finalResult);
          expect(
-            dp.trackDisplayOptions.cesiumColor.equals(
+            dp.trackDisplayOptions.colorCesium.equals(
                Color.fromCssColorString(newOptions.color)
             )
          ).toBeTruthy();
@@ -78,7 +78,7 @@ describe("DisplayPreferences", function() {
          );
          expect(dp.labelDisplayOptions).toEqual(finalResult);
          expect(
-            dp.labelDisplayOptions.cesiumColor.equals(
+            dp.labelDisplayOptions.colorCesium.equals(
                Color.fromCssColorString(newOptions.color)
             )
          ).toBeTruthy();

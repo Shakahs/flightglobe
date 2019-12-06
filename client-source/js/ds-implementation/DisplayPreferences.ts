@@ -38,7 +38,12 @@ export class DisplayPreferences {
    @action("updatePointDisplay")
    updatePointDisplay(newOptions: PointDisplayOptionsUpdate) {
       if (newOptions.color) {
-         newOptions.cesiumColor = Color.fromCssColorString(newOptions.color);
+         newOptions.colorCesium = Color.fromCssColorString(newOptions.color);
+      }
+      if (newOptions.outlineColor) {
+         newOptions.outlineColorCesium = Color.fromCssColorString(
+            newOptions.outlineColor
+         );
       }
       this.pointDisplayOptions = assign<
          unknown,
@@ -50,7 +55,7 @@ export class DisplayPreferences {
    @action("updateTrackDisplay")
    updateTrackDisplay(newOptions: TrackDisplayOptionsUpdate) {
       if (newOptions.color) {
-         newOptions.cesiumColor = Color.fromCssColorString(newOptions.color);
+         newOptions.colorCesium = Color.fromCssColorString(newOptions.color);
       }
       merge<TrackDisplayOptions, TrackDisplayOptionsUpdate>(
          this.trackDisplayOptions,
@@ -61,7 +66,7 @@ export class DisplayPreferences {
    @action("updateLabelDisplay")
    updateLabelDisplay(newOptions: LabelDisplayOptionsUpdate) {
       if (newOptions.color) {
-         newOptions.cesiumColor = Color.fromCssColorString(newOptions.color);
+         newOptions.colorCesium = Color.fromCssColorString(newOptions.color);
       }
       merge<LabelDisplayOptions, LabelDisplayOptionsUpdate>(
          this.labelDisplayOptions,
