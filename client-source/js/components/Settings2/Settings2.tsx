@@ -1,5 +1,13 @@
 import * as React from "react";
-import { Select, Checkbox, Drawer, Collapse, InputNumber, Card } from "antd";
+import {
+   Select,
+   Checkbox,
+   Drawer,
+   Collapse,
+   InputNumber,
+   Card,
+   Slider
+} from "antd";
 import { DisplayPreferences } from "../../ds-implementation/DisplayPreferences";
 import { observer } from "mobx-react";
 import Swatch from "../Swatch/Swatch";
@@ -36,7 +44,7 @@ class Settings2 extends React.Component<Settings2Props> {
          >
             <Card title={"Status"}>
                Camera Altitude:{" "}
-               {`${feetFromMeters(this.props.globe.cameraPosition.height)} ft`}
+               {`${this.props.globe.cameraPosition.height} meters`}
             </Card>
             <Collapse defaultActiveKey={0}>
                <Panel header={"General"} key={0}>
@@ -200,18 +208,18 @@ class Settings2 extends React.Component<Settings2Props> {
                      Show Labels for aircraft near the camera
                   </Checkbox>
                   Max altitude to show nearby labels:
-                  <InputNumber
-                     value={feetFromMeters(
+                  <Slider
+                     value={
                         this.props.displayPreferences.labelDisplayOptions
                            .maxCameraHeight
-                     )}
-                     onChange={(ftHeight) => {
-                        if (ftHeight) {
-                           this.props.displayPreferences.updateLabelDisplay({
-                              maxCameraHeight: metersFromFeet(ftHeight)
-                           });
-                        }
+                     }
+                     onChange={(newVal) => {
+                        const maxCameraHeight = newVal as number;
+                        this.props.displayPreferences.updateLabelDisplay({
+                           maxCameraHeight
+                        });
                      }}
+                     max={15_000_000}
                   />
                   Color:
                   <Swatch
