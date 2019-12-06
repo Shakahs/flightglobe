@@ -7,6 +7,9 @@ workers_dev = false
 bucket = "./client-build"
 entry-point = "workers-site"
 
+[env.test]
+workers_dev = true
+
 [env.production]
 name = 'flightglobe-prod'
 zone_id = "5cfac87e0001ef855bd87449d825f9e4"
