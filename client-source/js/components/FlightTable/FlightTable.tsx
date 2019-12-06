@@ -114,6 +114,12 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
                   transformDemographicForTable(change.name, change.newValue)
                ]
             });
+         } else if (change.type === "delete" && event.api) {
+            event.api.batchUpdateRowData({
+               remove: [
+                  transformDemographicForTable(change.name, change.oldValue)
+               ]
+            });
          }
       });
 
