@@ -8,12 +8,12 @@ import {
    reaction
 } from "mobx";
 import { Cartesian3 } from "cesium";
-import { convertPositionToCartesian } from "../ws-implementation/utility";
 import { each } from "lodash";
 import { DemographicsManager } from "./DemographicsManager";
 import { generateTrackFullKey } from "../../../lib/constants";
 import { DisplayPreferences } from "./DisplayPreferences";
 import { Globe } from "../globe/globe";
+import { convertPositionToCartesian } from "./utility";
 
 require("./mobxConfig");
 

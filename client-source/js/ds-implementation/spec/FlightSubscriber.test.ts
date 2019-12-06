@@ -5,11 +5,11 @@ import { GeoManager } from "../GeoManager";
 import { createGlobe, provideConnection } from "./support";
 import { FlightSubscriber } from "../FlightSubscriber";
 import { noop } from "lodash";
-import { convertPositionToCartesian } from "../../ws-implementation/utility";
 import { DemographicsManager } from "../DemographicsManager";
 import { fakeFlightPosition } from "../../../../lib/spec/fakeData";
 import { DisplayPreferences } from "../DisplayPreferences";
 import { Globe } from "../../globe/globe";
+import { convertPositionToCartesian } from "../utility";
 
 describe("FlightSubscriber", () => {
    let globe: Globe;

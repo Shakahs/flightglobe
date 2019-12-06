@@ -15,7 +15,6 @@ import {
 import { FlightSubscriberMap } from "./types";
 import { FlightSubscriber } from "./FlightSubscriber";
 import { map } from "lodash";
-import { convertPositionToCartesian } from "../ws-implementation/utility";
 import {
    LabelDisplayOptionDefaults,
    PointDisplayOptionDefaults
@@ -24,6 +23,7 @@ import { interpolate } from "d3-interpolate";
 import { color, RGBColor } from "d3-color";
 import { memoize } from "lodash";
 import { FlightPosition } from "../../../lib/types";
+import { convertPositionToCartesian } from "./utility";
 const airports = require("../../resources/airports.json");
 
 require("./mobxConfig");

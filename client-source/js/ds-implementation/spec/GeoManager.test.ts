@@ -5,11 +5,11 @@ import { FlightSubscriber } from "../FlightSubscriber";
 import { Viewer } from "cesium";
 import { CesiumPrimitiveHandler } from "../CesiumPrimitiveHandler";
 import { FlightPosition } from "../../../../lib/types";
-import { convertPositionToCartesian } from "../../ws-implementation/utility";
 import { DemographicsManager } from "../DemographicsManager";
 import { fakeFlightPosition } from "../../../../lib/spec/fakeData";
 import { DisplayPreferences } from "../DisplayPreferences";
 import { Globe } from "../../globe/globe";
+import { convertPositionToCartesian } from "../utility";
 
 describe("GeoManager", () => {
    let dsConn;
