@@ -1,6 +1,5 @@
 import * as React from "react";
 import Collapse from "reactstrap/lib/Collapse";
-import Container from "../Settings/PointSettings";
 import { Color, ColorState, GithubPicker } from "react-color";
 
 interface SwatchProps {
