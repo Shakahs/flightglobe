@@ -65,7 +65,8 @@ export class FlightSubscriber {
             this.requestRender();
          },
          {
-            fireImmediately: true
+            fireImmediately: true,
+            delay: 500
          }
       );
 

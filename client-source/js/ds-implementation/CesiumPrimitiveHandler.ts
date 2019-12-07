@@ -99,11 +99,7 @@ export class CesiumPrimitiveHandler {
             show: f.shouldDisplay
          });
       }
-      // child.point.color = PointDisplayOptionDefaults.cesiumColor;
-      child.point.color = memoizedCesiumColorFromAltitude(
-         f.position,
-         colorInterpolator
-      );
+      child.point.color = f.displayPreferences.pointDisplayOptions.colorCesium;
       child.point.pixelSize = f.displayPreferences.pointDisplayOptions.size;
       child.point.outlineColor =
          f.displayPreferences.pointDisplayOptions.outlineColorCesium;
