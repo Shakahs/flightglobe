@@ -15,12 +15,14 @@ import Swatch from "../Swatch/Swatch";
 import { Globe } from "../../globe/globe";
 import { GlobeImageryTypes } from "../../types";
 import { round } from "lodash";
+import { DemographicsManager } from "../../ds-implementation/DemographicsManager";
 
 interface Settings2Props {
    visible: boolean;
    toggleVisible: () => void;
    displayPreferences: DisplayPreferences;
    globe: Globe;
+   demographics: DemographicsManager;
 }
 
 const metricConversion = 3.2808;
@@ -45,8 +47,15 @@ class Settings2 extends React.Component<Settings2Props> {
             onClose={this.props.toggleVisible}
          >
             <Card title={"Status"}>
-               Camera Altitude:{" "}
-               {`${this.props.globe.cameraPosition.height} meters`}
+               <span>
+                  Camera Altitude:
+                  <br />
+                  {`${round(this.props.globe.cameraPosition.height)} meters`}
+                  <br />
+                  Tracked flights:
+                  <br />
+                  {this.props.demographics.demographicsMap.size}
+               </span>
             </Card>
             <Collapse defaultActiveKey={0} style={{ textAlign: "right" }}>
                <Panel header={"General"} key={0}>

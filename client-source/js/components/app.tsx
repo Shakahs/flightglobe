@@ -73,6 +73,7 @@ class App extends React.Component<AppProps, AppState> {
                toggleVisible={this.toggleShowSettings}
                displayPreferences={this.props.displayPreferences}
                globe={this.props.globe}
+               demographics={this.props.demographicsManager}
             />
             <Menu
                toggleShowFlightTable={this.toggleShowFlightTable}
