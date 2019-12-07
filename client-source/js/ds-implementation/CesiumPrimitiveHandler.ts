@@ -143,11 +143,9 @@ export class CesiumPrimitiveHandler {
          });
       }
       // child.label.fillColor = LabelDisplayOptionDefaults.cesiumColor;
-      child.label.fillColor = memoizedCesiumColorFromAltitude(
-         f.position,
-         colorInterpolator
-      );
-      child.label.font = `${LabelDisplayOptionDefaults.size}px sans-serif`;
+      child.label.fillColor =
+         f.displayPreferences.labelDisplayOptions.colorCesium;
+      child.label.font = `${f.displayPreferences.labelDisplayOptions.size}px sans-serif`;
    }
 
    destroyLabel(child: CesiumPrimitiveHolder) {
@@ -170,8 +168,11 @@ export class CesiumPrimitiveHandler {
       const gradientColors: Color[] = [];
 
       for (let i = 0; i < f.trackFull.length; i++) {
+         // gradientColors.push(
+         //    memoizedCesiumColorFromAltitude(f.trackFull[i], colorInterpolator)
+         // );
          gradientColors.push(
-            memoizedCesiumColorFromAltitude(f.trackFull[i], colorInterpolator)
+            f.displayPreferences.trackDisplayOptions.colorCesium
          );
       }
 
@@ -182,7 +183,7 @@ export class CesiumPrimitiveHandler {
             geometry: PolylineGeometry.createGeometry(
                new PolylineGeometry({
                   positions: cartesianPositions,
-                  width: 3,
+                  width: f.displayPreferences.trackDisplayOptions.size,
                   // vertexFormat: Cesium.PolylineColorAppearance.VERTEX_FORMAT,
                   colors: gradientColors,
                   colorsPerVertex: true

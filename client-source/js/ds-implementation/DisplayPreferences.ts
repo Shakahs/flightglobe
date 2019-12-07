@@ -20,13 +20,13 @@ export class DisplayPreferences {
    @observable.ref
    pointDisplayOptions: PointDisplayOptions = PointDisplayOptionDefaults;
 
-   @observable
-   selectedPointDisplayOptions: PointDisplayOptions = SelectedPointDisplayOptionDefaults;
+   // @observable
+   // selectedPointDisplayOptions: PointDisplayOptions = SelectedPointDisplayOptionDefaults;
 
-   @observable
+   @observable.ref
    trackDisplayOptions: TrackDisplayOptions = TrackDisplayOptionDefaults;
 
-   @observable
+   @observable.ref
    labelDisplayOptions: LabelDisplayOptions = LabelDisplayOptionDefaults;
 
    constructor() {
@@ -57,10 +57,11 @@ export class DisplayPreferences {
       if (newOptions.color) {
          newOptions.colorCesium = Color.fromCssColorString(newOptions.color);
       }
-      merge<TrackDisplayOptions, TrackDisplayOptionsUpdate>(
-         this.trackDisplayOptions,
-         newOptions
-      );
+      this.trackDisplayOptions = assign<
+         unknown,
+         TrackDisplayOptions,
+         TrackDisplayOptionsUpdate
+      >({}, this.trackDisplayOptions, newOptions);
    }
 
    @action("updateLabelDisplay")
@@ -68,9 +69,10 @@ export class DisplayPreferences {
       if (newOptions.color) {
          newOptions.colorCesium = Color.fromCssColorString(newOptions.color);
       }
-      merge<LabelDisplayOptions, LabelDisplayOptionsUpdate>(
-         this.labelDisplayOptions,
-         newOptions
-      );
+      this.labelDisplayOptions = assign<
+         unknown,
+         LabelDisplayOptions,
+         LabelDisplayOptionsUpdate
+      >({}, this.labelDisplayOptions, newOptions);
    }
 }

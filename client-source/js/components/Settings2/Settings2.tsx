@@ -59,7 +59,92 @@ class Settings2 extends React.Component<Settings2Props> {
             </Card>
             <Collapse defaultActiveKey={0} style={{ textAlign: "right" }}>
                <Panel header={"General"} key={0}>
-                  Imagery:{" "}
+                  <b style={{ textAlign: "left" }}>When Selected:</b>
+                  <Checkbox
+                     checked={
+                        this.props.displayPreferences.trackDisplayOptions
+                           .showWhenSelected
+                     }
+                     onChange={({ target }) =>
+                        this.props.displayPreferences.updateTrackDisplay({
+                           showWhenSelected: target.checked
+                        })
+                     }
+                  >
+                     Show Tracks
+                  </Checkbox>
+                  <Checkbox
+                     checked={
+                        this.props.displayPreferences.labelDisplayOptions
+                           .showWhenSelected
+                     }
+                     onChange={({ target }) =>
+                        this.props.displayPreferences.updateLabelDisplay({
+                           showWhenSelected: target.checked
+                        })
+                     }
+                  >
+                     Show Labels
+                  </Checkbox>
+                  <Divider style={dividerStyle} />
+                  <b style={{ textAlign: "left" }}>When Nearby:</b>
+                  <Checkbox
+                     checked={
+                        this.props.displayPreferences.trackDisplayOptions
+                           .showWhenCameraAdjacent
+                     }
+                     onChange={({ target }) =>
+                        this.props.displayPreferences.updateTrackDisplay({
+                           showWhenCameraAdjacent: target.checked
+                        })
+                     }
+                  >
+                     Show Tracks
+                  </Checkbox>
+                  <Checkbox
+                     checked={
+                        this.props.displayPreferences.labelDisplayOptions
+                           .showWhenCameraAdjacent
+                     }
+                     onChange={({ target }) =>
+                        this.props.displayPreferences.updateLabelDisplay({
+                           showWhenCameraAdjacent: target.checked
+                        })
+                     }
+                  >
+                     Show Labels
+                  </Checkbox>
+                  <Divider style={dividerStyle} />
+                  <b>Altitude cutoff:</b>
+                  <InputNumber
+                     value={
+                        this.props.displayPreferences.trackDisplayOptions
+                           .maxCameraHeight
+                     }
+                     onChange={(maxCameraHeight) =>
+                        this.props.displayPreferences.updateTrackDisplay({
+                           maxCameraHeight
+                        })
+                     }
+                     max={15_000_000}
+                  />{" "}
+                  Tracks
+                  <br />
+                  <InputNumber
+                     value={
+                        this.props.displayPreferences.labelDisplayOptions
+                           .maxCameraHeight
+                     }
+                     onChange={(maxCameraHeight) =>
+                        this.props.displayPreferences.updateLabelDisplay({
+                           maxCameraHeight
+                        })
+                     }
+                     max={15_000_000}
+                  />{" "}
+                  Labels
+                  <Divider style={dividerStyle} />
+                  <b>Imagery:</b>
                   <Select
                      value={this.props.globe.selectedImagery}
                      onChange={(newVal) => {
@@ -142,44 +227,7 @@ class Settings2 extends React.Component<Settings2Props> {
                   </div>
                </Panel>
                <Panel key={2} header={"Tracks"}>
-                  <Checkbox
-                     checked={
-                        this.props.displayPreferences.trackDisplayOptions
-                           .showWhenSelected
-                     }
-                     onChange={({ target }) =>
-                        this.props.displayPreferences.updateTrackDisplay({
-                           showWhenSelected: target.checked
-                        })
-                     }
-                  >
-                     Show Tracks for selected aircraft
-                  </Checkbox>
-                  <Checkbox
-                     checked={
-                        this.props.displayPreferences.trackDisplayOptions
-                           .showWhenCameraAdjacent
-                     }
-                     onChange={({ target }) =>
-                        this.props.displayPreferences.updateTrackDisplay({
-                           showWhenCameraAdjacent: target.checked
-                        })
-                     }
-                  >
-                     Show Tracks for aircraft near the camera
-                  </Checkbox>
-                  Color:
-                  <Swatch
-                     color={
-                        this.props.displayPreferences.trackDisplayOptions.color
-                     }
-                     onChange={(color: string) =>
-                        this.props.displayPreferences.updateTrackDisplay({
-                           color
-                        })
-                     }
-                  />
-                  Size:{" "}
+                  Line Size:{" "}
                   <InputNumber
                      min={1}
                      max={10}
@@ -193,63 +241,24 @@ class Settings2 extends React.Component<Settings2Props> {
                      }
                      style={{ width: "60px" }}
                   />
-               </Panel>
-               <Panel key={3} header={"Labels"}>
-                  <Checkbox
-                     checked={
-                        this.props.displayPreferences.labelDisplayOptions
-                           .showWhenSelected
-                     }
-                     onChange={({ target }) =>
-                        this.props.displayPreferences.updateLabelDisplay({
-                           showWhenSelected: target.checked
-                        })
-                     }
-                  >
-                     Show Labels for selected aircraft
-                  </Checkbox>
-                  <Checkbox
-                     checked={
-                        this.props.displayPreferences.labelDisplayOptions
-                           .showWhenCameraAdjacent
-                     }
-                     onChange={({ target }) =>
-                        this.props.displayPreferences.updateLabelDisplay({
-                           showWhenCameraAdjacent: target.checked
-                        })
-                     }
-                  >
-                     Show Labels for aircraft near the camera
-                  </Checkbox>
-                  Max altitude to show nearby labels:
-                  <Slider
-                     value={
-                        this.props.displayPreferences.labelDisplayOptions
-                           .maxCameraHeight
-                     }
-                     onChange={(newVal) => {
-                        const maxCameraHeight = newVal as number;
-                        this.props.displayPreferences.updateLabelDisplay({
-                           maxCameraHeight
-                        });
-                     }}
-                     max={15_000_000}
-                  />
-                  Color:
+                  <Divider style={dividerStyle} />
+                  Line Color:
                   <Swatch
                      color={
-                        this.props.displayPreferences.labelDisplayOptions.color
+                        this.props.displayPreferences.trackDisplayOptions.color
                      }
                      onChange={(color: string) =>
-                        this.props.displayPreferences.updateLabelDisplay({
+                        this.props.displayPreferences.updateTrackDisplay({
                            color
                         })
                      }
                   />
-                  Size:{" "}
+               </Panel>
+               <Panel key={3} header={"Labels"}>
+                  Font Size:{" "}
                   <InputNumber
                      min={1}
-                     max={10}
+                     max={25}
                      value={
                         this.props.displayPreferences.labelDisplayOptions.size
                      }
@@ -259,6 +268,18 @@ class Settings2 extends React.Component<Settings2Props> {
                         })
                      }
                      style={{ width: "60px" }}
+                  />
+                  <Divider style={dividerStyle} />
+                  Font Color:
+                  <Swatch
+                     color={
+                        this.props.displayPreferences.labelDisplayOptions.color
+                     }
+                     onChange={(color: string) =>
+                        this.props.displayPreferences.updateLabelDisplay({
+                           color
+                        })
+                     }
                   />
                </Panel>
             </Collapse>
