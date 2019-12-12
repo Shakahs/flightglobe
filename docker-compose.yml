@@ -9,83 +9,43 @@ services:
       ports:
          - "5672:5672"
          - "15672:15672"
-   deepstream:
-      image: deepstream-server
+      environment:
+         RABBITMQ_DEFAULT_USER: "user"
+         RABBITMQ_DEFAULT_PASS: "secretpassword"
+   centrifugo:
+      image: centrifugo/centrifugo:v2.2
       ports:
-         - "6020:6020"
+         - "8000:8000"
       links:
          - redis
       depends_on:
-        - redis
+         - redis
       environment:
-         REDIS_HOST: redis
-         REDIS_PORT: 6379
-   deepstream-pusher:
-      image: deepstream-pusher
+         CENTRIFUGO_REDIS_HOST: redis
+         CENTRIFUGO_API_KEY: "password"
+   fr-collector2:
+      image: fr-collector2
       links:
          - redis
-         - deepstream
+         - rabbitmq
       depends_on:
          - redis
-         - deepstream
-      environment:
-         REDIS_HOST: redis
-         REDIS_PORT: 6379
-         DEEPSTREAM_HOST: deepstream
-         DEEPSTREAM_PORT: 6020
-   benthos:
-      image: jeffail/benthos
-      ports:
-         - "4195:4195"
-      links:
-         - redis
-      environment:
-         INPUT_TYPE: redis_pubsub
-         INPUT_REDIS_PUBSUB_URL: tcp://redis:6379
-         INPUT_REDIS_PUBSUB_CHANNELS: new_data
-         OUTPUT_TYPE: redis_pubsub
-         OUTPUT_REDIS_PUBSUB_URL: tcp://redis:6379
-         OUTPUT_REDIS_PUBSUB_CHANNEL: persist_data
-   db:
-      image: pipelinedb/pipelinedb
-      ports:
-         - 5432:5432
-   fr-collector:
-      image: fr-collector
-      links:
-         - redis
-      depends_on:
-         - redis-point-persistor
+         - rabbitmq
       environment:
          REDIS_ADDRESS: redis
          REDIS_PORT: 6379
-         REDIS_PUB_CHANNEL: new_data
-         REDIS_DATA_KEY: flight_positions
-   redis-point-persistor:
+         RABBITMQ_HOST: rabbitmq
+         RABBITMQ_PORT: 5672
+   fg-redis-persistor:
       image: fg-redis-persistor
       links:
          - redis
-      environment:
-         REDIS_ADDRESS: redis
-         REDIS_PORT: 6379
-         REDIS_SUB_CHANNEL: new_data
-         REDIS_DATA_KEY: flight_positions
-   fg-server:
-      image: fg-server
-      links:
+         - rabbitmq
+      depends_on:
          - redis
-      ports:
-         - 5000:8080
+         - rabbitmq
       environment:
          REDIS_ADDRESS: redis
          REDIS_PORT: 6379
-         REDIS_DATA_KEY: flight_positions
-#  static:
-#    image: gcr.io/flight-globe/static
-#    ports:
-#    - 3000:80
-#  web:
-#    build: .
-#    ports:
-#     - "8080:80"
-#     - "443:443"
+         RABBITMQ_HOST: rabbitmq
+         RABBITMQ_PORT: 5672
