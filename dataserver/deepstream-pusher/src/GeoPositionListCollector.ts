@@ -1,7 +1,9 @@
 import {
    MasterFlightRecord,
    GeoPositionList,
-   GeoPositionListCollection
+   GeoPositionListCollection,
+   Icao,
+   FlightPosition
 } from "../../../lib/types";
 
 export class GeoPositionListCollector {
@@ -22,8 +24,7 @@ export class GeoPositionListCollector {
       return thisGeo;
    }
 
-   store(r: MasterFlightRecord) {
-      const geo = this.getSetGeo(r.latestPosition.geohash);
-      geo.flights[r.icao] = r.latestPosition;
+   store(geohash: string, icao: Icao, position: FlightPosition) {
+      this.getSetGeo(geohash).flights[icao] = position;
    }
 }
