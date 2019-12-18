@@ -12,17 +12,30 @@ services:
       environment:
          RABBITMQ_DEFAULT_USER: "user"
          RABBITMQ_DEFAULT_PASS: "secretpassword"
-   centrifugo:
-      image: centrifugo/centrifugo:v2.2
+   deepstream:
+      image: deepstream-server
       ports:
-         - "8000:8000"
+         - "6020:6020"
       links:
          - redis
       depends_on:
          - redis
       environment:
-         CENTRIFUGO_REDIS_HOST: redis
-         CENTRIFUGO_API_KEY: "password"
+         REDIS_HOST: redis
+         REDIS_PORT: 6379
+   deepstream-pusher:
+      image: deepstream-pusher
+      links:
+         - redis
+         - deepstream
+      depends_on:
+         - redis
+         - deepstream
+      environment:
+         REDIS_HOST: redis
+         REDIS_PORT: 6379
+         DEEPSTREAM_HOST: deepstream
+         DEEPSTREAM_PORT: 6020
    fr-collector2:
       image: fr-collector2
       links:
