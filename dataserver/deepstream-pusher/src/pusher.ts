@@ -49,7 +49,7 @@ const gatherKeys = (): Promise<Set<string>> =>
       });
    });
 
-const processTrack = (
+const processTrack = async (
    ds,
    key: string,
    demographicsMap: FlightDemographicsCollection,
@@ -58,7 +58,7 @@ const processTrack = (
 ) => {
    let rawFullTrack: string[] = [];
    try {
-      // rawFullTrack = await redis.lrange(key, 0, -1);
+      rawFullTrack = await redis.lrange(key, 0, -1);
    } catch (e) {
       console.log("a redis error ocurred when retrieving:", key);
       // return;
@@ -75,11 +75,11 @@ const processTrack = (
             lastTrackPosition.demographic;
          allGeohashes.add(shortenedGeohash);
          //write the full track
-         const dsTrackFull = ds.record.getRecord(
-            generateTrackFullKey(lastTrackPosition.icao)
-         );
+         // const dsTrackFull = ds.record.getRecord(
+         //    generateTrackFullKey(lastTrackPosition.icao)
+         // );
          // await dsTrackFull.whenReady();
-         dsTrackFull.set(extractLastPositions(fullTrack));
+         // dsTrackFull.set(extractLastPositions(fullTrack));
          // dsTrackFull.discard();
          geoCollector.store(
             shortenedGeohash,
@@ -92,6 +92,15 @@ const processTrack = (
    }
 
    return;
+};
+
+const geoWriter = async (ds, geo) => {
+   const dsGeo = ds.record.getRecord(
+      generateGeohashedPositionsKey(geo.geohash)
+   );
+   await dsGeo.whenReady();
+   await dsGeo.setWithAck(geo);
+   dsGeo.discard();
 };
 
 const work2 = async (ds) => {
@@ -110,20 +119,19 @@ const work2 = async (ds) => {
    console.log("found track keys:", trackKeys.size);
 
    for (const eachKey of trackKeys) {
-      processTrack(ds, eachKey, demographicsMap, allGeohashes, geoCollector);
+      await processTrack(
+         ds,
+         eachKey,
+         demographicsMap,
+         allGeohashes,
+         geoCollector
+      );
    }
 
-   //write geohashed positions
-   const promises: Array<(x: GeoPositionList) => Promise<void>> = [];
+   // write geohashed positions
+   const promises: Array<Promise<void>> = [];
    geoCollector.geocoll.forEach((geo) => {
-      promises.push(async (geo) => {
-         const dsGeo = ds.record.getRecord(
-            generateGeohashedPositionsKey(geo.geohash)
-         );
-         await dsGeo.whenReady();
-         dsGeo.setWithAck(geo);
-         dsGeo.discard();
-      });
+      promises.push(geoWriter(ds, geo));
    });
    await Promise.all(promises);
    console.log("geohashed position groups written:", geoCollector.geocoll.size);
