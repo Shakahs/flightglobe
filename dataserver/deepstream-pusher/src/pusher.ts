@@ -75,12 +75,12 @@ const processTrack = async (
             lastTrackPosition.demographic;
          allGeohashes.add(shortenedGeohash);
          //write the full track
-         // const dsTrackFull = ds.record.getRecord(
-         //    generateTrackFullKey(lastTrackPosition.icao)
-         // );
-         // await dsTrackFull.whenReady();
-         // dsTrackFull.set(extractLastPositions(fullTrack));
-         // dsTrackFull.discard();
+         const dsTrackFull = ds.record.getRecord(
+            generateTrackFullKey(lastTrackPosition.icao)
+         );
+         await dsTrackFull.whenReady();
+         await dsTrackFull.setWithAck(extractLastPositions(fullTrack));
+         dsTrackFull.discard();
          geoCollector.store(
             shortenedGeohash,
             lastTrackPosition.icao,
@@ -118,22 +118,21 @@ const work2 = async (ds) => {
 
    console.log("found track keys:", trackKeys.size);
 
+   const trackPromises: Array<Promise<void>> = [];
    for (const eachKey of trackKeys) {
-      await processTrack(
-         ds,
-         eachKey,
-         demographicsMap,
-         allGeohashes,
-         geoCollector
+      trackPromises.push(
+         processTrack(ds, eachKey, demographicsMap, allGeohashes, geoCollector)
       );
    }
+   await Promise.all(trackPromises);
+   console.log("full tracks written");
 
    // write geohashed positions
-   const promises: Array<Promise<void>> = [];
+   const geoCollPromises: Array<Promise<void>> = [];
    geoCollector.geocoll.forEach((geo) => {
-      promises.push(geoWriter(ds, geo));
+      geoCollPromises.push(geoWriter(ds, geo));
    });
-   await Promise.all(promises);
+   await Promise.all(geoCollPromises);
    console.log("geohashed position groups written:", geoCollector.geocoll.size);
 
    //write geohash list
@@ -225,9 +224,10 @@ const work2 = async (ds) => {
 if (require.main === module) {
    initConnection().then((ds) => {
       const loop = () => {
-         work2(ds);
+         work2(ds).then(() => {
+            setTimeout(loop, 10 * 1000);
+         });
       };
       loop();
-      setInterval(loop, 10 * 1000);
    });
 }
