@@ -1,6 +1,5 @@
 import * as React from "react";
-import Collapse from "reactstrap/lib/Collapse";
-import { Color, ColorState, GithubPicker } from "react-color";
+import { ColorState, GithubPicker } from "react-color";
 
 interface SwatchProps {
    color: string;
@@ -35,14 +34,14 @@ class Swatch extends React.Component<SwatchProps, SwatchState> {
                   style={{ backgroundColor: this.props.color }}
                />
             </div>
-            <Collapse isOpen={this.state.pickerOpen}>
+            {this.state.pickerOpen && (
                <GithubPicker
                   color={this.props.color}
                   onChangeComplete={(color: ColorState) =>
                      this.props.onChange(color.hex)
                   }
                />
-            </Collapse>
+            )}
          </React.Fragment>
       );
    }

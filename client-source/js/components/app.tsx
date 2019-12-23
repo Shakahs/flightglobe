@@ -74,7 +74,7 @@ class App extends React.Component<AppProps, AppState> {
                globe={this.props.globe}
             />
             <div
-               className={classnames("px-2", "pb-2", "flightTable", {
+               className={classnames("flightTable", {
                   "fixed-bottom": this.state.showFlightTable
                })}
             >

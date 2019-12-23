@@ -33,16 +33,23 @@ class Menu extends React.Component<MenuProps, MenuState> {
    render() {
       return (
          <div
-            className={"fixed-top p-2"}
             style={{
-               zIndex: 10
+               zIndex: 10,
+               position: "fixed",
+               top: 0,
+               right: 0,
+               left: 0,
+               padding: "0.5rem"
             }}
          >
-            <Button className={"mr-1"} onClick={this.props.toggleShowInfoModal}>
+            <Button
+               style={{ marginRight: "0.25rem" }}
+               onClick={this.props.toggleShowInfoModal}
+            >
                <Icon type="setting" style={{ fontSize: "20px" }} />
             </Button>
             <Button
-               className={"mr-1"}
+               style={{ marginRight: "0.25rem" }}
                onClick={this.props.toggleShowFlightTable}
             >
                <Icon type="filter" style={{ fontSize: "20px" }} />

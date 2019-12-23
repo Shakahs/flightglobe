@@ -178,7 +178,10 @@ class FlightTable extends React.Component<FlightTableProps, FlightTableState> {
                   </span>
                )}
             </div>
-            <div className="ag-theme-balham-dark w-100 h-100">
+            <div
+               className="ag-theme-balham-dark"
+               style={{ height: "100%", width: "100%" }}
+            >
                <AgGridReact
                   columnDefs={this.state.columnDefs}
                   getRowNodeId={(data) => {
