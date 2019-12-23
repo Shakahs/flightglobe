@@ -1,8 +1,8 @@
 import * as React from "react";
-import { FontAwesomeIcon as FontAwesome } from "@fortawesome/react-fontawesome";
 import { Button } from "antd";
 import { observer } from "mobx-react";
 import { Globe } from "../../globe/globe";
+import { Icon } from "antd";
 
 interface MenuProps {
    toggleShowFlightTable: () => void;
@@ -39,13 +39,13 @@ class Menu extends React.Component<MenuProps, MenuState> {
             }}
          >
             <Button className={"mr-1"} onClick={this.props.toggleShowInfoModal}>
-               <FontAwesome icon="cog" size="lg" />
+               <Icon type="setting" style={{ fontSize: "20px" }} />
             </Button>
             <Button
                className={"mr-1"}
                onClick={this.props.toggleShowFlightTable}
             >
-               <FontAwesome icon="filter" size="lg" />
+               <Icon type="filter" style={{ fontSize: "20px" }} />
             </Button>
          </div>
       );

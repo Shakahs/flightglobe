@@ -1,11 +1,6 @@
 import FlightTable from "./FlightTable/FlightTable";
 import * as React from "react";
 import Menu from "./Menu/Menu";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { faCog } from "@fortawesome/free-solid-svg-icons/faCog";
-import { faFilter } from "@fortawesome/free-solid-svg-icons/faFilter";
-import { faCircleNotch } from "@fortawesome/free-solid-svg-icons/faCircleNotch";
-import { faGlobeAmericas } from "@fortawesome/free-solid-svg-icons/faGlobeAmericas";
 import classnames from "classnames";
 import { hot } from "react-hot-loader/root";
 import { Globe } from "../globe/globe";
@@ -14,8 +9,6 @@ import "antd/dist/antd.css";
 import { DisplayPreferences } from "../ds-implementation/DisplayPreferences";
 import Settings2 from "./Settings2/Settings2";
 import { message } from "antd";
-
-library.add(faCog, faFilter, faCircleNotch, faGlobeAmericas);
 
 interface AppProps {
    demographicsManager: DemographicsManager;
