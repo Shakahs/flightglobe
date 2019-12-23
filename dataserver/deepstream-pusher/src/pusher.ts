@@ -1,14 +1,9 @@
 // import "regenerator-runtime/runtime";
 import { initConnection } from "./deepstream";
-import { extractLastPositions, MasterFlightRecordFromRedis } from "./utility";
+import { extractLastPositions } from "./utility";
 import { GeoPositionListCollector } from "./GeoPositionListCollector";
 import {
    FlightDemographicsCollection,
-   FlightPosition,
-   GeoPositionList,
-   GeoPositionListCollection,
-   Icao,
-   MasterFlightRecord,
    RedisFlightRecord
 } from "../../../lib/types";
 import {
@@ -17,8 +12,10 @@ import {
    generateGeohashedPositionsKey,
    generateTrackFullKey
 } from "../../../lib/constants";
-import { last, each, size } from "lodash";
+import { last, size } from "lodash";
+import { queue } from "d3-queue";
 
+const util = require("util");
 const Redis = require("ioredis");
 
 console.log("deepstream pusher starting");
@@ -54,7 +51,8 @@ const processTrack = async (
    key: string,
    demographicsMap: FlightDemographicsCollection,
    allGeohashes: Set<string>,
-   geoCollector: GeoPositionListCollector
+   geoCollector: GeoPositionListCollector,
+   finishedCallback
 ) => {
    let rawFullTrack: string[] = [];
    try {
@@ -87,6 +85,7 @@ const processTrack = async (
             lastTrackPosition.position
          );
       }
+      finishedCallback();
    } catch (e) {
       console.log("error during track processing:", e);
    }
@@ -118,13 +117,33 @@ const work2 = async (ds) => {
 
    console.log("found track keys:", trackKeys.size);
 
-   const trackPromises: Array<Promise<void>> = [];
+   const q = queue(1000);
+
+   // const trackPromises: Array<Promise<void>> = [];
    for (const eachKey of trackKeys) {
-      trackPromises.push(
-         processTrack(ds, eachKey, demographicsMap, allGeohashes, geoCollector)
+      q.defer(
+         processTrack,
+         ds,
+         eachKey,
+         demographicsMap,
+         allGeohashes,
+         geoCollector
       );
+      // trackPromises.push(
+      //    processTrack(ds, eachKey, demographicsMap, allGeohashes, geoCollector)
+      // );
    }
-   await Promise.all(trackPromises);
+
+   await new Promise((resolve, reject) => {
+      q.awaitAll((err, result) => {
+         if (err) {
+            reject(err);
+         } else {
+            resolve(result);
+         }
+      });
+   });
+   // await Promise.all(trackPromises);
    console.log("full tracks written");
 
    // write geohashed positions
@@ -226,6 +245,9 @@ if (require.main === module) {
       const loop = () => {
          work2(ds).then(() => {
             setTimeout(loop, 10 * 1000);
+            if (global.gc) {
+               global.gc();
+            }
          });
       };
       loop();
