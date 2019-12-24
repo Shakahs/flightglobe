@@ -75,3 +75,21 @@ type Airport struct {
 }
 
 type AirportMap map[string]Airport
+
+type GeohashedPositions struct {
+	Geohash string              `json:"geohash"`
+	Flights map[string]Position `json:"flights"`
+}
+
+type DemographicsMap map[string]Demographic
+
+type GeohashSet map[string]bool
+
+type GeocollectedPositions map[string]GeohashedPositions
+
+type LockableCurrentData struct {
+	DemographicsMap       DemographicsMap
+	GeohashSet            GeohashSet
+	GeocollectedPositions GeocollectedPositions
+	Lock                  sync.RWMutex
+}
