@@ -32,7 +32,7 @@ func scanKeys(redisClient *redis.Client) []string {
 	return keys
 }
 
-func getAllPositions(redisClient *redis.Client, key string) (FlightRecords, error) {
+func GetFullTrack(redisClient *redis.Client, key string) (FlightRecords, error) {
 	var result FlightRecords
 	rawList, err := redisClient.LRange(key, 0, -1).Result()
 	if err != nil {
@@ -62,7 +62,7 @@ func GetCurrentData(redisClient *redis.Client) (DemographicsMap, GeohashSet, Geo
 	//get all keys
 	keys := scanKeys(redisClient)
 	for _, k := range keys {
-		allPos, err := getAllPositions(redisClient, k)
+		allPos, err := GetFullTrack(redisClient, k)
 		if err == nil {
 			var last = allPos[len(allPos)-1]
 			var geohashShort = string(last.Position.Geohash[0])

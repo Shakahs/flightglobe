@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
@@ -69,6 +70,19 @@ func getGeocollectedPositions(c *gin.Context) {
 	dataset.Lock.RUnlock()
 }
 
+func getTrack(c *gin.Context) {
+	icao := c.Param("icao")
+	track, err := pkg.GetFullTrack(redisClient, fmt.Sprintf("track:%s", icao))
+	if err == nil {
+		c.JSON(200, track)
+	} else {
+		fmt.Println(err)
+		c.JSON(400, gin.H{
+			"error": "track not found, or an error occurred",
+		})
+	}
+}
+
 func main() {
 	refreshData()
 	c := cron.New()
@@ -81,5 +95,6 @@ func main() {
 	r.GET("/geohashset", getGeohashSet)
 	r.GET("/demographicsmap", getDemographicsMap)
 	r.GET("/geocollectedpositions", getGeocollectedPositions)
+	r.GET("/track/:icao", getTrack)
 	r.Run()
 }
