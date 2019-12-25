@@ -91,6 +91,7 @@ func main() {
 
 	c.Start()
 
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.GET("/geohashset", getGeohashSet)
 	r.GET("/demographicsmap", getDemographicsMap)

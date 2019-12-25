@@ -1,6 +1,4 @@
 #!/bin/bash
-( cd dataserver/cmd/fr-collector && go get -v && go build -v )
 ( cd dataserver/cmd/fr-collector2 && go get -v && go build -v )
 ( cd dataserver/cmd/fg-redis-persistor && go get -v && go build -v )
-( cd dataserver/cmd/fg-server && go get -v && go build -v )
-( cd dataserver/deepstream-pusher && rm -rf ./compiled/* && ../../node_modules/.bin/tsc --build ./tsconfig.json )
+( cd dataserver/cmd/rest-server && go get -v && go build -v )

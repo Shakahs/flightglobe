@@ -19,3 +19,4 @@ dataserver/cmd/pipelinedb-sidecar/pipelinedb-sidecar
 *packr*
 /dataserver/deepstream-pusher/compiled/
 webpack-stats.json
+/dataserver/cmd/rest-server/rest-server
