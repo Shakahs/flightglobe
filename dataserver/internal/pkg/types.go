@@ -88,8 +88,8 @@ type GeohashSet map[string]bool
 type GeocollectedPositions map[string]GeohashedPositions
 
 type LockableCurrentData struct {
-	DemographicsMap       DemographicsMap
-	GeohashSet            GeohashSet
-	GeocollectedPositions GeocollectedPositions
+	DemographicsMap       []byte
+	GeohashSet            []byte
+	GeocollectedPositions []byte
 	Lock                  sync.RWMutex
 }

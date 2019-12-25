@@ -24,36 +24,49 @@ func init() {
 func refreshData() {
 	x, y, z := pkg.GetCurrentData(redisClient)
 	dataset.Lock.Lock()
-	dataset.DemographicsMap = x
-	dataset.GeohashSet = y
-	dataset.GeocollectedPositions = z
+	var err error
+
+	dataset.DemographicsMap, err = json.Marshal(x)
+	if err != nil {
+		dataset.DemographicsMap = nil
+	}
+
+	//we need to convert the map[bool]string we have into an array of keys
+	geohashKeys := make([]string, len(y))
+	i := 0
+	for k := range y {
+		geohashKeys[i] = k
+		i++
+	}
+	dataset.GeohashSet, err = json.Marshal(geohashKeys)
+	if err != nil {
+		dataset.DemographicsMap = nil
+	}
+
+	dataset.GeocollectedPositions, err = json.Marshal(z)
+	if err != nil {
+		dataset.GeocollectedPositions = nil
+	}
 	dataset.Lock.Unlock()
 }
 
 func getGeohashSet(c *gin.Context) {
 	dataset.Lock.RLock()
-	//we need to convert the map[bool]string we have into an array of keys
-	keys := make([]string, len(dataset.GeohashSet))
-	i := 0
-	for k := range dataset.GeohashSet {
-		keys[i] = k
-		i++
-	}
+	c.Data(200, "application/json", dataset.GeohashSet)
 	dataset.Lock.RUnlock()
-	c.JSON(200, dataset.GeohashSet)
+
 }
 
 func getDemographicsMap(c *gin.Context) {
 	dataset.Lock.RLock()
-	data, err := json.Marshal(dataset.DemographicsMap)
+	c.Data(200, "application/json", dataset.DemographicsMap)
 	dataset.Lock.RUnlock()
-	if err == nil {
-		c.Data(200, "application/json", data)
-	} else {
-		c.JSON(500, gin.H{
-			"message": "an error occurred",
-		})
-	}
+}
+
+func getGeocollectedPositions(c *gin.Context) {
+	dataset.Lock.RLock()
+	c.Data(200, "application/json", dataset.GeocollectedPositions)
+	dataset.Lock.RUnlock()
 }
 
 func main() {
@@ -67,5 +80,6 @@ func main() {
 	r := gin.Default()
 	r.GET("/geohashset", getGeohashSet)
 	r.GET("/demographicsmap", getDemographicsMap)
+	r.GET("/geocollectedpositions", getGeocollectedPositions)
 	r.Run()
 }
