@@ -90,7 +90,7 @@ module.exports = {
       disableHostCheck: true,
       proxy: [
          {
-            context: ["/sub", "/track"],
+            context: ["/api"],
             target: `http://localhost:${process.env.PORT}`,
             ws: true
          }

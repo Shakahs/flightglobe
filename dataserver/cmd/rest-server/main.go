@@ -91,11 +91,11 @@ func main() {
 
 	c.Start()
 
-	gin.SetMode(gin.ReleaseMode)
+	//gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
-	r.GET("/geohashset", getGeohashSet)
-	r.GET("/demographicsmap", getDemographicsMap)
-	r.GET("/geocollectedpositions", getGeocollectedPositions)
-	r.GET("/track/:icao", getTrack)
+	r.GET("/api/geohashset", getGeohashSet)
+	r.GET("/api/demographicsmap", getDemographicsMap)
+	r.GET("/api/geocollectedpositions", getGeocollectedPositions)
+	r.GET("/api/track/:icao", getTrack)
 	r.Run()
 }

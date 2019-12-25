@@ -23,9 +23,11 @@ import {
 import { EventEmitter } from "events";
 import { Globe } from "../globe/globe";
 import { shallowEnhancer } from "mobx/lib/types/modifiers";
+import { fromStream } from "mobx-utils";
+import { ajax } from "rxjs/ajax";
+import polling from "rx-polling";
 
 export class DemographicsManager {
-   dsConn: DeepstreamClient;
    dsRecord;
    globe: Globe | null = null;
    demographicsMap: ObservableMap<Icao, FlightDemographics> = observable.map(
@@ -41,14 +43,16 @@ export class DemographicsManager {
    });
    selectionClickChange = new EventEmitter();
 
-   constructor(dsConn: DeepstreamClient, globe?: Globe) {
-      this.dsConn = dsConn;
+   constructor(globe?: Globe) {
       this.globe = globe || null;
-   }
 
-   subscribe() {
-      this.dsRecord = this.dsConn.record.getRecord(DS_DEMOGRAPHICS_KEY);
-      this.dsRecord.subscribe(this.handleUpdate.bind(this));
+      const request$ = ajax({
+         url: "http://localhost:3000/api/demographicsmap"
+      });
+
+      polling(request$, { interval: 10000 }).subscribe((res) => {
+         this.demographicsMap.replace(res.response);
+      });
    }
 
    @action

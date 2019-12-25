@@ -9,12 +9,12 @@ import { generateGeohashedPositionsKey } from "../../../lib/constants";
 import { DemographicsManager } from "./DemographicsManager";
 import { DisplayPreferences } from "./DisplayPreferences";
 import { Globe } from "../globe/globe";
+import { GeoManagerCreator } from "./GeoManagerCreator";
+import { autorun, computed, reaction } from "mobx";
 
 require("./mobxConfig");
 
 export class GeoManager {
-   dsConn: DeepstreamClient;
-   dsRecord;
    geohash: Geohash;
    // flightPositions = new ObservableMap<Icao, FlightPosition>(
    //    undefined,
@@ -27,14 +27,15 @@ export class GeoManager {
    demographics: DemographicsManager;
    displayPreferences: DisplayPreferences;
    globe: Globe | undefined;
+   gmc: GeoManagerCreator;
    constructor(
-      dsConn: DeepstreamClient,
+      gmc: GeoManagerCreator,
       geohash: Geohash,
       demographics: DemographicsManager,
       displayPreferences: DisplayPreferences,
       globe?: Globe | null
    ) {
-      this.dsConn = dsConn;
+      this.gmc = gmc;
       this.geohash = geohash;
       this.demographics = demographics;
       this.flightSubscriberMap = new Map();
@@ -49,13 +50,22 @@ export class GeoManager {
       this.updateOrCreateFlightSubscriber = this.updateOrCreateFlightSubscriber.bind(
          this
       );
+
+      reaction(
+         () => ({
+            currentDataSet: this.currentDataSet
+         }),
+         () => {
+            if (this.currentDataSet) {
+               this.reconcile(this.currentDataSet);
+            }
+         }
+      );
    }
 
-   subscribe() {
-      this.dsRecord = this.dsConn.record.getRecord(
-         generateGeohashedPositionsKey(this.geohash)
-      );
-      this.dsRecord.subscribe(this.reconcile.bind(this));
+   @computed
+   get currentDataSet(): GeoPositionList | undefined {
+      return this.gmc.geoCollectedPositions.get(this.geohash);
    }
 
    reconcile(update: GeoPositionList) {
@@ -82,7 +92,6 @@ export class GeoManager {
          this.flightSubscriberMap.set(
             icao,
             new FlightSubscriber(
-               this.dsConn,
                icao,
                fpos,
                this.debouncedRender,
@@ -99,7 +108,6 @@ export class GeoManager {
    }
 
    destroy() {
-      this.dsRecord?.discard();
       this.flightSubscriberMap.forEach((f) => f.destroy());
       this.cph?.destroy();
       this.cph = null;

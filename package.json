@@ -92,10 +92,13 @@
       "lodash-es": "^4.17.15",
       "mobx": "^4.15.1",
       "mobx-react": "^6.1.4",
+      "mobx-utils": "^5.5.2",
       "react": "^16.8.1",
       "react-color": "^2.17.0",
       "react-dom": "^16.8.1",
-      "react-hot-loader": "^4.12.15"
+      "react-hot-loader": "^4.12.15",
+      "rx-polling": "^1.0.1",
+      "rxjs": "^6.5.3"
    },
    "engines": {
       "node": "10.x"

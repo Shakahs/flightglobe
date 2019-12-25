@@ -18,7 +18,6 @@ import { convertPositionToCartesian } from "./utility";
 require("./mobxConfig");
 
 export class FlightSubscriber {
-   private readonly dsConn: DeepstreamClient;
    readonly icao: Icao;
    // gm: GeoManager;
    private disposers: Array<IReactionDisposer>;
@@ -32,7 +31,6 @@ export class FlightSubscriber {
    globe: Globe | undefined;
 
    constructor(
-      dsConn: DeepstreamClient,
       icao: Icao,
       pos: FlightPosition,
       requestRender: () => void,
@@ -40,7 +38,6 @@ export class FlightSubscriber {
       displayPreferences: DisplayPreferences,
       globe?: Globe
    ) {
-      this.dsConn = dsConn;
       this.icao = icao;
       // this.gm = gm;
       this.position = pos;
@@ -83,26 +80,27 @@ export class FlightSubscriber {
          }
       );
 
-      this.disposers = [renderRequester, trackFullRequester];
+      // this.disposers = [renderRequester, trackFullRequester];
+      this.disposers = [renderRequester];
    }
 
-   subscribeTrackFull() {
-      if (!this.dsTrackFull) {
-         this.dsTrackFull = this.dsConn.record.getRecord(
-            generateTrackFullKey(this.icao)
-         );
-         this.dsTrackFull.subscribe((fullTrack) => {
-            this.updateTrackFull(fullTrack);
-         });
-      }
-   }
-
-   unsubscribeTrackFull() {
-      if (this.dsTrackFull) {
-         this.dsTrackFull.discard();
-         this.dsTrackFull = null;
-      }
-   }
+   // subscribeTrackFull() {
+   //    if (!this.dsTrackFull) {
+   //       this.dsTrackFull = this.dsConn.record.getRecord(
+   //          generateTrackFullKey(this.icao)
+   //       );
+   //       this.dsTrackFull.subscribe((fullTrack) => {
+   //          this.updateTrackFull(fullTrack);
+   //       });
+   //    }
+   // }
+   //
+   // unsubscribeTrackFull() {
+   //    if (this.dsTrackFull) {
+   //       this.dsTrackFull.discard();
+   //       this.dsTrackFull = null;
+   //    }
+   // }
 
    @action
    updateTrackFull(track: FlightPosition[]) {
@@ -199,6 +197,6 @@ export class FlightSubscriber {
       each(this.disposers, (d) => {
          d();
       });
-      this.unsubscribeTrackFull();
+      // this.unsubscribeTrackFull();
    }
 }

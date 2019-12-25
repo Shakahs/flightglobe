@@ -12,16 +12,15 @@ import { REMOTE_WINS } from "@deepstream/client/dist/record/merge-strategy";
 import { GeoManagerCreator } from "../ds-implementation/GeoManagerCreator";
 import { DemographicsManager } from "../ds-implementation/DemographicsManager";
 import applyClickHandler from "../globe/clickHandler";
-import { Icao } from "../../../lib/types";
+import { FlightDemographicsCollection, Icao } from "../../../lib/types";
 import { DisplayPreferences } from "../ds-implementation/DisplayPreferences";
-
-const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
-const dsConn = new DeepstreamClient(`${wsProtocol}://localhost:6020`, {
-   mergeStrategy: REMOTE_WINS
-});
+import { map } from "rxjs/operators";
+import { ajax } from "rxjs/ajax";
+import polling from "rx-polling";
+import { DemographicsUpdate } from "../types";
 
 const globe = new Globe("cesiumContainer");
-const dm = new DemographicsManager(dsConn, globe);
+const dm = new DemographicsManager(globe);
 const dp = new DisplayPreferences();
 
 ReactDOM.render(
@@ -33,9 +32,8 @@ applyClickHandler(globe.viewer, (id: Icao) =>
    dm.selectionClickChange.emit("selectionClickChange", id)
 );
 
-const getData = async () => {
-   //wait until tiles are loaded
-   await new Promise((resolve) => {
+const waitForGlobe = () => {
+   return new Promise((resolve) => {
       const poller = setInterval(() => {
          //@ts-ignore tilesLoaded is missing from TS definition
          if (globe.viewer.scene.globe.tilesLoaded) {
@@ -44,10 +42,8 @@ const getData = async () => {
          }
       }, 1000);
    });
-
-   dm.subscribe();
-   const gmc = new GeoManagerCreator(dsConn, dm, dp, globe);
-   gmc.subscribe();
 };
 
-dsConn.login().then(getData);
+waitForGlobe().then(() => {
+   const gmc = new GeoManagerCreator(dm, dp, globe);
+});
