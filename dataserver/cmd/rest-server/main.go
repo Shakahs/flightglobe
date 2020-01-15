@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Shakahs/flightglobe/dataserver/internal/pkg"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
 	"github.com/robfig/cron"
@@ -98,6 +99,8 @@ func main() {
 
 	//gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
+	r.Use(cors.Default())
+
 	r.GET("/api/geohashset", getGeohashSet)
 	r.GET("/api/demographicsmap", getDemographicsMap)
 	r.GET("/api/geocollectedpositions", getGeocollectedPositions)
