@@ -1,0 +1,38 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: rest-server
+spec:
+  selector:
+    app: rest-server
+  ports:
+    - protocol: TCP
+      port: 8080
+---
+apiVersion: apps/v1
+kind: "Deployment"
+metadata:
+  name: "rest-server"
+  labels:
+    app: rest-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rest-server
+  template:
+    metadata:
+      labels:
+        app: rest-server
+    spec:
+      containers:
+        - name: rest-server
+          image: gcr.io/flight-globe/rest-server
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: REDIS_ADDRESS
+              value: redis-master
+            - name: REDIS_PORT
+              value: "6379"
