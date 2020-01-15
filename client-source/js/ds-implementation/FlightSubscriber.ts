@@ -14,6 +14,10 @@ import { generateTrackFullKey } from "../../../lib/constants";
 import { DisplayPreferences } from "./DisplayPreferences";
 import { Globe } from "../globe/globe";
 import { convertPositionToCartesian } from "./utility";
+import { ajax, AjaxResponse } from "rxjs/ajax";
+import polling from "rx-polling";
+import { Observable } from "rxjs";
+import { Subscription } from "rxjs/src/internal/Subscription";
 
 require("./mobxConfig");
 
@@ -25,7 +29,8 @@ export class FlightSubscriber {
    readonly requestRender: () => void;
    needsRender: boolean = false;
    demographicsManager: DemographicsManager;
-   dsTrackFull;
+   polling: Observable<AjaxResponse>;
+   pollingSub;
    @observable.ref trackFull: FlightPosition[] = [];
    displayPreferences: DisplayPreferences;
    globe: Globe | undefined;
@@ -69,6 +74,11 @@ export class FlightSubscriber {
          }
       );
 
+      const trackRequest = ajax({
+         url: `${window.location.origin}/api/track/${this.icao}`
+      });
+      this.polling = polling(trackRequest, { interval: 10000 });
+
       const trackFullRequester = reaction(
          () => this.shouldFetchTrack,
          (shouldFetchTrack) => {
@@ -84,23 +94,18 @@ export class FlightSubscriber {
       this.disposers = [renderRequester];
    }
 
-   // subscribeTrackFull() {
-   //    if (!this.dsTrackFull) {
-   //       this.dsTrackFull = this.dsConn.record.getRecord(
-   //          generateTrackFullKey(this.icao)
-   //       );
-   //       this.dsTrackFull.subscribe((fullTrack) => {
-   //          this.updateTrackFull(fullTrack);
-   //       });
-   //    }
-   // }
-   //
-   // unsubscribeTrackFull() {
-   //    if (this.dsTrackFull) {
-   //       this.dsTrackFull.discard();
-   //       this.dsTrackFull = null;
-   //    }
-   // }
+   subscribeTrackFull() {
+      if (!this.pollingSub) {
+         this.pollingSub = this.polling.subscribe((res) => {
+            this.updateTrackFull(res.response);
+         });
+      }
+   }
+
+   unsubscribeTrackFull() {
+      this.pollingSub?.unsubscribe();
+      this.pollingSub = undefined;
+   }
 
    @action
    updateTrackFull(track: FlightPosition[]) {

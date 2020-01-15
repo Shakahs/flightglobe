@@ -73,8 +73,14 @@ func getGeocollectedPositions(c *gin.Context) {
 func getTrack(c *gin.Context) {
 	icao := c.Param("icao")
 	track, err := pkg.GetFullTrack(redisClient, fmt.Sprintf("track:%s", icao))
+
+	var positions []pkg.Position
+	for _, v := range track {
+		positions = append(positions, v.Position)
+	}
+
 	if err == nil {
-		c.JSON(200, track)
+		c.JSON(200, positions)
 	} else {
 		fmt.Println(err)
 		c.JSON(400, gin.H{
