@@ -25,6 +25,7 @@ func init() {
 func refreshData() {
 	x, y, z := pkg.GetCurrentData(redisClient)
 	dataset.Lock.Lock()
+	defer dataset.Lock.Unlock()
 	var err error
 
 	dataset.DemographicsMap, err = json.Marshal(x)
@@ -48,26 +49,24 @@ func refreshData() {
 	if err != nil {
 		dataset.GeocollectedPositions = nil
 	}
-	dataset.Lock.Unlock()
 }
 
 func getGeohashSet(c *gin.Context) {
 	dataset.Lock.RLock()
+	defer dataset.Lock.RUnlock()
 	c.Data(200, "application/json", dataset.GeohashSet)
-	dataset.Lock.RUnlock()
-
 }
 
 func getDemographicsMap(c *gin.Context) {
 	dataset.Lock.RLock()
+	defer dataset.Lock.RUnlock()
 	c.Data(200, "application/json", dataset.DemographicsMap)
-	dataset.Lock.RUnlock()
 }
 
 func getGeocollectedPositions(c *gin.Context) {
 	dataset.Lock.RLock()
+	defer dataset.Lock.RUnlock()
 	c.Data(200, "application/json", dataset.GeocollectedPositions)
-	dataset.Lock.RUnlock()
 }
 
 func getTrack(c *gin.Context) {
