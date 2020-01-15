@@ -26,6 +26,7 @@ import { shallowEnhancer } from "mobx/lib/types/modifiers";
 import { fromStream } from "mobx-utils";
 import { ajax } from "rxjs/ajax";
 import polling from "rx-polling";
+import { generateAPIURL } from "./utility";
 
 export class DemographicsManager {
    dsRecord;
@@ -47,7 +48,7 @@ export class DemographicsManager {
       this.globe = globe || null;
 
       const request$ = ajax({
-         url: "http://localhost:3000/api/demographicsmap"
+         url: generateAPIURL("demographicsmap")
       });
 
       polling(request$, { interval: 10000 }).subscribe((res) => {

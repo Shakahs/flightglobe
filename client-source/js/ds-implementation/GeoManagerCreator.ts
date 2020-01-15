@@ -15,6 +15,7 @@ import { DisplayPreferences } from "./DisplayPreferences";
 import { Globe } from "../globe/globe";
 import { ajax } from "rxjs/ajax";
 import polling from "rx-polling";
+import { generateAPIURL } from "./utility";
 require("./mobxConfig");
 
 export class GeoManagerCreator {
@@ -38,7 +39,7 @@ export class GeoManagerCreator {
       this.displayPreferences = displayPreferences;
 
       const geohashRequest = ajax({
-         url: "http://localhost:3000/api/geohashset"
+         url: generateAPIURL("geohashset")
       });
       const boundUpdate = this.handleUpdate.bind(this);
       polling(geohashRequest, { interval: 10000 }).subscribe((res) => {
@@ -46,7 +47,7 @@ export class GeoManagerCreator {
       });
 
       const geoPositionRequest = ajax({
-         url: "http://localhost:3000/api/geocollectedpositions"
+         url: generateAPIURL("geocollectedpositions")
       });
       polling(geoPositionRequest, { interval: 10000 }).subscribe((res) => {
          this.geoCollectedPositions.replace(res.response);

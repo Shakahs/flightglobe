@@ -80,7 +80,8 @@ module.exports = {
          MAPTILER_KEY: JSON.stringify(process.env.MAPTILER_KEY)
       }),
       new ForkTsCheckerWebpackPlugin(),
-      new WebpackBar({ profile: true, fancy: true, basic: false })
+      new WebpackBar({ profile: true, fancy: true, basic: false }),
+      new webpack.EnvironmentPlugin(["NODE_ENV"])
    ],
    devServer: {
       port: 3000,

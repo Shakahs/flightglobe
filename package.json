@@ -3,8 +3,8 @@
    "version": "0.0.1",
    "main": "server/index.js",
    "scripts": {
-      "dev": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js --hot",
-      "build": "rm -rf ./client-build/* && node --max_old_space_size=8000 ./node_modules/webpack/bin/webpack.js --config webpack.config.prod.js --profile --json > webpack-stats.json",
+      "dev": "NODE_ENV=development ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --hot",
+      "build": "rm -rf ./client-build/* && NODE_ENV=production node --max_old_space_size=8000 ./node_modules/webpack/bin/webpack.js -p --config webpack.config.prod.js --profile --json > webpack-stats.json",
       "analyze-bundle": "./node_modules/webpack-bundle-analyzer/lib/bin/analyzer.js ./webpack-stats.json ./client-build/",
       "lint-break-on-errors": "eslint ./client-source/js ./webpack.config.js -f table --ext .js --ext .jsx",
       "lint": "eslint ./client-source/js ./webpack.config.js -f table --ext .js --ext .jsx || true",

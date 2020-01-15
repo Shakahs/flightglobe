@@ -13,7 +13,7 @@ import { DemographicsManager } from "./DemographicsManager";
 import { generateTrackFullKey } from "../../../lib/constants";
 import { DisplayPreferences } from "./DisplayPreferences";
 import { Globe } from "../globe/globe";
-import { convertPositionToCartesian } from "./utility";
+import { convertPositionToCartesian, generateAPIURL } from "./utility";
 import { ajax, AjaxResponse } from "rxjs/ajax";
 import polling from "rx-polling";
 import { Observable } from "rxjs";
@@ -75,7 +75,7 @@ export class FlightSubscriber {
       );
 
       const trackRequest = ajax({
-         url: `${window.location.origin}/api/track/${this.icao}`
+         url: generateAPIURL(`track/${this.icao}`)
       });
       this.polling = polling(trackRequest, { interval: 10000 });
 
