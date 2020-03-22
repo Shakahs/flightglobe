@@ -93,7 +93,7 @@ export class Globe {
    provideMapTilerTopo(): UrlTemplateImageryProvider {
       return new UrlTemplateImageryProvider({
          //@ts-ignore
-         url: `https://maps.tilehosting.com/styles/topo/{z}/{x}/{y}.png?key=${MAPTILER_KEY}`,
+         url: `https://api.maptiler.com/maps/topo/{z}/{x}/{y}.png?key=${MAPTILER_KEY}`,
          maximumLevel: this.maxZoom
       });
    }
@@ -101,7 +101,7 @@ export class Globe {
    provideMapTilerSatellite(): UrlTemplateImageryProvider {
       return new UrlTemplateImageryProvider({
          //@ts-ignore
-         url: `https://maps.tilehosting.com/styles/hybrid/{z}/{x}/{y}.jpg?key=${MAPTILER_KEY}`,
+         url: `https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=${MAPTILER_KEY}`,
          maximumLevel: this.maxZoom
       });
    }

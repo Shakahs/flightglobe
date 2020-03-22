@@ -24,3 +24,11 @@ The frontend is a TypeScript application that utilizes MobX for reactive state, 
 
 Flight data is stored in the FlightStore, and each Flight is represented by a Flight object that is subscribed to the relevant state in MobX. State updates will cause the Flight object to recompute and update its representation on the globe by rendering, derendering, moving, changing color, etc. 
 
+##### Dev Environment
+
+Prerequisites: Kubernetes cluster available (I use Minikube)
+
+1. yarn/npm install #javascript dependencies
+2. ./buildexecutables.sh #build Golang backend executables
+3. tilt up #launch backend components in Kubernetes
+4. yarn dev  #launch frontend
