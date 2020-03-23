@@ -8,7 +8,9 @@
       "analyze-bundle": "./node_modules/webpack-bundle-analyzer/lib/bin/analyzer.js ./webpack-stats.json ./client-build/",
       "lint-break-on-errors": "eslint ./client-source/js ./webpack.config.js -f table --ext .js --ext .jsx",
       "lint": "eslint ./client-source/js ./webpack.config.js -f table --ext .js --ext .jsx || true",
-      "test": " node --max_old_space_size=2000 ./node_modules/karma/bin/karma start"
+      "test": " node --max_old_space_size=2000 ./node_modules/karma/bin/karma start",
+      "publish": "yarn wrangler publish --env test",
+      "publish-prod": "yarn wrangler publish --env production"
    },
    "devDependencies": {
       "@babel/core": "^7.7.7",

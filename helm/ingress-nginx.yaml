@@ -1,0 +1,4 @@
+controller:
+  service:
+    annotations:
+      service.beta.kubernetes.io/do-loadbalancer-hostname: "data.flight.earth"
