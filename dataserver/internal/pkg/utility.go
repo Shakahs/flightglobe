@@ -2,6 +2,8 @@ package pkg
 
 import (
 	"encoding/json"
+	"os"
+	"time"
 )
 
 func CheckEnvVars(vars ...string) {
@@ -41,4 +43,22 @@ func Check(e error) {
 	if e != nil {
 		panic(e)
 	}
+}
+
+func TouchFile(fileName string) error {
+	_, err := os.Stat(fileName)
+	if os.IsNotExist(err) {
+		file, err := os.Create(fileName)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+	} else {
+		currentTime := time.Now().Local()
+		err = os.Chtimes(fileName, currentTime, currentTime)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

@@ -14,6 +14,12 @@ spec:
       labels:
         app: "fr-collector2"
     spec:
+#      initContainers:
+#        - name: dial-rabbitmq
+#          image: busybox:glibc
+#          command: ["sh","-c","until nc -z -w 5 $RABBITMQ_SERVICE_HOST $RABBITMQ_PORT; do echo waiting; sleep 2; done;"]
+#          command: ["sh","-c","nc -vz -w 5 $RABBITMQ_SERVICE_HOST $RABBITMQ_PORT"]
+#          command: ["bash","-c","until timeout 1 bash -c 'cat < /dev/null > /dev/tcp/$RABBITMQ_HOST/$RABBITMQ_PORT'; do echo waiting; sleep 2; done;"]
       containers:
         - name: "fr-collector2"
           image: gcr.io/flight-globe/fr-collector2
@@ -27,3 +33,11 @@ spec:
               value: rabbitmq
             - name: RABBITMQ_PORT
               value: "5672"
+          livenessProbe:
+            exec:
+             command:
+              - cat
+              - /tmp/fr-collector2-live
+            initialDelaySeconds: 60
+            periodSeconds: 35
+            failureThreshold: 1

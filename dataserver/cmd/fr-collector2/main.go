@@ -14,6 +14,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
 	"github.com/go-redis/redis"
 	"github.com/paulbellamy/ratecounter"
+	"github.com/prometheus/common/log"
 	"github.com/robfig/cron"
 	"os"
 	"time"
@@ -31,7 +32,8 @@ var (
 	amqpURI         = fmt.Sprintf("amqp://user:secretpassword@%s:%s/",
 		os.Getenv("RABBITMQ_HOST"),
 		os.Getenv("RABBITMQ_PORT"))
-	counter = ratecounter.NewRateCounter(30 * time.Second)
+	counter           = ratecounter.NewRateCounter(30 * time.Second)
+	livenessProbeFile = "/tmp/fr-collector2-live"
 )
 
 func init() {
@@ -91,8 +93,15 @@ func publishMessages(publisher message.Publisher) {
 				msg := message.NewMessage(watermill.NewUUID(), rawData)
 				middleware.SetCorrelationID(watermill.NewUUID(), msg)
 
-				if err := publisher.Publish(incomingChannel, msg); err != nil {
-					panic(err)
+				err := publisher.Publish(incomingChannel, msg)
+				if err != nil {
+					log.Error("Unable to publish to Watermill input")
+					os.Remove(livenessProbeFile)
+				} else {
+					touchError := pkg.TouchFile(livenessProbeFile)
+					if touchError != nil {
+						panic("unable to touch liveness file")
+					}
 				}
 			}
 			time.Sleep(time.Duration(delay) * time.Second)
@@ -131,13 +140,19 @@ func main() {
 	}
 
 	localPubSub := gochannel.NewGoChannel(gochannel.Config{}, logger)
-	remotePubSub, err := amqp.NewPublisher(
-		amqp.NewNonDurablePubSubConfig(amqpURI, amqp.GenerateQueueNameTopicName),
-		watermill.NewStdLogger(false, false))
-	if err != nil {
-		panic(err)
+
+	remotePubSubConnected := false
+	var remotePubSub *amqp.Publisher
+	for remotePubSubConnected == false {
+		remotePubSub, err = amqp.NewPublisher(
+			amqp.NewNonDurablePubSubConfig(amqpURI, amqp.GenerateQueueNameTopicName),
+			watermill.NewStdLogger(false, false))
+		if err == nil {
+			remotePubSubConnected = true
+		} else {
+			log.Warn(err)
+		}
 	}
-	pkg.Check(err)
 
 	router.AddHandler(
 		"FlightRadar24_Processing", // handler name, must be unique
@@ -152,6 +167,7 @@ func main() {
 	router.AddMiddleware(
 		middleware.CorrelationID,
 		middleware.Recoverer,
+		middleware.Timeout(time.Second*10),
 	)
 
 	go publishMessages(localPubSub)

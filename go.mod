@@ -29,6 +29,7 @@ require (
 	github.com/paulmach/go.geo v0.0.0-20180829195134-22b514266d33
 	github.com/paulmach/go.geojson v1.4.0
 	github.com/pkg/errors v0.8.1
+	github.com/prometheus/common v0.4.1
 	github.com/renstrom/shortuuid v3.0.0+incompatible // indirect
 	github.com/robfig/cron v1.2.0
 	github.com/shopspring/decimal v0.0.0-20191009025716-f1972eb1d1f5 // indirect
