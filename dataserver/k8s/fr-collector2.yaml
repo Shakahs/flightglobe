@@ -37,13 +37,13 @@ spec:
             exec:
              command:
                - /var/flightglobe/liveness.sh
-            initialDelaySeconds: 30
-            periodSeconds: 35
+            initialDelaySeconds: 45
+            periodSeconds: 40
             failureThreshold: 1
           readinessProbe:
             exec:
               command:
                 - /var/flightglobe/readiness.sh
-            initialDelaySeconds: 30
+            initialDelaySeconds: 0
             periodSeconds: 10
             failureThreshold: 1

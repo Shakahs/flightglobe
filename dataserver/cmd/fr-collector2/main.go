@@ -41,6 +41,19 @@ func init() {
 		os.Getenv("RABBITMQ_HOST"),
 		os.Getenv("RABBITMQ_PORT"))
 	redisClient = pkg.ProvideRedisClient(redisAddress, redisPort)
+
+	//wait here until Redis connects
+	redisConnected := false
+	for redisConnected == false {
+		_, err := redisClient.Ping().Result()
+		if err == nil {
+			redisConnected = true
+			log.Info("Connected to Redis")
+		} else {
+			log.Info("Waiting to connect to Redis...")
+			time.Sleep(time.Second * 5)
+		}
+	}
 }
 
 func getPositions() *pkg.LockableRecordMap {
@@ -94,15 +107,7 @@ func publishMessages(publisher message.Publisher) {
 				middleware.SetCorrelationID(watermill.NewUUID(), msg)
 
 				publisher.Publish(incomingChannel, msg)
-				//if err != nil {
-				//	log.Error("Unable to publish to Watermill input")
-				//	os.Remove(livenessProbeFile)
-				//} else {
-				//	touchError := pkg.TouchFile(livenessProbeFile)
-				//	if touchError != nil {
-				//		panic("unable to touch liveness file")
-				//	}
-				//}
+
 			}
 			time.Sleep(time.Duration(delay) * time.Second)
 		}
@@ -132,8 +137,17 @@ func FrHandler(msg *message.Message) ([]*message.Message, error) {
 	return outgoingData, nil
 }
 
-func updateLiveness(_ *message.Message) error {
+func updateLiveness() error {
 	touchError := pkg.TouchFile(livenessProbeFile)
+	if touchError != nil {
+		return touchError
+	}
+
+	return nil
+}
+
+func updateLivenessAfterMessage(_ *message.Message) error {
+	touchError := updateLiveness()
 	if touchError != nil {
 		return touchError
 	}
@@ -148,6 +162,7 @@ func configureCollection(r *message.Router) *message.Router {
 	remotePubSubConnected := false
 	err := error(nil)
 	var remotePubSub *amqp.Publisher
+	//wait here until AMQP connects
 	for remotePubSubConnected == false {
 		remotePubSub, err = amqp.NewPublisher(
 			amqp.NewNonDurablePubSubConfig(amqpURI, amqp.GenerateQueueNameTopicName),
@@ -183,7 +198,7 @@ func configureCollectionMonitoring(r *message.Router) *message.Router {
 	r.AddNoPublisherHandler("FlightRadar24_Collector_Verifier",
 		outgoingChannel,
 		remotePubSub,
-		updateLiveness)
+		updateLivenessAfterMessage)
 
 	return r
 }
