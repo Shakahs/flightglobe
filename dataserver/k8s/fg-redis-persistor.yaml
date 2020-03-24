@@ -27,3 +27,17 @@ spec:
                    value: rabbitmq
                  - name: RABBITMQ_PORT
                    value: "5672"
+              livenessProbe:
+                exec:
+                  command:
+                    - /var/flightglobe/liveness.sh
+                initialDelaySeconds: 45
+                periodSeconds: 40
+                failureThreshold: 1
+              readinessProbe:
+                exec:
+                  command:
+                    - /var/flightglobe/readiness.sh
+                initialDelaySeconds: 0
+                periodSeconds: 10
+                failureThreshold: 1

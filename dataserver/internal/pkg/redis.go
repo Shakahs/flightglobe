@@ -6,6 +6,7 @@ import (
 	"github.com/go-redis/redis"
 	_ "github.com/jackc/pgx/stdlib"
 	"github.com/paulbellamy/ratecounter"
+	log2 "github.com/prometheus/common/log"
 	"log"
 	"time"
 )
@@ -73,4 +74,19 @@ func GeneratePointKeyName(icao string) string {
 
 func GenerateTrackKeyName(icao string) string {
 	return fmt.Sprintf("track:%s", icao)
+}
+
+func WaitRedisConnected(r *redis.Client) {
+	//wait here until Redis connects
+	redisConnected := false
+	for redisConnected == false {
+		_, err := r.Ping().Result()
+		if err == nil {
+			redisConnected = true
+			log2.Info("Connected to Redis")
+		} else {
+			log2.Info("Waiting to connect to Redis...")
+			time.Sleep(time.Second * 5)
+		}
+	}
 }

@@ -62,3 +62,12 @@ func TouchFile(fileName string) error {
 	}
 	return nil
 }
+
+func UpdateLiveness() error {
+	touchError := TouchFile("/tmp/app-is-live")
+	if touchError != nil {
+		return touchError
+	}
+
+	return nil
+}

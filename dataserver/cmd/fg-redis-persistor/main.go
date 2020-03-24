@@ -44,6 +44,7 @@ func init() {
 		os.Getenv("RABBITMQ_PORT"))
 	//
 	redisClient = pkg.ProvideRedisClient(redisAddress, redisPort)
+	pkg.WaitRedisConnected(redisClient)
 }
 
 func persistor(msg *message.Message) error {
@@ -60,6 +61,7 @@ func persistor(msg *message.Message) error {
 		return err
 	} else {
 		counter.Incr(1)
+		pkg.UpdateLiveness()
 	}
 	return nil
 }
@@ -70,13 +72,20 @@ func main() {
 		panic(err)
 	}
 
-	remotePubSub, err := amqp.NewSubscriber(
-		amqp.NewNonDurablePubSubConfig(amqpURI, amqp.GenerateQueueNameTopicName),
-		watermill.NewStdLogger(false, false))
-	if err != nil {
-		panic(err)
+	//wait here for AMQP connection
+	remotePubSubConnected := false
+	err = error(nil)
+	var remotePubSub *amqp.Subscriber
+	for remotePubSubConnected == false {
+		remotePubSub, err = amqp.NewSubscriber(
+			amqp.NewNonDurablePubSubConfig(amqpURI, amqp.GenerateQueueNameTopicName),
+			watermill.NewStdLogger(false, false))
+		if err == nil {
+			remotePubSubConnected = true
+		} else {
+			fmt.Println(err)
+		}
 	}
-	pkg.Check(err)
 
 	router.AddNoPublisherHandler("Redis_Persistor", incomingChannel, remotePubSub, persistor)
 

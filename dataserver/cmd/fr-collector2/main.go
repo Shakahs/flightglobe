@@ -14,7 +14,6 @@ import (
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
 	"github.com/go-redis/redis"
 	"github.com/paulbellamy/ratecounter"
-	"github.com/prometheus/common/log"
 	"github.com/robfig/cron"
 	"os"
 	"time"
@@ -32,8 +31,7 @@ var (
 	amqpURI         = fmt.Sprintf("amqp://user:secretpassword@%s:%s/",
 		os.Getenv("RABBITMQ_HOST"),
 		os.Getenv("RABBITMQ_PORT"))
-	counter           = ratecounter.NewRateCounter(30 * time.Second)
-	livenessProbeFile = "/tmp/fr-collector2-live"
+	counter = ratecounter.NewRateCounter(30 * time.Second)
 )
 
 func init() {
@@ -42,18 +40,7 @@ func init() {
 		os.Getenv("RABBITMQ_PORT"))
 	redisClient = pkg.ProvideRedisClient(redisAddress, redisPort)
 
-	//wait here until Redis connects
-	redisConnected := false
-	for redisConnected == false {
-		_, err := redisClient.Ping().Result()
-		if err == nil {
-			redisConnected = true
-			log.Info("Connected to Redis")
-		} else {
-			log.Info("Waiting to connect to Redis...")
-			time.Sleep(time.Second * 5)
-		}
-	}
+	pkg.WaitRedisConnected(redisClient)
 }
 
 func getPositions() *pkg.LockableRecordMap {
@@ -137,17 +124,8 @@ func FrHandler(msg *message.Message) ([]*message.Message, error) {
 	return outgoingData, nil
 }
 
-func updateLiveness() error {
-	touchError := pkg.TouchFile(livenessProbeFile)
-	if touchError != nil {
-		return touchError
-	}
-
-	return nil
-}
-
 func updateLivenessAfterMessage(_ *message.Message) error {
-	touchError := updateLiveness()
+	touchError := pkg.UpdateLiveness()
 	if touchError != nil {
 		return touchError
 	}
@@ -170,7 +148,7 @@ func configureCollection(r *message.Router) *message.Router {
 		if err == nil {
 			remotePubSubConnected = true
 		} else {
-			log.Warn(err)
+			fmt.Println(err)
 		}
 	}
 
