@@ -93,16 +93,16 @@ func publishMessages(publisher message.Publisher) {
 				msg := message.NewMessage(watermill.NewUUID(), rawData)
 				middleware.SetCorrelationID(watermill.NewUUID(), msg)
 
-				err := publisher.Publish(incomingChannel, msg)
-				if err != nil {
-					log.Error("Unable to publish to Watermill input")
-					os.Remove(livenessProbeFile)
-				} else {
-					touchError := pkg.TouchFile(livenessProbeFile)
-					if touchError != nil {
-						panic("unable to touch liveness file")
-					}
-				}
+				publisher.Publish(incomingChannel, msg)
+				//if err != nil {
+				//	log.Error("Unable to publish to Watermill input")
+				//	os.Remove(livenessProbeFile)
+				//} else {
+				//	touchError := pkg.TouchFile(livenessProbeFile)
+				//	if touchError != nil {
+				//		panic("unable to touch liveness file")
+				//	}
+				//}
 			}
 			time.Sleep(time.Duration(delay) * time.Second)
 		}
@@ -132,16 +132,21 @@ func FrHandler(msg *message.Message) ([]*message.Message, error) {
 	return outgoingData, nil
 }
 
-func main() {
-
-	router, err := message.NewRouter(message.RouterConfig{}, logger)
-	if err != nil {
-		panic(err)
+func updateLiveness(_ *message.Message) error {
+	touchError := pkg.TouchFile(livenessProbeFile)
+	if touchError != nil {
+		return touchError
 	}
 
+	return nil
+}
+
+//this is what scrapes FR and publishes it to PubSub via Watermill
+func configureCollection(r *message.Router) *message.Router {
 	localPubSub := gochannel.NewGoChannel(gochannel.Config{}, logger)
 
 	remotePubSubConnected := false
+	err := error(nil)
 	var remotePubSub *amqp.Publisher
 	for remotePubSubConnected == false {
 		remotePubSub, err = amqp.NewPublisher(
@@ -154,14 +159,44 @@ func main() {
 		}
 	}
 
-	router.AddHandler(
-		"FlightRadar24_Processing", // handler name, must be unique
-		incomingChannel,            // topic from which we will read events
+	r.AddHandler(
+		"FlightRadar24_Collector", // handler name, must be unique
+		incomingChannel,           // topic from which we will read events
 		localPubSub,
 		outgoingChannel, // topic to which we will publish events
 		remotePubSub,
 		FrHandler,
 	)
+
+	go publishMessages(localPubSub)
+
+	return r
+}
+
+//this subscribes to the same PubSub stream just to verify that we are actually publishing
+func configureCollectionMonitoring(r *message.Router) *message.Router {
+
+	remotePubSub, _ := amqp.NewSubscriber(
+		amqp.NewNonDurablePubSubConfig(amqpURI, amqp.GenerateQueueNameTopicName),
+		watermill.NewStdLogger(false, false))
+
+	r.AddNoPublisherHandler("FlightRadar24_Collector_Verifier",
+		outgoingChannel,
+		remotePubSub,
+		updateLiveness)
+
+	return r
+}
+
+func main() {
+
+	router, err := message.NewRouter(message.RouterConfig{}, logger)
+	if err != nil {
+		panic(err)
+	}
+
+	configureCollection(router)
+	configureCollectionMonitoring(router)
 
 	router.AddPlugin(plugin.SignalsHandler)
 	router.AddMiddleware(
@@ -169,8 +204,6 @@ func main() {
 		middleware.Recoverer,
 		middleware.Timeout(time.Second*10),
 	)
-
-	go publishMessages(localPubSub)
 
 	c := cron.New()
 	err = c.AddFunc("@every 30s", func() {

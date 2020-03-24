@@ -36,8 +36,14 @@ spec:
           livenessProbe:
             exec:
              command:
-              - cat
-              - /tmp/fr-collector2-live
-            initialDelaySeconds: 60
+               - /var/flightglobe/liveness.sh
+            initialDelaySeconds: 30
             periodSeconds: 35
+            failureThreshold: 1
+          readinessProbe:
+            exec:
+              command:
+                - /var/flightglobe/readiness.sh
+            initialDelaySeconds: 30
+            periodSeconds: 10
             failureThreshold: 1
