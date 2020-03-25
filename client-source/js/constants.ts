@@ -27,7 +27,8 @@ export const TrackDisplayOptionDefaults: TrackDisplayOptions = {
    size: 4,
    showWhenCameraAdjacent: false,
    showWhenSelected: true,
-   maxCameraHeight: 500000
+   maxCameraHeight: 500000,
+   maxTrackDisplayLength: 3
 };
 export const LabelDisplayOptionDefaults: LabelDisplayOptions = {
    color: "#3399ff",

@@ -24,6 +24,7 @@ import { color, RGBColor } from "d3-color";
 import { memoize } from "lodash";
 import { FlightPosition } from "../../../lib/types";
 import { convertPositionToCartesian } from "./utility";
+import { takeRight } from "lodash-es";
 const airports = require("../../resources/airports.json");
 
 require("./mobxConfig");
@@ -164,10 +165,17 @@ export class CesiumPrimitiveHandler {
    }
 
    renderTrack(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
-      const cartesianPositions = map(f.trackFull, convertPositionToCartesian);
+      const maxLength =
+         f.displayPreferences.trackDisplayOptions.maxTrackDisplayLength ??
+         f.trackFull.length;
+
+      const cartesianPositions = map(
+         takeRight(f.trackFull, maxLength),
+         convertPositionToCartesian
+      );
       const gradientColors: Color[] = [];
 
-      for (let i = 0; i < f.trackFull.length; i++) {
+      for (let i = 0; i < maxLength; i++) {
          // gradientColors.push(
          //    memoizedCesiumColorFromAltitude(f.trackFull[i], colorInterpolator)
          // );

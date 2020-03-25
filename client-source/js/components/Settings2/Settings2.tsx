@@ -227,6 +227,21 @@ class Settings2 extends React.Component<Settings2Props> {
                   </div>
                </Panel>
                <Panel key={2} header={"Tracks"}>
+                  Max Length:
+                  <InputNumber
+                     min={0}
+                     value={
+                        this.props.displayPreferences.trackDisplayOptions
+                           .maxTrackDisplayLength
+                     }
+                     onChange={(maxTrackDisplayLength) =>
+                        this.props.displayPreferences.updateTrackDisplay({
+                           maxTrackDisplayLength
+                        })
+                     }
+                     style={{ width: "60px" }}
+                  />
+                  <Divider style={dividerStyle} />
                   Line Size:{" "}
                   <InputNumber
                      min={1}
