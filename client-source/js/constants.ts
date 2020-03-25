@@ -39,15 +39,15 @@ export const TrackDisplayOptionDefaults: TrackDisplayOptions = {
    color: "#3399ff",
    colorPreset: TrackColorPresets.Cool,
    colorCesium: Color.fromCssColorString("#3399ff"),
-   size: 4,
+   size: 2,
    showWhenCameraAdjacent: false,
    showWhenSelected: true,
    maxCameraHeight: 500000,
    maxTrackDisplayLength: 3
 };
 export const LabelDisplayOptionDefaults: LabelDisplayOptions = {
-   color: "#3399ff",
-   colorCesium: Color.fromCssColorString("#3399ff"),
+   color: "#ff151c",
+   colorCesium: Color.fromCssColorString("#ff151c"),
    size: 12,
    showWhenCameraAdjacent: true,
    showWhenSelected: true,

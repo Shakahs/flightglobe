@@ -36,7 +36,7 @@ export interface TrackDisplayOptions extends ElementDisplayOptions {
    showWhenSelected: boolean;
    showWhenCameraAdjacent: boolean;
    maxCameraHeight: number; //meters!
-   maxTrackDisplayLength?: number;
+   maxTrackDisplayLength?: number; //minutes
    colorPreset: TrackColorPreset;
 }
 

@@ -15,18 +15,12 @@ import {
 import { FlightSubscriberMap } from "./types";
 import { FlightSubscriber } from "./FlightSubscriber";
 import { map } from "lodash";
-import {
-   LabelDisplayOptionDefaults,
-   PointDisplayOptionDefaults
-} from "../constants";
-import { interpolate } from "d3-interpolate";
 import { color, RGBColor } from "d3-color";
-import { memoize } from "lodash";
 import { FlightPosition } from "../../../lib/types";
 import { convertPositionToCartesian } from "./utility";
-import { takeRight } from "lodash-es";
-import { interpolatePlasma } from "d3-scale-chromatic";
+import { last, takeRightWhile } from "lodash-es";
 import { ColorInterpolator } from "../types";
+
 const airports = require("../../resources/airports.json");
 
 require("./mobxConfig");
@@ -166,46 +160,64 @@ export class CesiumPrimitiveHandler {
    }
 
    renderTrack(child: CesiumPrimitiveHolder, f: FlightSubscriber) {
-      const maxLength =
-         f.displayPreferences.trackDisplayOptions.maxTrackDisplayLength ??
-         f.trackFull.length;
-
-      const cartesianPositions = map(
-         takeRight(f.trackFull, maxLength),
-         convertPositionToCartesian
-      );
-      const gradientColors: Color[] = [];
-
-      for (let i = 0; i < maxLength; i++) {
-         gradientColors.push(
-            CesiumColorFromAltitude(
-               f.trackFull[i],
-               f.displayPreferences.trackDisplayOptions.colorPreset.interpolator
-            )
+      let usePositions: FlightPosition[];
+      const lastPosition = last(f.trackFull);
+      if (
+         lastPosition &&
+         f.displayPreferences.trackDisplayOptions.maxTrackDisplayLength
+      ) {
+         const cutoffTimestamp =
+            lastPosition.timestamp -
+            f.displayPreferences.trackDisplayOptions.maxTrackDisplayLength * 60;
+         usePositions = takeRightWhile(
+            f.trackFull,
+            (pos) => pos.timestamp >= cutoffTimestamp
          );
+      } else {
+         usePositions = f.trackFull;
       }
 
-      const newTrack = new Primitive({
-         asynchronous: false,
-         geometryInstances: new GeometryInstance({
-            id: f.icao,
-            geometry: PolylineGeometry.createGeometry(
-               new PolylineGeometry({
-                  positions: cartesianPositions,
-                  width: f.displayPreferences.trackDisplayOptions.size,
-                  // vertexFormat: Cesium.PolylineColorAppearance.VERTEX_FORMAT,
-                  colors: gradientColors,
-                  colorsPerVertex: true
-               })
-            )
-         }),
-         appearance: new PolylineColorAppearance({
-            translucent: true
-         })
-      });
-      this.destroyTrack(child, f);
-      child.track = newTrack;
-      this.tracks.add(child.track);
+      if (usePositions.length >= 2) {
+         const cartesianPositions = map(
+            usePositions,
+            convertPositionToCartesian
+         );
+         const gradientColors: Color[] = [];
+
+         for (let i = 0; i < usePositions.length; i++) {
+            gradientColors.push(
+               CesiumColorFromAltitude(
+                  usePositions[i],
+                  f.displayPreferences.trackDisplayOptions.colorPreset
+                     .interpolator
+               )
+            );
+         }
+
+         const newTrack = new Primitive({
+            asynchronous: false,
+            geometryInstances: new GeometryInstance({
+               id: f.icao,
+               geometry: PolylineGeometry.createGeometry(
+                  new PolylineGeometry({
+                     positions: cartesianPositions,
+                     width: f.displayPreferences.trackDisplayOptions.size,
+                     // vertexFormat: Cesium.PolylineColorAppearance.VERTEX_FORMAT,
+                     colors: gradientColors,
+                     colorsPerVertex: true
+                  })
+               )
+            }),
+            appearance: new PolylineColorAppearance({
+               translucent: true
+            })
+         });
+         this.destroyTrack(child, f);
+         child.track = newTrack;
+         this.tracks.add(child.track);
+      } else {
+         this.destroyTrack(child, f);
+      }
    }
 
    destroyTrack(child: CesiumPrimitiveHolder, f: FlightSubscriber) {

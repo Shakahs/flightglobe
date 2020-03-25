@@ -229,7 +229,7 @@ class Settings2 extends React.Component<Settings2Props> {
                   </div>
                </Panel>
                <Panel key={2} header={"Tracks"}>
-                  Max Length:
+                  Length (minutes):
                   <InputNumber
                      min={0}
                      value={
@@ -244,7 +244,7 @@ class Settings2 extends React.Component<Settings2Props> {
                      style={{ width: "60px" }}
                   />
                   <Divider style={dividerStyle} />
-                  Track Size:{" "}
+                  Track Width:{" "}
                   <InputNumber
                      min={1}
                      max={10}
@@ -278,7 +278,9 @@ class Settings2 extends React.Component<Settings2Props> {
                      }}
                   >
                      {map(TrackColorPresets, (preset, key) => (
-                        <Option value={key}>{key}</Option>
+                        <Option key={key} value={key}>
+                           {key}
+                        </Option>
                      ))}
                   </Select>
                </Panel>
