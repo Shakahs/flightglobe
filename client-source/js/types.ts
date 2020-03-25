@@ -37,7 +37,7 @@ export interface TrackDisplayOptions extends ElementDisplayOptions {
    showWhenCameraAdjacent: boolean;
    maxCameraHeight: number; //meters!
    maxTrackDisplayLength?: number;
-   colorHigh: string;
+   colorPreset: TrackColorPreset;
 }
 
 export type TrackDisplayOptionsUpdate = Partial<TrackDisplayOptions>;
@@ -59,4 +59,15 @@ export interface AircraftModelData {
 export enum GlobeImageryTypes {
    satellite = "satellite",
    topographic = "topographic"
+}
+
+export type ColorInterpolator = (t: number) => string;
+
+export interface TrackColorPreset {
+   name: string;
+   interpolator: ColorInterpolator;
+}
+
+export interface TrackColorPresetList {
+   [name: string]: TrackColorPreset;
 }

@@ -1,9 +1,23 @@
 import {
    LabelDisplayOptions,
    PointDisplayOptions,
+   TrackColorPreset,
+   TrackColorPresetList,
    TrackDisplayOptions
 } from "./types";
 import { Color } from "cesium";
+import { interpolateCool, interpolateInferno } from "d3-scale-chromatic";
+
+export const TrackColorPresets: TrackColorPresetList = {
+   Inferno: {
+      name: "Inferno",
+      interpolator: interpolateInferno
+   },
+   Cool: {
+      name: "Cool",
+      interpolator: interpolateCool
+   }
+};
 
 export const PointDisplayOptionDefaults: PointDisplayOptions = {
    color: "#3399ff",
@@ -23,7 +37,7 @@ export const SelectedPointDisplayOptionDefaults: PointDisplayOptions = {
 };
 export const TrackDisplayOptionDefaults: TrackDisplayOptions = {
    color: "#3399ff",
-   colorHigh: "#ff151c",
+   colorPreset: TrackColorPresets.Cool,
    colorCesium: Color.fromCssColorString("#3399ff"),
    size: 4,
    showWhenCameraAdjacent: false,

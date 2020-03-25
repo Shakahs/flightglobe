@@ -16,6 +16,8 @@ import { Globe } from "../../globe/globe";
 import { GlobeImageryTypes } from "../../types";
 import { round } from "lodash";
 import { DemographicsManager } from "../../ds-implementation/DemographicsManager";
+import { TrackColorPresets } from "../../constants";
+import { find, forIn, map } from "lodash-es";
 
 interface Settings2Props {
    visible: boolean;
@@ -257,29 +259,28 @@ class Settings2 extends React.Component<Settings2Props> {
                      style={{ width: "60px" }}
                   />
                   <Divider style={dividerStyle} />
-                  Track Color Low:
-                  <Swatch
-                     color={
-                        this.props.displayPreferences.trackDisplayOptions.color
-                     }
-                     onChange={(color: string) =>
-                        this.props.displayPreferences.updateTrackDisplay({
-                           color
-                        })
-                     }
-                  />
-                  Track Color High:
-                  <Swatch
-                     color={
+                  Track Color:
+                  <Select
+                     value={
                         this.props.displayPreferences.trackDisplayOptions
-                           .colorHigh
+                           .colorPreset.name
                      }
-                     onChange={(colorHigh: string) =>
-                        this.props.displayPreferences.updateTrackDisplay({
-                           colorHigh
-                        })
-                     }
-                  />
+                     onChange={(v) => {
+                        const colorPreset = find(
+                           TrackColorPresets,
+                           (preset) => preset.name === v
+                        );
+                        if (colorPreset) {
+                           this.props.displayPreferences.updateTrackDisplay({
+                              colorPreset
+                           });
+                        }
+                     }}
+                  >
+                     {map(TrackColorPresets, (preset, key) => (
+                        <Option value={key}>{key}</Option>
+                     ))}
+                  </Select>
                </Panel>
                <Panel key={3} header={"Labels"}>
                   Font Size:{" "}

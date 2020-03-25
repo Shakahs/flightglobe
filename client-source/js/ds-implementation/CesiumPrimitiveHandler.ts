@@ -25,6 +25,8 @@ import { memoize } from "lodash";
 import { FlightPosition } from "../../../lib/types";
 import { convertPositionToCartesian } from "./utility";
 import { takeRight } from "lodash-es";
+import { interpolatePlasma } from "d3-scale-chromatic";
+import { ColorInterpolator } from "../types";
 const airports = require("../../resources/airports.json");
 
 require("./mobxConfig");
@@ -39,7 +41,7 @@ const labelOffset = new Cartesian2(10, 20);
 
 const CesiumColorFromAltitude = (
    position: FlightPosition,
-   interpolator: (t: number) => string
+   interpolator: ColorInterpolator
 ): Color => {
    const newColor = color(interpolator(position.altitude / 50000)) as RGBColor;
    return Color.fromBytes(newColor.r, newColor.g, newColor.b);
@@ -178,10 +180,7 @@ export class CesiumPrimitiveHandler {
          gradientColors.push(
             CesiumColorFromAltitude(
                f.trackFull[i],
-               interpolate(
-                  f.displayPreferences.trackDisplayOptions.colorHigh,
-                  f.displayPreferences.trackDisplayOptions.color
-               )
+               f.displayPreferences.trackDisplayOptions.colorPreset.interpolator
             )
          );
       }
