@@ -23,6 +23,7 @@ export const SelectedPointDisplayOptionDefaults: PointDisplayOptions = {
 };
 export const TrackDisplayOptionDefaults: TrackDisplayOptions = {
    color: "#3399ff",
+   colorHigh: "#ff151c",
    colorCesium: Color.fromCssColorString("#3399ff"),
    size: 4,
    showWhenCameraAdjacent: false,

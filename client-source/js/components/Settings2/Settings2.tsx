@@ -242,7 +242,7 @@ class Settings2 extends React.Component<Settings2Props> {
                      style={{ width: "60px" }}
                   />
                   <Divider style={dividerStyle} />
-                  Line Size:{" "}
+                  Track Size:{" "}
                   <InputNumber
                      min={1}
                      max={10}
@@ -257,7 +257,7 @@ class Settings2 extends React.Component<Settings2Props> {
                      style={{ width: "60px" }}
                   />
                   <Divider style={dividerStyle} />
-                  Line Color:
+                  Track Color Low:
                   <Swatch
                      color={
                         this.props.displayPreferences.trackDisplayOptions.color
@@ -265,6 +265,18 @@ class Settings2 extends React.Component<Settings2Props> {
                      onChange={(color: string) =>
                         this.props.displayPreferences.updateTrackDisplay({
                            color
+                        })
+                     }
+                  />
+                  Track Color High:
+                  <Swatch
+                     color={
+                        this.props.displayPreferences.trackDisplayOptions
+                           .colorHigh
+                     }
+                     onChange={(colorHigh: string) =>
+                        this.props.displayPreferences.updateTrackDisplay({
+                           colorHigh
                         })
                      }
                   />

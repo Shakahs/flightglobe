@@ -36,7 +36,6 @@ interface CesiumPrimitiveHolder {
 }
 
 const labelOffset = new Cartesian2(10, 20);
-const colorInterpolator = interpolate("red", "white");
 
 const CesiumColorFromAltitude = (
    position: FlightPosition,
@@ -46,8 +45,8 @@ const CesiumColorFromAltitude = (
    return Color.fromBytes(newColor.r, newColor.g, newColor.b);
 };
 
-memoize.Cache = WeakMap;
-const memoizedCesiumColorFromAltitude = memoize(CesiumColorFromAltitude);
+// memoize.Cache = WeakMap;
+// const memoizedCesiumColorFromAltitude = memoize(CesiumColorFromAltitude);
 
 export class CesiumPrimitiveHandler {
    private readonly viewer: Viewer;
@@ -176,11 +175,14 @@ export class CesiumPrimitiveHandler {
       const gradientColors: Color[] = [];
 
       for (let i = 0; i < maxLength; i++) {
-         // gradientColors.push(
-         //    memoizedCesiumColorFromAltitude(f.trackFull[i], colorInterpolator)
-         // );
          gradientColors.push(
-            f.displayPreferences.trackDisplayOptions.colorCesium
+            CesiumColorFromAltitude(
+               f.trackFull[i],
+               interpolate(
+                  f.displayPreferences.trackDisplayOptions.colorHigh,
+                  f.displayPreferences.trackDisplayOptions.color
+               )
+            )
          );
       }
 

@@ -37,6 +37,7 @@ export interface TrackDisplayOptions extends ElementDisplayOptions {
    showWhenCameraAdjacent: boolean;
    maxCameraHeight: number; //meters!
    maxTrackDisplayLength?: number;
+   colorHigh: string;
 }
 
 export type TrackDisplayOptionsUpdate = Partial<TrackDisplayOptions>;
