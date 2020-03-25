@@ -36,3 +36,16 @@ spec:
               value: redis-master
             - name: REDIS_PORT
               value: "6379"
+          readinessProbe:
+            exec:
+              command:
+                - /var/flightglobe/readiness.sh
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /api/geohashset
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
