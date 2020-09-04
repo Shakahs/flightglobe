@@ -54,7 +54,7 @@
     "karma-jasmine": "^2.0.1",
     "karma-webpack": "4.0.0-rc.3",
     "mock-socket": "^8.0.5",
-    "node-sass": "^4.11.0",
+    "node-sass": "^4.13.1",
     "regenerator-runtime": "^0.13.2",
     "requirejs": "^2.3.6",
     "sass-loader": "^7.1.0",
