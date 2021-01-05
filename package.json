@@ -73,7 +73,7 @@
     "@fortawesome/react-fontawesome": "^0.1.4",
     "ag-grid-community": "^21.2.0",
     "ag-grid-react": "^21.2.0",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "bootstrap": "^4.3.1",
     "cesium": "^1.54.0",
     "classnames": "^2.2.6",
